@@ -1,4 +1,4 @@
-package com.theMs.ms.sakany;
+package com.theMs.sakany;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
