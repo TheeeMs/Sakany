@@ -1,4 +1,5 @@
 package com.theMs.sakany.shared.cqrs;
 
-public class QueryHandler {
+public interface QueryHandler<Q extends Query<R>,R>{
+    R handle(Q query);
 }
