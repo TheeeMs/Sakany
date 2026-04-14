@@ -10,7 +10,8 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE,
     password_hash VARCHAR(255),
     phone VARCHAR(20) NOT NULL UNIQUE,
-    name VARCHAR(100) NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
     avatar_url VARCHAR(500),
     
     -- Role (using CHECK constraint instead of ENUM for flexibility)
