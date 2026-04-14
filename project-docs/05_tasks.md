@@ -52,14 +52,32 @@
 
 ---
 
-## Phase 4: Accounts Module
-- [ ] `V2__create_profile_tables.sql`
-- [ ] `accounts/internal/domain/User.java` (aggregate root)
+## Phase 4: Accounts Module ⏳ IN PROGRESS
+
+### Domain Layer (Pure Java)
+- [x] `accounts/internal/domain/User.java` (aggregate root)
+- [x] `accounts/internal/domain/Role.java` (enum)
+- [x] `accounts/internal/domain/LoginMethod.java` (enum)
+- [x] `accounts/internal/domain/events/UserCreated.java` (domain event - Java record)
+- [ ] Add getters to User.java
+- [ ] Add domain methods (deactivate, verifyPhone, etc.)
 - [ ] `accounts/internal/domain/ResidentProfile.java`
 - [ ] `accounts/internal/domain/TechnicianProfile.java`
 - [ ] `accounts/internal/domain/AdminProfile.java`
-- [ ] `accounts/internal/infrastructure/UserRepository.java`
+
+### Database Migrations
+- [x] `V1__create_users_table.sql` (updated: name → first_name + last_name)
+- [ ] `V3__create_profile_tables.sql` (resident, technician, admin profiles)
+- [ ] Reset database to apply updated V1
+
+### Infrastructure Layer (JPA)
+- [ ] `accounts/internal/infrastructure/persistence/UserEntity.java`
+- [ ] `accounts/internal/infrastructure/persistence/UserMapper.java`
+- [ ] `accounts/internal/infrastructure/persistence/UserRepositoryImpl.java`
+
+### Module Configuration
 - [ ] `accounts/package-info.java`
+- [ ] `shared/package-info.java` (@ApplicationModule type=OPEN)
 
 ---
 

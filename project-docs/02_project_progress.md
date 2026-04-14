@@ -39,18 +39,22 @@
 ### User Aggregate
 
 ```
-User (Aggregate Root)
-├── id: UUID
-├── email: String? (nullable for phone-only)
-├── passwordHash: String? (nullable for OAuth/OTP)
-├── phone: String (required, unique) ← PRIMARY identifier
-├── name: String
-├── avatarUrl: String?
-├── role: RESIDENT | TECHNICIAN | ADMIN | SECURITY_GUARD
-├── authProvider: PHONE_OTP | EMAIL_PASSWORD | GOOGLE
-├── isPhoneVerified: Boolean
-├── isActive: Boolean (soft delete)
-├── createdAt, updatedAt: Timestamp
+User (Aggregate Root) ← extends AggregateRoot (Pure Java)
+├── id: UUID (generated in application layer via UUID.randomUUID())
+├── firstName: String (split from single 'name' field)
+├── lastName: String
+├── email: String? (nullable for phone-only users)
+├── hashedPassword: String? (nullable for OAuth/OTP)
+├── phoneNumber: String (required, unique) ← PRIMARY identifier
+├── role: Role enum (RESIDENT | TECHNICIAN | ADMIN | SECURITY_GUARD)
+├── loginMethod: LoginMethod enum (PHONE_OTP | EMAIL_PASSWORD | GOOGLE)
+├── isPhoneVerified: boolean (default false)
+├── isActive: boolean (default true, soft delete)
+
+Creation: Private constructor + static factory method User.create()
+Invariant: phoneNumber cannot be null or empty (enforced at creation)
+Domain Event: Registers UserCreated on creation
+State Changes: Domain methods (e.g., deactivate()) not setters
 ```
 
 ### Decision: Composition over Inheritance
@@ -185,9 +189,13 @@ Unit (Aggregate Root)
 |----------|--------|-----------|
 | Module communication | API for sync, Events for async | Loose coupling between modules |
 | Enum storage | VARCHAR + CHECK | More flexible than PostgreSQL ENUM |
-| Soft delete | `is_active` flag | Preserve referential integrity |
+| Soft delete | `is_active` flag + `ON DELETE RESTRICT` | Preserve data, RESTRICT is safety net |
 | Password handling | Phone-first, password optional | Mobile-first UX for residential app |
-| Profile separation | Composition pattern | Different data shapes per role |
+| Profile separation | Composition pattern (separate tables) | No NULL columns, clean data model |
+| Profile PK | `user_id` as PK (no separate id) | True 1-to-1, simpler |
+| Name field | Split: `first_name` + `last_name` | Flexible for forms, personalization |
+| Domain Events | Java Records | Immutable data carriers, auto-generates boilerplate |
+| UUID generation | Application layer (`UUID.randomUUID()`) | Need ID before DB save for domain events |
 | **Architecture style** | **TRUE Pure DDD** | Complete separation: domain models ≠ JPA entities |
 | **Mappers** | **Manual** | Learn fundamentals before MapStruct automation |
 | **AggregateRoot** | **Pure Java** | Domain layer has zero framework dependencies |
@@ -229,7 +237,26 @@ Flyway owns the schema. Hibernate should only validate entities match tables. Us
 - **Pragmatic DDD:** 1 class per aggregate. Domain has JPA annotations. Simpler but less pure.
 - **We chose TRUE Pure DDD** for enterprise learning experience.
 
+### Composition vs Inheritance (for User + Profiles)
+- **Inheritance:** `Resident extends User` — rigid, can't be Resident AND Technician
+- **Composition:** `User` has-a `ResidentProfile` — flexible, like inventory slots on a game character
+- **ResidentProfile is INSIDE User aggregate** — it has no meaning without a User
+
+### Static Factory Methods in DDD
+- Private constructor prevents bypassing validation
+- `User.create()` enforces invariants before object exists
+- Not deprecated — standard pattern (List.of, Optional.of, UUID.randomUUID)
+
+### Domain Methods vs Setters
+- No setters on domain models
+- Use business-meaningful methods: `deactivate()` not `setActive(false)`
+- Methods can enforce rules AND register domain events
+
+### Phone Numbers Are Strings
+- Phone numbers are identifiers, not quantities
+- Need `+` prefix, leading zeros, dashes — `int` can't store these
+
 ---
 
-*Last updated: January 8, 2026*
+*Last updated: April 14, 2026*
 

@@ -185,6 +185,91 @@ INFRASTRUCTURE LAYER (JPA):
 
 ---
 
+## Session 5: April 14, 2026
+
+### Topics Covered:
+- Composition vs Inheritance pattern (deep dive with real-world analogies)
+- Aggregate boundaries: why ResidentProfile is part of User aggregate
+- Phone-first auth reasoning (mobile-first UX, Middle East context)
+- Database schema: profile tables design (Option A vs B)
+- PostgreSQL fundamentals: schemas, CASCADE vs RESTRICT, ON DELETE behavior
+- Soft delete strategy (is_active flag, RESTRICT as safety net)
+- Docker/psql command breakdown (-it, -U, -d, -c flags)
+- Pure DDD: Static factory methods for aggregate creation
+- Java Records vs Classes (immutable data carriers)
+- Constructor chaining with `this(...)`
+- DDD state changes: domain methods vs setters (`deactivate()` not `setActive(false)`)
+- Domain Events: what data to carry, who creates/stores/publishes/listens
+
+### Domain Models Designed:
+- **User Aggregate Root** (Pure Java, extends AggregateRoot)
+  - Private constructor + static factory method `create()`
+  - Phone number invariant enforced at creation
+  - UUID generated in application layer (not DB)
+  - Registers `UserCreated` domain event on creation
+  - Smart defaults: isActive=true, isPhoneVerified=false, role=RESIDENT
+
+- **UserCreated Domain Event** (Java Record)
+  - Implements DomainEvent interface
+  - Immutable with convenience constructor (auto-sets occurredAt)
+  - Carries: id, firstName, lastName, phoneNumber, loginMethod
+
+### Key Decisions:
+| Decision | Choice | Reason |
+|----------|--------|--------|
+| Profile tables | Separate tables (Composition - Option B) | Clean data model, no NULL columns, learn enterprise patterns |
+| Profile PK | `user_id` as PK (Option A style) | True 1-to-1, simpler than separate id |
+| ON DELETE behavior | RESTRICT | Safety net, we use soft delete via is_active |
+| Name field | Split to first_name + last_name | More flexible for forms and personalization |
+| LoginMethod values | Match DB CHECK exactly | PHONE_OTP, EMAIL_PASSWORD, GOOGLE |
+| Domain Events | Java Records | Immutable data carriers, less boilerplate |
+| State changes | Domain methods, not setters | `deactivate()` enforces rules + fires events |
+| UUID generation | Application layer (UUID.randomUUID()) | Need ID before DB save for domain events |
+
+### Concepts Learned:
+1. **Composition vs Inheritance** = "Has-A" vs "Is-A". Video game character with inventory slots, not biology.
+2. **Aggregate boundary test** = "Does it make sense without its parent?" No → part of aggregate
+3. **CASCADE** = Delete parent → auto-delete children (folder with files)
+4. **RESTRICT** = Block parent deletion if children exist (safety net)
+5. **Soft delete** = `is_active = false`, never hard delete in production
+6. **PostgreSQL Schema** = Like a folder for tables (`public` is default)
+7. **Static Factory Method** = Not deprecated, standard in Java (List.of, Optional.of)
+8. **Java Record** = Auto-generates constructor, getters, equals, hashCode, toString
+9. **Constructor chaining** = `this(...)` calls another constructor in same class
+10. **Domain methods > setters** = Methods describe business actions and can enforce invariants
+11. **Fail fast** = Validate before doing expensive operations (check phone before generating UUID)
+
+### Files Created:
+- `accounts/internal/domain/User.java` — User aggregate root (pure Java)
+- `accounts/internal/domain/Role.java` — Enum: RESIDENT, TECHNICIAN, ADMIN, SECURITY_GUARD
+- `accounts/internal/domain/LoginMethod.java` — Enum: PHONE_OTP, EMAIL_PASSWORD, GOOGLE
+- `accounts/internal/domain/events/UserCreated.java` — Domain event (Java record)
+
+### Files Modified:
+- `V1__create_users_table.sql` — Split `name` → `first_name` + `last_name`
+- `05_tasks.md` — Marked Phase 2 & 3 as complete
+- `.gitignore` — Removed project-docs from ignore (docs should be in git)
+
+### Issues Encountered:
+- **Docker container not running:** Must `docker compose up -d` before exec
+- **Wrong DB credentials in psql command:** Used `sakany_admin` instead of `sakany`
+- **Spring Modulith visibility:** `accounts` can't see `shared.exception` sub-package (fix pending: `@ApplicationModule(type = OPEN)` on shared)
+
+### Pending Items:
+- Add getters to User.java (no setters — use domain methods instead)
+- Create `shared/package-info.java` with `@ApplicationModule(type = OPEN)`
+- Reset database and run migrations with updated V1
+- Create V3 migration for profile tables (resident_profiles, technician_profiles, admin_profiles)
+
+### Next Session:
+- Add getters to User.java
+- Fix Spring Modulith shared module visibility
+- Write V3__create_profile_tables.sql
+- Create profile domain models (ResidentProfile, TechnicianProfile)
+- Reset DB and verify migrations
+
+---
+
 <!-- 
 TEMPLATE FOR NEW SESSIONS:
 
