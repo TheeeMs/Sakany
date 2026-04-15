@@ -27,7 +27,7 @@ public class TechnicianProfileEntity extends BaseEntity {
     @Column(name = "is_available", nullable = false)
     private boolean isAvailable = true;
 
-    @Column(name = "rating")
+    @Column(name = "rating", columnDefinition = "numeric(3,2)")
     private Double rating;
 
     public TechnicianProfileEntity() {}

@@ -1,0 +1,122 @@
+package com.theMs.sakany.maintenance.internal.api.controllers;
+
+import com.theMs.sakany.maintenance.internal.api.dto.AssignTechnicianDto;
+import com.theMs.sakany.maintenance.internal.api.dto.CreateMaintenanceRequestDto;
+import com.theMs.sakany.maintenance.internal.api.dto.MaintenanceRequestResponseDto;
+import com.theMs.sakany.maintenance.internal.api.dto.RejectRequestDto;
+import com.theMs.sakany.maintenance.internal.application.commands.*;
+import com.theMs.sakany.maintenance.internal.application.queries.*;
+import com.theMs.sakany.maintenance.internal.domain.MaintenanceRequest;
+import com.theMs.sakany.maintenance.internal.domain.MaintenanceStatus;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/v1/maintenance-requests")
+public class MaintenanceRequestController {
+
+    private final CreateMaintenanceRequestCommandHandler createHandler;
+    private final AssignTechnicianCommandHandler assignHandler;
+    private final StartWorkCommandHandler startWorkHandler;
+    private final ResolveCommandHandler resolveHandler;
+    private final CancelCommandHandler cancelHandler;
+    private final RejectCommandHandler rejectHandler;
+
+    private final GetMaintenanceRequestByIdQueryHandler getByIdHandler;
+    private final GetMaintenanceRequestsByResidentQueryHandler getByResidentHandler;
+    private final GetMaintenanceRequestsByStatusQueryHandler getByStatusHandler;
+
+    public MaintenanceRequestController(
+            CreateMaintenanceRequestCommandHandler createHandler,
+            AssignTechnicianCommandHandler assignHandler,
+            StartWorkCommandHandler startWorkHandler,
+            ResolveCommandHandler resolveHandler,
+            CancelCommandHandler cancelHandler,
+            RejectCommandHandler rejectHandler,
+            GetMaintenanceRequestByIdQueryHandler getByIdHandler,
+            GetMaintenanceRequestsByResidentQueryHandler getByResidentHandler,
+            GetMaintenanceRequestsByStatusQueryHandler getByStatusHandler) {
+        this.createHandler = createHandler;
+        this.assignHandler = assignHandler;
+        this.startWorkHandler = startWorkHandler;
+        this.resolveHandler = resolveHandler;
+        this.cancelHandler = cancelHandler;
+        this.rejectHandler = rejectHandler;
+        this.getByIdHandler = getByIdHandler;
+        this.getByResidentHandler = getByResidentHandler;
+        this.getByStatusHandler = getByStatusHandler;
+    }
+
+    @PostMapping
+    public ResponseEntity<UUID> createRequest(@RequestBody CreateMaintenanceRequestDto dto) {
+        CreateMaintenanceRequestCommand command = new CreateMaintenanceRequestCommand(
+                dto.residentId(),
+                dto.unitId(),
+                dto.title(),
+                dto.description(),
+                dto.category(),
+                dto.priority(),
+                dto.isPublic(),
+                dto.photoUrls()
+        );
+        UUID id = createHandler.handle(command);
+        return ResponseEntity.status(HttpStatus.CREATED).body(id);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<MaintenanceRequestResponseDto> getById(@PathVariable UUID id) {
+        MaintenanceRequest request = getByIdHandler.handle(new GetMaintenanceRequestByIdQuery(id));
+        return ResponseEntity.ok(MaintenanceRequestResponseDto.fromDomain(request));
+    }
+
+    @GetMapping("/resident/{residentId}")
+    public ResponseEntity<List<MaintenanceRequestResponseDto>> getByResident(@PathVariable UUID residentId) {
+        List<MaintenanceRequest> requests = getByResidentHandler.handle(new GetMaintenanceRequestsByResidentQuery(residentId));
+        return ResponseEntity.ok(requests.stream()
+                .map(MaintenanceRequestResponseDto::fromDomain)
+                .collect(Collectors.toList()));
+    }
+
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<MaintenanceRequestResponseDto>> getByStatus(@PathVariable MaintenanceStatus status) {
+        List<MaintenanceRequest> requests = getByStatusHandler.handle(new GetMaintenanceRequestsByStatusQuery(status));
+        return ResponseEntity.ok(requests.stream()
+                .map(MaintenanceRequestResponseDto::fromDomain)
+                .collect(Collectors.toList()));
+    }
+
+    @PostMapping("/{id}/assign")
+    public ResponseEntity<Void> assignTechnician(@PathVariable UUID id, @RequestBody AssignTechnicianDto dto) {
+        assignHandler.handle(new AssignTechnicianCommand(id, dto.technicianId()));
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/start")
+    public ResponseEntity<Void> startWork(@PathVariable UUID id) {
+        startWorkHandler.handle(new StartWorkCommand(id));
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/resolve")
+    public ResponseEntity<Void> resolve(@PathVariable UUID id) {
+        resolveHandler.handle(new ResolveCommand(id));
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/cancel")
+    public ResponseEntity<Void> cancel(@PathVariable UUID id) {
+        cancelHandler.handle(new CancelCommand(id));
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/reject")
+    public ResponseEntity<Void> reject(@PathVariable UUID id, @RequestBody RejectRequestDto dto) {
+        rejectHandler.handle(new RejectCommand(id, dto.reason()));
+        return ResponseEntity.ok().build();
+    }
+}
