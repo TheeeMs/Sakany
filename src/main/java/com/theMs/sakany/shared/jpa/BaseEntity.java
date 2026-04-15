@@ -10,10 +10,11 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.Instant;
 import java.util.UUID;
 
+import org.springframework.data.domain.Persistable;
+
 @MappedSuperclass
-public abstract class BaseEntity {
+public abstract class BaseEntity implements Persistable<UUID> {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @CreationTimestamp
@@ -22,6 +23,7 @@ public abstract class BaseEntity {
     @UpdateTimestamp
     private Instant updatedAt;
 
+    @Override
     public UUID getId() {
         return id;
     }
@@ -32,5 +34,11 @@ public abstract class BaseEntity {
 
     public Instant getUpdatedAt() {
         return updatedAt;
+    }
+
+    @Override
+    public boolean isNew() {
+        // If createdAt is null, this is a newly created entity that hasn't been saved yet.
+        return this.createdAt == null;
     }
 }

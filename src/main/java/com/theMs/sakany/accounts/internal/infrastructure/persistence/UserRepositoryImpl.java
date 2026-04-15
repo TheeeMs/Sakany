@@ -21,9 +21,25 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User save(User user) {
-        UserEntity entity = Objects.requireNonNull(mapper.toEntity(user), "User entity cannot be null");
-        UserEntity savedEntity = jpaRepository.save(entity);
-        return mapper.toDomain(savedEntity);
+        UserEntity existingEntity = jpaRepository.findById(user.getId()).orElse(null);
+        if (existingEntity != null) {
+            // Update existing entity to avoid detached/duplicate session object issues
+            existingEntity.setFirstName(user.getFirstName());
+            existingEntity.setLastName(user.getLastName());
+            existingEntity.setPhone(user.getPhoneNumber());
+            existingEntity.setEmail(user.getEmail());
+            existingEntity.setPasswordHash(user.getHashedPassword());
+            existingEntity.setRole(user.getRole());
+            existingEntity.setActive(user.isActive());
+            existingEntity.setPhoneVerified(user.isPhoneVerified());
+            existingEntity.setAuthProvider(user.getLoginMethod());
+            return mapper.toDomain(jpaRepository.save(existingEntity));
+        } else {
+            // Create new
+            UserEntity entity = Objects.requireNonNull(mapper.toEntity(user), "User entity cannot be null");
+            UserEntity savedEntity = jpaRepository.save(entity);
+            return mapper.toDomain(savedEntity);
+        }
     }
 
     @Override

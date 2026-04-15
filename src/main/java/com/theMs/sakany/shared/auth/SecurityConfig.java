@@ -20,17 +20,18 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                    .requestMatchers(
-                        "/v1/auth/register",
-                        "/v1/auth/login/**",
-                        "/v1/auth/refresh",
-                        "/actuator/**",
-                        "/swagger-ui/**",
-                        "/v3/api-docs/**"
-                    ).permitAll()
+                        .requestMatchers(
+                                "/v1/auth/register",
+                                "/v1/auth/login/**",
+                                "/v1/auth/refresh",
+                                "/v1/auth/send-otp",
+                                "/actuator/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/error")
+                        .permitAll()
                         .requestMatchers("/v1/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -25,4 +25,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return problem;
     }
+
+    @ExceptionHandler(Exception.class)
+    ProblemDetail handleGenericException(Exception e) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage() != null ? e.getMessage() : "Unknown internal error");
+        problem.setTitle("Internal Server Error");
+        if (e.getCause() != null) {
+            problem.setProperty("cause", e.getCause().getMessage());
+        }
+        // Very handy for debugging 500s directly on the client side
+        problem.setProperty("trace", e.getStackTrace()[0].toString());
+        return problem;
+    }
 }

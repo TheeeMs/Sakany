@@ -36,17 +36,19 @@ public class AuthController {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final com.theMs.sakany.shared.firebase.OtpService otpService;
 
     public AuthController(
             CreateUserCommandHandler createUserCommandHandler,
             UserRepository userRepository,
             JwtService jwtService,
-            BCryptPasswordEncoder passwordEncoder
-    ) {
+            BCryptPasswordEncoder passwordEncoder,
+            com.theMs.sakany.shared.firebase.OtpService otpService) {
         this.createUserCommandHandler = createUserCommandHandler;
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
+        this.otpService = otpService;
     }
 
     @PostMapping("/register")
@@ -59,8 +61,7 @@ public class AuthController {
                 request.firstName(),
                 request.lastName(),
                 request.phoneNumber(),
-                request.loginMethod()
-        ));
+                request.loginMethod()));
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User", userId));
@@ -70,6 +71,24 @@ public class AuthController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new AuthResponse(user.getId(), accessToken, refreshToken));
+    }
+
+    @PostMapping("/send-otp")
+    public ResponseEntity<Map<String, String>> sendOtp(@RequestBody Map<String, String> request) {
+        String phoneNumber = request.get("phoneNumber");
+        if (phoneNumber == null || phoneNumber.isBlank()) {
+            throw new BusinessRuleException("phoneNumber is required");
+        }
+
+        // Check if user exists
+        userRepository.findByPhoneNumber(phoneNumber)
+                .orElseThrow(() -> new NotFoundException("User", phoneNumber));
+
+        String otp = otpService.generateOtp(phoneNumber);
+
+        return ResponseEntity.ok(Map.of(
+                "message", "OTP sent successfully",
+                "phoneNumber", phoneNumber));
     }
 
     @PostMapping("/login/phone")
@@ -85,7 +104,11 @@ public class AuthController {
             throw new BusinessRuleException("User account is inactive");
         }
 
-        // OTP validation is intentionally stubbed for now.
+        // Verify OTP
+        if (!otpService.verifyOtp(request.phoneNumber(), request.otpCode())) {
+            throw new BusinessRuleException("Invalid or expired OTP");
+        }
+
         if (!user.isPhoneVerified()) {
             user.verifyPhone();
             userRepository.save(user);
@@ -106,7 +129,8 @@ public class AuthController {
             throw new BusinessRuleException("User account is inactive");
         }
 
-        if (user.getHashedPassword() == null || !passwordEncoder.matches(request.password(), user.getHashedPassword())) {
+        if (user.getHashedPassword() == null
+                || !passwordEncoder.matches(request.password(), user.getHashedPassword())) {
             throw new BusinessRuleException("Invalid email or password");
         }
 
