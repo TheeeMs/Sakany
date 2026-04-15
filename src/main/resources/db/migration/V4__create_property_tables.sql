@@ -1,0 +1,30 @@
+CREATE TABLE compounds (
+    id UUID PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    address TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE buildings (
+    id UUID PRIMARY KEY,
+    compound_id UUID NOT NULL REFERENCES compounds(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    number_of_floors INT NOT NULL CHECK (number_of_floors > 0),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_buildings_compound_id ON buildings(compound_id);
+
+CREATE TABLE units (
+    id UUID PRIMARY KEY,
+    building_id UUID NOT NULL REFERENCES buildings(id) ON DELETE CASCADE,
+    unit_number VARCHAR(50) NOT NULL,
+    floor INT NOT NULL CHECK (floor >= 0),
+    type VARCHAR(50) NOT NULL CHECK (type IN ('APARTMENT', 'VILLA', 'STUDIO', 'PENTHOUSE')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_units_building_id ON units(building_id);
