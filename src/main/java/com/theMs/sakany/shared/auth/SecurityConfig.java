@@ -27,7 +27,9 @@ public class SecurityConfig {
                                 "/v1/auth/send-otp",
                                 "/actuator/**",
                                 "/swagger-ui/**",
+                                "/swagger-ui.html",
                                 "/v3/api-docs/**",
+                                "/v3/api-docs",
                                 "/error")
                         .permitAll()
                         .requestMatchers("/v1/admin/**").hasRole("ADMIN")
