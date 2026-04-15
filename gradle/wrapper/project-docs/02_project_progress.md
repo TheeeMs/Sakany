@@ -233,3 +233,13 @@ Flyway owns the schema. Hibernate should only validate entities match tables. Us
 
 *Last updated: January 8, 2026*
 
+
+---
+
+## 🎯 Session: Phase 4 Accounts Module Completion
+
+### Progress and Decisions:
+- **Profile Segregation:** Completed the true DDD approach by having separate purely java models for `ResidentProfile`, `TechnicianProfile`, and `AdminProfile`. They are properties of the `User` aggregate root but maintained individually to cleanly distribute logic.
+- **Migration `V3__create_profile_tables.sql`:** Was written using proper constraints tying foreign keys with `user_id`, handling cascading deletion gracefully. Note that V3 was chosen since a `V2` migration existed for events publication.
+- **Persistence Handling:** Overcame `BaseEntity` id mapping limitation by using reflection in the `UserMapper` to write onto the private `id` field. This maintains the true DDD abstraction without exposing JPA specifics.
+- **Service Layer (CQRS):** Formally created `CreateUserCommand` and `CreateUserCommandHandler` to encapsulate creation business logic.

@@ -218,3 +218,28 @@ TEMPLATE FOR NEW SESSIONS:
 ---
 -->
 
+
+---
+
+## Session Date: $(date +"%Y-%m-%d")
+
+### 🎯 Objective
+Complete Phase 4: Accounts Module, including profile creation, SQL migrations, fixing Modulith bounds, and writing CQRS implementation for user.
+
+### 📚 Concepts Covered
+- Pure DDD Entity Mapping (Mapping internal ID with reflection in `UserMapper`)
+- Separate aggregate persistence vs composition
+- CQRS commands mapping logic inside the `Service` application layer.
+- Correctly resolving Spring Modulith boundaries across domains (`package-info.java`)
+
+### ✅ Accomplishments
+- Fixed previous boundary error on `shared :: exceptions`.
+- Created pure domain models for `AdminProfile`, `ResidentProfile`, `TechnicianProfile`.
+- Handled SQL migrations for `resident_profiles`, `admin_profiles`, `technician_profiles` resolving foreign-key deletions (`V3__create_profile_tables.sql`).
+- Handled JPA mapping with explicit reflection ensuring standard Hibernate implementations without compromising Domain purity.
+- Added Service layer: `CreateUserCommand` / `CreateUserCommandHandler`.
+- Checked off Phase 4 from `05_tasks.md`.
+
+### ❓ Next Steps
+- Consider setting up controller API definitions for account initialization.
+- Move towards Phase 5: Property Module.

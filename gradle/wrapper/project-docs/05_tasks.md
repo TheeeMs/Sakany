@@ -53,13 +53,13 @@
 ---
 
 ## Phase 4: Accounts Module
-- [ ] `V2__create_profile_tables.sql`
-- [ ] `accounts/internal/domain/User.java` (aggregate root)
-- [ ] `accounts/internal/domain/ResidentProfile.java`
-- [ ] `accounts/internal/domain/TechnicianProfile.java`
-- [ ] `accounts/internal/domain/AdminProfile.java`
-- [ ] `accounts/internal/infrastructure/UserRepository.java`
-- [ ] `accounts/package-info.java`
+- [x] `V3__create_profile_tables.sql` (V2 taken)
+- [x] `accounts/internal/domain/User.java` (aggregate root)
+- [x] `accounts/internal/domain/ResidentProfile.java`
+- [x] `accounts/internal/domain/TechnicianProfile.java`
+- [x] `accounts/internal/domain/AdminProfile.java`
+- [x] `accounts/internal/infrastructure/UserRepository.java`
+- [x] `accounts/package-info.java`
 
 ---
 
