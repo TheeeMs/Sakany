@@ -8,20 +8,19 @@ import java.util.UUID;
 
 public class User extends AggregateRoot {
     private UUID id;
-    // I used the second approach to split the first and last name so what the migration should i do now?
     private String firstName;
     private String lastName;
-    // is phone number should be string so can we add +whatever for the country code just normal int?
     private String phoneNumber;
     private String email;
     private String hashedPassword;
-    // is role enum path good or should i create spearate dir for the user and its stuff like ROLE and LOGIN METHOD
     private Role role;
     private boolean isActive;
     private boolean isPhoneVerified;
-
-    // why we need the login method
     private LoginMethod loginMethod;
+
+    private ResidentProfile residentProfile;
+    private TechnicianProfile technicianProfile;
+    private AdminProfile adminProfile;
 
     private User(UUID id, String firstName, String lastName, String phoneNumber, String email, String hashedPassword, Role role, boolean isActive, boolean isPhoneVerified, LoginMethod loginMethod) {
         this.id = id;
@@ -36,21 +35,77 @@ public class User extends AggregateRoot {
         this.loginMethod = loginMethod;
     }
 
-//is creating with that factory method is good or deprecated
-
     public static User create(String firstName, String lastName, String phoneNumber, LoginMethod loginMethod) {
-
-
         if (phoneNumber == null || phoneNumber.isEmpty()) {
-            // how can i fix that Module 'accounts' depends on non-exposed type 'com.theMs.sakany.shared.exception.BusinessRuleException' from module 'shared'
             throw new BusinessRuleException("Phone number cannot be null or empty");
         }
         UUID id = UUID.randomUUID();
-        // we can add some validation here if needed
         User user = new User(id, firstName, lastName, phoneNumber, null, null, Role.RESIDENT, true, false, loginMethod);
-        //userCreated event where it should be created first before importing?
         user.registerEvent(new UserCreated(id, firstName, lastName, phoneNumber, loginMethod));
         return user;
     }
 
+    public UUID getId() {
+        return id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getHashedPassword() {
+        return hashedPassword;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public boolean isPhoneVerified() {
+        return isPhoneVerified;
+    }
+
+    public LoginMethod getLoginMethod() {
+        return loginMethod;
+    }
+
+    public ResidentProfile getResidentProfile() {
+        return residentProfile;
+    }
+
+    public void setResidentProfile(ResidentProfile residentProfile) {
+        this.residentProfile = residentProfile;
+    }
+
+    public TechnicianProfile getTechnicianProfile() {
+        return technicianProfile;
+    }
+
+    public void setTechnicianProfile(TechnicianProfile technicianProfile) {
+        this.technicianProfile = technicianProfile;
+    }
+
+    public AdminProfile getAdminProfile() {
+        return adminProfile;
+    }
+
+    public void setAdminProfile(AdminProfile adminProfile) {
+        this.adminProfile = adminProfile;
+    }
 }
