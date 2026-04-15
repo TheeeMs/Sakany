@@ -1,6 +1,7 @@
 package com.theMs.sakany.accounts.internal.domain;
 
 import com.theMs.sakany.accounts.internal.domain.events.UserCreated;
+import com.theMs.sakany.accounts.internal.domain.events.UserDeactivated;
 import com.theMs.sakany.shared.domain.AggregateRoot;
 import com.theMs.sakany.shared.exception.BusinessRuleException;
 
@@ -43,6 +44,40 @@ public class User extends AggregateRoot {
         User user = new User(id, firstName, lastName, phoneNumber, null, null, Role.RESIDENT, true, false, loginMethod);
         user.registerEvent(new UserCreated(id, firstName, lastName, phoneNumber, loginMethod));
         return user;
+    }
+
+    public void verifyPhone() {
+        this.isPhoneVerified = true;
+    }
+
+    public void deactivate() {
+        if (!this.isActive) {
+            throw new BusinessRuleException("User is already inactive");
+        }
+
+        this.isActive = false;
+        this.registerEvent(new UserDeactivated(this.id));
+    }
+
+    public void setHashedPassword(String hash) {
+        if (hash == null || hash.trim().isEmpty()) {
+            throw new BusinessRuleException("Password hash cannot be null or empty");
+        }
+
+        this.hashedPassword = hash;
+    }
+
+    public void setEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new BusinessRuleException("Email cannot be null or empty");
+        }
+
+        String normalizedEmail = email.trim().toLowerCase();
+        if (!normalizedEmail.contains("@")) {
+            throw new BusinessRuleException("Invalid email format");
+        }
+
+        this.email = normalizedEmail;
     }
 
     public UUID getId() {
