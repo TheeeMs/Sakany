@@ -28,6 +28,7 @@ public class CreateMaintenanceRequestCommandHandler implements CommandHandler<Cr
                 command.unitId(),
                 command.title(),
                 command.description(),
+            command.locationLabel(),
                 command.category(),
                 command.priority(),
                 command.isPublic(),

@@ -22,6 +22,8 @@ public record EventDto(
         String contactPhone,
         Double latitude,
         Double longitude,
+        String tags,
+        boolean recurringEvent,
         int currentAttendees,
         EventStatus status,
         UUID approvedBy,

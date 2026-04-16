@@ -20,12 +20,15 @@ public class MaintenanceRequestMapper {
                 entity.getTechnicianId(),
                 entity.getTitle(),
                 entity.getDescription(),
+            entity.getLocationLabel(),
                 entity.getCategory(),
                 entity.getPriority(),
                 entity.getStatus(),
                 entity.isPublic(),
                 entity.getPhotoUrls() != null ? new ArrayList<>(entity.getPhotoUrls()) : new ArrayList<>(),
                 entity.getResolvedAt(),
+            entity.getResolutionNotes(),
+            entity.getResolutionCost(),
                 entity.getCreatedAt()
         );
     }
@@ -56,12 +59,15 @@ public class MaintenanceRequestMapper {
         entity.setTechnicianId(domain.getTechnicianId());
         entity.setTitle(domain.getTitle());
         entity.setDescription(domain.getDescription());
+        entity.setLocationLabel(domain.getLocationLabel());
         entity.setCategory(domain.getCategory());
         entity.setPriority(domain.getPriority());
         entity.setStatus(domain.getStatus());
         entity.setPublic(domain.isPublic());
         entity.setPhotoUrls(domain.getPhotoUrls() != null ? new ArrayList<>(domain.getPhotoUrls()) : new ArrayList<>());
         entity.setResolvedAt(domain.getResolvedAt());
+        entity.setResolutionNotes(domain.getResolutionNotes());
+        entity.setResolutionCost(domain.getResolutionCost());
 
         return entity;
     }

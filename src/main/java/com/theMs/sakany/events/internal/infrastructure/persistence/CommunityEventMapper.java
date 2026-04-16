@@ -27,6 +27,8 @@ public class CommunityEventMapper {
                 entity.getContactPhone(),
                 entity.getLatitude(),
                 entity.getLongitude(),
+                entity.getTags(),
+                entity.isRecurringEvent(),
                 entity.getCurrentAttendees(),
                 entity.getStatus(),
                 entity.getApprovedBy()
@@ -54,6 +56,8 @@ public class CommunityEventMapper {
                 domain.getContactPhone(),
                 domain.getLatitude(),
                 domain.getLongitude(),
+                domain.getTags(),
+                domain.isRecurringEvent(),
                 domain.getCurrentAttendees(),
                 domain.getStatus(),
                 domain.getApprovedBy()

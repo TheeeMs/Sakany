@@ -31,6 +31,7 @@ public class AlertRepositoryImpl implements AlertRepository {
              entity.setReporterId(alert.getReporterId());
              entity.setType(alert.getType());
              entity.setCategory(alert.getCategory());
+             entity.setStatus(alert.getStatus());
              entity.setTitle(alert.getTitle());
              entity.setDescription(alert.getDescription());
              entity.setLocation(alert.getLocation());

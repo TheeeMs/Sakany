@@ -25,7 +25,7 @@ public class ResolveCommandHandler implements CommandHandler<ResolveCommand, Voi
         MaintenanceRequest request = repository.findById(command.requestId())
                 .orElseThrow(() -> new NotFoundException("MaintenanceRequest", command.requestId()));
 
-        request.resolve();
+        request.resolve(command.resolutionNotes(), command.resolutionCost());
         
         repository.save(request);
 

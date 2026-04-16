@@ -27,6 +27,8 @@ public class CommunityEvent extends AggregateRoot {
     private final String contactPhone;
     private final Double latitude;
     private final Double longitude;
+    private final String tags;
+    private final boolean recurringEvent;
     private int currentAttendees;
     private EventStatus status;
     private UUID approvedBy;
@@ -35,7 +37,7 @@ public class CommunityEvent extends AggregateRoot {
     public CommunityEvent(UUID id, UUID organizerId, String title, String description, String location,
                    Instant startDate, Instant endDate, String imageUrl, String hostName, Double price, Integer maxAttendees, 
                    String category, String hostRole, String contactPhone, Double latitude, Double longitude, 
-                   int currentAttendees, EventStatus status, UUID approvedBy) {
+                   String tags, boolean recurringEvent, int currentAttendees, EventStatus status, UUID approvedBy) {
         this.id = id;
         this.organizerId = organizerId;
         this.title = title;
@@ -52,6 +54,8 @@ public class CommunityEvent extends AggregateRoot {
         this.contactPhone = contactPhone;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.tags = tags;
+        this.recurringEvent = recurringEvent;
         this.currentAttendees = currentAttendees;
         this.status = status;
         this.approvedBy = approvedBy;
@@ -59,7 +63,8 @@ public class CommunityEvent extends AggregateRoot {
 
     public static CommunityEvent propose(UUID organizerId, String title, String description, String location,
                                          Instant startDate, Instant endDate, String imageUrl, String hostName, Double price, Integer maxAttendees,
-                                         String category, String hostRole, String contactPhone, Double latitude, Double longitude) {
+                                         String category, String hostRole, String contactPhone, Double latitude, Double longitude,
+                                         String tags, boolean recurringEvent) {
         if (title == null || title.isBlank()) throw new BusinessRuleException("Title is required");
         if (description == null || description.isBlank()) throw new BusinessRuleException("Description is required");
         if (location == null || location.isBlank()) throw new BusinessRuleException("Location is required");
@@ -69,7 +74,7 @@ public class CommunityEvent extends AggregateRoot {
 
         UUID id = UUID.randomUUID();
         CommunityEvent event = new CommunityEvent(id, organizerId, title, description, location, startDate, endDate, imageUrl, hostName, price, maxAttendees, 
-                                                  category, hostRole, contactPhone, latitude, longitude, 0, EventStatus.PROPOSED, null);
+                                                  category, hostRole, contactPhone, latitude, longitude, tags, recurringEvent, 0, EventStatus.PROPOSED, null);
         event.registerEvent(new EventProposed(id, organizerId, title));
         return event;
     }
@@ -138,6 +143,8 @@ public class CommunityEvent extends AggregateRoot {
     public String getContactPhone() { return contactPhone; }
     public Double getLatitude() { return latitude; }
     public Double getLongitude() { return longitude; }
+    public String getTags() { return tags; }
+    public boolean isRecurringEvent() { return recurringEvent; }
     public int getCurrentAttendees() { return currentAttendees; }
     public EventStatus getStatus() { return status; }
     public UUID getApprovedBy() { return approvedBy; }

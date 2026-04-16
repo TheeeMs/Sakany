@@ -174,7 +174,7 @@ public class AccessController {
     }
 
     /**
-     * GET /v1/access/visit-logs — List visit logs (admin)
+     * GET /v1/access/visit-logs — List visit logs for the authenticated resident
      */
     @GetMapping("/visit-logs")
     public ResponseEntity<List<VisitLogResponse>> listVisitLogs() {

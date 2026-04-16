@@ -12,6 +12,7 @@ public record CreateMaintenanceRequestCommand(
         UUID unitId,
         String title,
         String description,
+        String locationLabel,
         MaintenanceCategory category,
         MaintenancePriority priority,
         boolean isPublic,

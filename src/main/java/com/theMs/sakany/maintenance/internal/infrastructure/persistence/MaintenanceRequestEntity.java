@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,9 @@ public class MaintenanceRequestEntity extends BaseEntity {
     @Column(name = "description", nullable = false, columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "location_label", length = 255)
+    private String locationLabel;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "category", nullable = false, length = 20)
     private MaintenanceCategory category;
@@ -54,6 +58,12 @@ public class MaintenanceRequestEntity extends BaseEntity {
     @Column(name = "resolved_at")
     private Instant resolvedAt;
 
+    @Column(name = "resolution_notes", columnDefinition = "TEXT")
+    private String resolutionNotes;
+
+    @Column(name = "resolution_cost", precision = 12, scale = 2)
+    private BigDecimal resolutionCost;
+
     public UUID getResidentId() { return residentId; }
     public void setResidentId(UUID residentId) { this.residentId = residentId; }
 
@@ -68,6 +78,9 @@ public class MaintenanceRequestEntity extends BaseEntity {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+
+    public String getLocationLabel() { return locationLabel; }
+    public void setLocationLabel(String locationLabel) { this.locationLabel = locationLabel; }
 
     public MaintenanceCategory getCategory() { return category; }
     public void setCategory(MaintenanceCategory category) { this.category = category; }
@@ -86,4 +99,10 @@ public class MaintenanceRequestEntity extends BaseEntity {
 
     public Instant getResolvedAt() { return resolvedAt; }
     public void setResolvedAt(Instant resolvedAt) { this.resolvedAt = resolvedAt; }
+
+    public String getResolutionNotes() { return resolutionNotes; }
+    public void setResolutionNotes(String resolutionNotes) { this.resolutionNotes = resolutionNotes; }
+
+    public BigDecimal getResolutionCost() { return resolutionCost; }
+    public void setResolutionCost(BigDecimal resolutionCost) { this.resolutionCost = resolutionCost; }
 }

@@ -35,7 +35,9 @@ public class ProposeEventCommandHandler implements CommandHandler<ProposeEventCo
                 command.hostRole(),
                 command.contactPhone(),
                 command.latitude(),
-                command.longitude()
+                command.longitude(),
+                command.tags(),
+                command.recurringEvent()
         );
 
         eventRepository.save(event);

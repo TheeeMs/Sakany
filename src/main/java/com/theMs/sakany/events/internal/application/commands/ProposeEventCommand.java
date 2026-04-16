@@ -19,6 +19,8 @@ public record ProposeEventCommand(
         String hostRole,
         String contactPhone,
         Double latitude,
-        Double longitude
+        Double longitude,
+        String tags,
+        boolean recurringEvent
 ) implements Command<UUID> {
 }

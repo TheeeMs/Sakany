@@ -5,6 +5,7 @@ import com.theMs.sakany.community.internal.application.commands.ResolveAlertComm
 import com.theMs.sakany.community.internal.application.queries.GetActiveAlertsQuery;
 import com.theMs.sakany.community.internal.application.queries.GetAlertByIdQuery;
 import com.theMs.sakany.community.internal.domain.Alert;
+import com.theMs.sakany.community.internal.domain.AlertReportStatus;
 import com.theMs.sakany.community.internal.domain.AlertType;
 import com.theMs.sakany.community.internal.domain.AlertCategory;
 import org.springframework.http.HttpStatus;
@@ -54,6 +55,7 @@ public class AlertController {
         UUID reporterId,
         AlertType type,
         AlertCategory category,
+        AlertReportStatus status,
         String title,
         String description,
         String location,
@@ -68,6 +70,7 @@ public class AlertController {
                 alert.getReporterId(),
                 alert.getType(),
                 alert.getCategory(),
+                alert.getStatus(),
                 alert.getTitle(),
                 alert.getDescription(),
                 alert.getLocation(),

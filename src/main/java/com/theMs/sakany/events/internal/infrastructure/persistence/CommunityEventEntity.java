@@ -28,6 +28,8 @@ public class CommunityEventEntity extends BaseEntity {
     private String contactPhone;
     private Double latitude;
     private Double longitude;
+    private String tags;
+    private boolean recurringEvent;
     private int currentAttendees;
 
     @Enumerated(EnumType.STRING)
@@ -40,7 +42,7 @@ public class CommunityEventEntity extends BaseEntity {
     public CommunityEventEntity(UUID id, UUID organizerId, String title, String description, String location,
                                 Instant startDate, Instant endDate, String imageUrl, String hostName, Double price, Integer maxAttendees, 
                                 String category, String hostRole, String contactPhone, Double latitude, Double longitude, 
-                                int currentAttendees, EventStatus status, UUID approvedBy) {
+                                String tags, boolean recurringEvent, int currentAttendees, EventStatus status, UUID approvedBy) {
         try {
             java.lang.reflect.Field idField = com.theMs.sakany.shared.jpa.BaseEntity.class.getDeclaredField("id");
             idField.setAccessible(true);
@@ -63,6 +65,8 @@ public class CommunityEventEntity extends BaseEntity {
         this.contactPhone = contactPhone;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.tags = tags;
+        this.recurringEvent = recurringEvent;
         this.currentAttendees = currentAttendees;
         this.status = status;
         this.approvedBy = approvedBy;
@@ -112,6 +116,12 @@ public class CommunityEventEntity extends BaseEntity {
 
     public Double getLongitude() { return longitude; }
     public void setLongitude(Double longitude) { this.longitude = longitude; }
+
+    public String getTags() { return tags; }
+    public void setTags(String tags) { this.tags = tags; }
+
+    public boolean isRecurringEvent() { return recurringEvent; }
+    public void setRecurringEvent(boolean recurringEvent) { this.recurringEvent = recurringEvent; }
 
     public int getCurrentAttendees() { return currentAttendees; }
     public void setCurrentAttendees(int currentAttendees) { this.currentAttendees = currentAttendees; }

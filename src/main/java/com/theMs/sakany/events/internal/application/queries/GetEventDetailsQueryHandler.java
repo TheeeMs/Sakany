@@ -42,6 +42,8 @@ public class GetEventDetailsQueryHandler implements QueryHandler<GetEventDetails
                 entity.getContactPhone(),
                 entity.getLatitude(),
                 entity.getLongitude(),
+                entity.getTags(),
+                entity.isRecurringEvent(),
                 entity.getCurrentAttendees(),
                 entity.getStatus(),
                 entity.getApprovedBy(),

@@ -69,7 +69,8 @@ public class AuthController {
                 request.password(),
                 request.type(),
                 request.unitId(),
-                request.loginMethod()));
+            request.loginMethod(),
+            null));
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User", userId));

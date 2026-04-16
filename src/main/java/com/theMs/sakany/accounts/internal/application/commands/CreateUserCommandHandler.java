@@ -49,7 +49,7 @@ public class CreateUserCommandHandler implements CommandHandler<CreateUserComman
             ResidentProfile residentProfile = ResidentProfile.create(
                 user.getId(),
                 command.unitId(),
-                LocalDate.now(),
+                command.moveInDate() != null ? command.moveInDate() : LocalDate.now(),
                 command.type()
             );
             user.setResidentProfile(residentProfile);

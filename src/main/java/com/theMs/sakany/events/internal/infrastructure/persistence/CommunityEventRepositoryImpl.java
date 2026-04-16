@@ -40,6 +40,8 @@ public class CommunityEventRepositoryImpl implements CommunityEventRepository {
         entity.setContactPhone(event.getContactPhone());
         entity.setLatitude(event.getLatitude());
         entity.setLongitude(event.getLongitude());
+        entity.setTags(event.getTags());
+        entity.setRecurringEvent(event.isRecurringEvent());
         entity.setCurrentAttendees(event.getCurrentAttendees());
         entity.setStatus(event.getStatus());
         entity.setApprovedBy(event.getApprovedBy());

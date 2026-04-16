@@ -1,6 +1,7 @@
 package com.theMs.sakany.community.internal.infrastructure.persistence;
 
 import com.theMs.sakany.community.internal.domain.AlertCategory;
+import com.theMs.sakany.community.internal.domain.AlertReportStatus;
 import com.theMs.sakany.community.internal.domain.AlertType;
 import com.theMs.sakany.shared.jpa.BaseEntity;
 import jakarta.persistence.Column;
@@ -29,6 +30,10 @@ public class AlertEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AlertCategory category;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AlertReportStatus status = AlertReportStatus.OPEN;
 
     @Column(nullable = false)
     private String title;
@@ -73,6 +78,14 @@ public class AlertEntity extends BaseEntity {
 
     public void setCategory(AlertCategory category) {
         this.category = category;
+    }
+
+    public AlertReportStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(AlertReportStatus status) {
+        this.status = status;
     }
 
     public String getTitle() {

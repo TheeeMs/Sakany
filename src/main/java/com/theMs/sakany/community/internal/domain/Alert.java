@@ -15,6 +15,7 @@ public class Alert extends AggregateRoot {
     private UUID reporterId;
     private AlertType type;
     private AlertCategory category;
+    private AlertReportStatus status;
     private String title;
     private String description;
     private String location;
@@ -23,11 +24,25 @@ public class Alert extends AggregateRoot {
     private boolean isResolved;
     private Instant resolvedAt;
 
-    private Alert(UUID id, UUID reporterId, AlertType type, AlertCategory category, String title, String description, String location, Instant eventTime, List<String> photoUrls, boolean isResolved, Instant resolvedAt) {
+    private Alert(
+            UUID id,
+            UUID reporterId,
+            AlertType type,
+            AlertCategory category,
+            AlertReportStatus status,
+            String title,
+            String description,
+            String location,
+            Instant eventTime,
+            List<String> photoUrls,
+            boolean isResolved,
+            Instant resolvedAt
+    ) {
         this.id = id;
         this.reporterId = reporterId;
         this.type = type;
         this.category = category;
+        this.status = status == null ? (isResolved ? AlertReportStatus.RESOLVED : AlertReportStatus.OPEN) : status;
         this.title = title;
         this.description = description;
         this.location = location;
@@ -49,23 +64,65 @@ public class Alert extends AggregateRoot {
         }
 
         UUID id = UUID.randomUUID();
-        Alert alert = new Alert(id, reporterId, type, category, title, description, location, eventTime, photoUrls, false, null);
+        Alert alert = new Alert(
+                id,
+                reporterId,
+                type,
+                category,
+                AlertReportStatus.OPEN,
+                title,
+                description,
+                location,
+                eventTime,
+                photoUrls,
+                false,
+                null
+        );
         alert.registerEvent(new AlertCreated(id, reporterId, type, category, title, description, location, eventTime, alert.getPhotoUrls(), Instant.now()));
         return alert;
     }
 
     // For mapping from DB entity
-    public static Alert reconstitute(UUID id, UUID reporterId, AlertType type, AlertCategory category, String title, String description, String location, Instant eventTime, List<String> photoUrls, boolean isResolved, Instant resolvedAt) {
-        return new Alert(id, reporterId, type, category, title, description, location, eventTime, photoUrls, isResolved, resolvedAt);
+    public static Alert reconstitute(
+            UUID id,
+            UUID reporterId,
+            AlertType type,
+            AlertCategory category,
+            AlertReportStatus status,
+            String title,
+            String description,
+            String location,
+            Instant eventTime,
+            List<String> photoUrls,
+            boolean isResolved,
+            Instant resolvedAt
+    ) {
+        return new Alert(id, reporterId, type, category, status, title, description, location, eventTime, photoUrls, isResolved, resolvedAt);
     }
 
     public void resolve() {
-        if (this.isResolved) {
+        if (this.status == AlertReportStatus.RESOLVED || this.isResolved) {
             throw new BusinessRuleException("Alert is already resolved");
         }
+        this.status = AlertReportStatus.RESOLVED;
         this.isResolved = true;
         this.resolvedAt = Instant.now();
         this.registerEvent(new AlertResolved(this.id, this.resolvedAt, Instant.now()));
+    }
+
+    public void markMatched() {
+        if (this.status == AlertReportStatus.RESOLVED) {
+            throw new BusinessRuleException("Resolved alerts cannot be marked as matched");
+        }
+        this.status = AlertReportStatus.MATCHED;
+        this.isResolved = false;
+        this.resolvedAt = null;
+    }
+
+    public void reopen() {
+        this.status = AlertReportStatus.OPEN;
+        this.isResolved = false;
+        this.resolvedAt = null;
     }
 
     public UUID getId() {
@@ -82,6 +139,10 @@ public class Alert extends AggregateRoot {
 
     public AlertCategory getCategory() {
         return category;
+    }
+
+    public AlertReportStatus getStatus() {
+        return status;
     }
 
     public String getTitle() {

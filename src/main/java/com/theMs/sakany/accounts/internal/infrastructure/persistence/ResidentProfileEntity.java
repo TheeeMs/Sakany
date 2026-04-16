@@ -1,5 +1,6 @@
 package com.theMs.sakany.accounts.internal.infrastructure.persistence;
 
+import com.theMs.sakany.accounts.internal.domain.ResidentApprovalStatus;
 import com.theMs.sakany.accounts.internal.domain.ResidentType;
 import com.theMs.sakany.shared.jpa.BaseEntity;
 import jakarta.persistence.Column;
@@ -11,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -28,9 +30,19 @@ public class ResidentProfileEntity extends BaseEntity {
     @Column(name = "move_in_date")
     private LocalDate moveInDate;
 
+    @Column(name = "national_id", length = 50)
+    private String nationalId;
+
+    @Column(name = "monthly_fee", precision = 12, scale = 2)
+    private BigDecimal monthlyFee;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "resident_type", nullable = false)
     private ResidentType type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "approval_status", nullable = false, length = 20)
+    private ResidentApprovalStatus approvalStatus = ResidentApprovalStatus.PENDING;
 
     public ResidentProfileEntity() {}
 
@@ -65,11 +77,35 @@ public class ResidentProfileEntity extends BaseEntity {
         this.moveInDate = moveInDate;
     }
 
+    public String getNationalId() {
+        return nationalId;
+    }
+
+    public void setNationalId(String nationalId) {
+        this.nationalId = nationalId;
+    }
+
+    public BigDecimal getMonthlyFee() {
+        return monthlyFee;
+    }
+
+    public void setMonthlyFee(BigDecimal monthlyFee) {
+        this.monthlyFee = monthlyFee;
+    }
+
     public ResidentType getType() {
         return type;
     }
 
     public void setType(ResidentType type) {
         this.type = type;
+    }
+
+    public ResidentApprovalStatus getApprovalStatus() {
+        return approvalStatus;
+    }
+
+    public void setApprovalStatus(ResidentApprovalStatus approvalStatus) {
+        this.approvalStatus = approvalStatus;
     }
 }

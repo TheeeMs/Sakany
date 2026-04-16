@@ -4,6 +4,7 @@ import com.theMs.sakany.accounts.internal.domain.LoginMethod;
 import com.theMs.sakany.accounts.internal.domain.ResidentType;
 import com.theMs.sakany.shared.cqrs.Command;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 public record CreateUserCommand(
@@ -14,5 +15,6 @@ public record CreateUserCommand(
     String password,
     ResidentType type,
     UUID unitId,
-    LoginMethod loginMethod
+    LoginMethod loginMethod,
+    LocalDate moveInDate
 ) implements Command<UUID> {}

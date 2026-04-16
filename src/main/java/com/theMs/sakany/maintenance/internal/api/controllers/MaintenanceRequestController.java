@@ -4,6 +4,7 @@ import com.theMs.sakany.maintenance.internal.api.dto.AssignTechnicianDto;
 import com.theMs.sakany.maintenance.internal.api.dto.CreateMaintenanceRequestDto;
 import com.theMs.sakany.maintenance.internal.api.dto.MaintenanceRequestResponseDto;
 import com.theMs.sakany.maintenance.internal.api.dto.RejectRequestDto;
+import com.theMs.sakany.maintenance.internal.api.dto.ResolveMaintenanceRequestDto;
 import com.theMs.sakany.maintenance.internal.application.commands.*;
 import com.theMs.sakany.maintenance.internal.application.queries.*;
 import com.theMs.sakany.maintenance.internal.domain.MaintenanceRequest;
@@ -26,6 +27,7 @@ public class MaintenanceRequestController {
     private final ResolveCommandHandler resolveHandler;
     private final CancelCommandHandler cancelHandler;
     private final RejectCommandHandler rejectHandler;
+    private final MaintenanceTimelineService timelineService;
 
     private final GetMaintenanceRequestByIdQueryHandler getByIdHandler;
     private final GetMaintenanceRequestsByResidentQueryHandler getByResidentHandler;
@@ -40,7 +42,8 @@ public class MaintenanceRequestController {
             RejectCommandHandler rejectHandler,
             GetMaintenanceRequestByIdQueryHandler getByIdHandler,
             GetMaintenanceRequestsByResidentQueryHandler getByResidentHandler,
-            GetMaintenanceRequestsByStatusQueryHandler getByStatusHandler) {
+            GetMaintenanceRequestsByStatusQueryHandler getByStatusHandler,
+            MaintenanceTimelineService timelineService) {
         this.createHandler = createHandler;
         this.assignHandler = assignHandler;
         this.startWorkHandler = startWorkHandler;
@@ -50,6 +53,7 @@ public class MaintenanceRequestController {
         this.getByIdHandler = getByIdHandler;
         this.getByResidentHandler = getByResidentHandler;
         this.getByStatusHandler = getByStatusHandler;
+        this.timelineService = timelineService;
     }
 
     @PostMapping
@@ -59,12 +63,21 @@ public class MaintenanceRequestController {
                 dto.unitId(),
                 dto.title(),
                 dto.description(),
+                dto.locationLabel(),
                 dto.category(),
                 dto.priority(),
                 dto.isPublic(),
                 dto.photoUrls()
         );
         UUID id = createHandler.handle(command);
+
+        timelineService.record(
+            id,
+            MaintenanceTimelineEventType.REQUEST_SUBMITTED,
+            "Request Submitted",
+            null,
+            dto.residentId()
+        );
         return ResponseEntity.status(HttpStatus.CREATED).body(id);
     }
 
@@ -93,30 +106,94 @@ public class MaintenanceRequestController {
     @PostMapping("/{id}/assign")
     public ResponseEntity<Void> assignTechnician(@PathVariable UUID id, @RequestBody AssignTechnicianDto dto) {
         assignHandler.handle(new AssignTechnicianCommand(id, dto.technicianId()));
+
+        timelineService.record(
+                id,
+                MaintenanceTimelineEventType.TECHNICIAN_ASSIGNED,
+                "Technician Assigned",
+                null,
+                dto.technicianId()
+        );
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/start")
     public ResponseEntity<Void> startWork(@PathVariable UUID id) {
         startWorkHandler.handle(new StartWorkCommand(id));
+
+        timelineService.record(
+                id,
+                MaintenanceTimelineEventType.WORK_STARTED,
+                "Work Started",
+                null,
+                null
+        );
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/resolve")
-    public ResponseEntity<Void> resolve(@PathVariable UUID id) {
-        resolveHandler.handle(new ResolveCommand(id));
+        public ResponseEntity<Void> resolve(
+            @PathVariable UUID id,
+            @RequestBody(required = false) ResolveMaintenanceRequestDto dto
+        ) {
+        String resolution = dto != null ? dto.resolution() : null;
+        java.math.BigDecimal totalCost = dto != null ? dto.totalCost() : null;
+
+        resolveHandler.handle(new ResolveCommand(id, resolution, totalCost));
+
+        timelineService.record(
+                id,
+                MaintenanceTimelineEventType.REQUEST_RESOLVED,
+                "Request Resolved",
+            buildResolutionTimelineDetails(resolution, totalCost),
+                null
+        );
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/cancel")
     public ResponseEntity<Void> cancel(@PathVariable UUID id) {
         cancelHandler.handle(new CancelCommand(id));
+
+        timelineService.record(
+                id,
+                MaintenanceTimelineEventType.REQUEST_CANCELLED,
+                "Request Cancelled",
+                null,
+                null
+        );
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/reject")
     public ResponseEntity<Void> reject(@PathVariable UUID id, @RequestBody RejectRequestDto dto) {
         rejectHandler.handle(new RejectCommand(id, dto.reason()));
+
+        timelineService.record(
+                id,
+                MaintenanceTimelineEventType.REQUEST_REJECTED,
+                "Request Rejected",
+                dto.reason(),
+                null
+        );
         return ResponseEntity.ok().build();
+    }
+
+    private String buildResolutionTimelineDetails(String resolution, java.math.BigDecimal totalCost) {
+        if ((resolution == null || resolution.isBlank()) && totalCost == null) {
+            return null;
+        }
+
+        StringBuilder details = new StringBuilder();
+        if (resolution != null && !resolution.isBlank()) {
+            details.append("Resolution: ").append(resolution.trim());
+        }
+        if (totalCost != null) {
+            if (!details.isEmpty()) {
+                details.append(" | ");
+            }
+            details.append("Cost: ").append(totalCost).append(" EGP");
+        }
+        return details.toString();
     }
 }

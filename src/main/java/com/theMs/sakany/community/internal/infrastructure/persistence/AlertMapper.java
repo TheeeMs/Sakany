@@ -10,13 +10,13 @@ public class AlertMapper {
     public AlertEntity toEntity(Alert domain) {
         if (domain == null) return null;
         AlertEntity entity = new AlertEntity();
-        // Since id is mapped in BaseEntity and doesn't have a setter, use Reflection
         if (domain.getId() != null) {
-            try { java.lang.reflect.Field idField = com.theMs.sakany.shared.jpa.BaseEntity.class.getDeclaredField("id"); idField.setAccessible(true); idField.set(entity, domain.getId()); } catch (Exception e) { throw new RuntimeException(e); }
+            entity.setId(domain.getId());
         }
         entity.setReporterId(domain.getReporterId());
         entity.setType(domain.getType());
         entity.setCategory(domain.getCategory());
+        entity.setStatus(domain.getStatus());
         entity.setTitle(domain.getTitle());
         entity.setDescription(domain.getDescription());
         entity.setLocation(domain.getLocation());
@@ -34,6 +34,7 @@ public class AlertMapper {
             entity.getReporterId(),
             entity.getType(),
             entity.getCategory(),
+            entity.getStatus(),
             entity.getTitle(),
             entity.getDescription(),
             entity.getLocation(),

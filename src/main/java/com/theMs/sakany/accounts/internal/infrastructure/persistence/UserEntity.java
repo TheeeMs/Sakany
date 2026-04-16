@@ -9,6 +9,8 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "users")
 public class UserEntity extends BaseEntity {
@@ -41,6 +43,12 @@ public class UserEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "auth_provider", nullable = false, length = 20)
     private LoginMethod authProvider;
+
+    @Column(name = "hire_date")
+    private LocalDate hireDate;
+
+    @Column(name = "department", length = 100)
+    private String department;
 
     public UserEntity() {}
 
@@ -126,5 +134,21 @@ public class UserEntity extends BaseEntity {
 
     public void setAuthProvider(LoginMethod authProvider) {
         this.authProvider = authProvider;
+    }
+
+    public LocalDate getHireDate() {
+        return hireDate;
+    }
+
+    public void setHireDate(LocalDate hireDate) {
+        this.hireDate = hireDate;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
     }
 }

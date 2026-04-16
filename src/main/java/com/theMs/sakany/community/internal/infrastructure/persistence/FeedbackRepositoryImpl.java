@@ -44,6 +44,13 @@ public class FeedbackRepositoryImpl implements FeedbackRepository {
     }
 
     @Override
+    public List<Feedback> findAllOrderByCreatedAtDesc() {
+        return jpaRepository.findAllByOrderByCreatedAtDesc().stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<Feedback> findPublicFeedback() {
         return jpaRepository.findByIsPublicTrueOrderByCreatedAtDesc().stream()
                 .map(mapper::toDomain)
@@ -76,5 +83,10 @@ public class FeedbackRepositoryImpl implements FeedbackRepository {
         voteEntity.setVoterId(voterId);
         voteEntity.setVoteType(voteType);
         voteJpaRepository.save(voteEntity);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        jpaRepository.deleteById(id);
     }
 }
