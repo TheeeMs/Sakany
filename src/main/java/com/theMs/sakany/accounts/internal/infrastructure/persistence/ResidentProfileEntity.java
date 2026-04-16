@@ -1,8 +1,11 @@
 package com.theMs.sakany.accounts.internal.infrastructure.persistence;
 
+import com.theMs.sakany.accounts.internal.domain.ResidentType;
 import com.theMs.sakany.shared.jpa.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -25,16 +28,17 @@ public class ResidentProfileEntity extends BaseEntity {
     @Column(name = "move_in_date")
     private LocalDate moveInDate;
 
-    @Column(name = "is_owner", nullable = false)
-    private boolean isOwner = false;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "resident_type", nullable = false)
+    private ResidentType type;
 
     public ResidentProfileEntity() {}
 
-    public ResidentProfileEntity(UserEntity user, UUID unitId, LocalDate moveInDate, boolean isOwner) {
+    public ResidentProfileEntity(UserEntity user, UUID unitId, LocalDate moveInDate, ResidentType type) {
         this.user = user;
         this.unitId = unitId;
         this.moveInDate = moveInDate;
-        this.isOwner = isOwner;
+        this.type = type;
     }
 
     public UserEntity getUser() {
@@ -61,11 +65,11 @@ public class ResidentProfileEntity extends BaseEntity {
         this.moveInDate = moveInDate;
     }
 
-    public boolean isOwner() {
-        return isOwner;
+    public ResidentType getType() {
+        return type;
     }
 
-    public void setOwner(boolean owner) {
-        isOwner = owner;
+    public void setType(ResidentType type) {
+        this.type = type;
     }
 }

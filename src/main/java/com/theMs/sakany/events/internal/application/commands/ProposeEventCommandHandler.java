@@ -21,12 +21,21 @@ public class ProposeEventCommandHandler implements CommandHandler<ProposeEventCo
     @Transactional
     public UUID handle(ProposeEventCommand command) {
         CommunityEvent event = CommunityEvent.propose(
-            command.organizerId(),
-            command.title(),
-            command.description(),
-            command.location(),
-            command.eventDate(),
-            command.maxAttendees()
+                command.organizerId(),
+                command.title(),
+                command.description(),
+                command.location(),
+                command.startDate(),
+                command.endDate(),
+                command.imageUrl(),
+                command.hostName(),
+                command.price(),
+                command.maxAttendees(),
+                command.category(),
+                command.hostRole(),
+                command.contactPhone(),
+                command.latitude(),
+                command.longitude()
         );
 
         eventRepository.save(event);

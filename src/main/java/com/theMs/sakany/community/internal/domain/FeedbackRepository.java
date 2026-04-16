@@ -8,6 +8,7 @@ public interface FeedbackRepository {
     Feedback save(Feedback feedback);
     Optional<Feedback> findById(UUID id);
     List<Feedback> findPublicFeedback();
+    List<Feedback> findByAuthorId(UUID authorId);
     boolean hasVoted(UUID feedbackId, UUID voterId);
     void recordVote(UUID feedbackId, UUID voterId, VoteType voteType);
 }

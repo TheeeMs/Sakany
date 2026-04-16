@@ -26,18 +26,27 @@ public class GetEventDetailsQueryHandler implements QueryHandler<GetEventDetails
 
     private EventDto mapToDto(CommunityEventEntity entity) {
         return new EventDto(
-            entity.getId(),
-            entity.getOrganizerId(),
-            entity.getTitle(),
-            entity.getDescription(),
-            entity.getLocation(),
-            entity.getEventDate(),
-            entity.getMaxAttendees(),
-            entity.getCurrentAttendees(),
-            entity.getStatus(),
-            entity.getApprovedBy(),
-            entity.getCreatedAt(),
-            entity.getUpdatedAt()
+                entity.getId(),
+                entity.getOrganizerId(),
+                entity.getTitle(),
+                entity.getDescription(),
+                entity.getLocation(),
+                entity.getStartDate(),
+                entity.getEndDate(),
+                entity.getImageUrl(),
+                entity.getHostName(),
+                entity.getPrice(),
+                entity.getMaxAttendees(),
+                entity.getCategory(),
+                entity.getHostRole(),
+                entity.getContactPhone(),
+                entity.getLatitude(),
+                entity.getLongitude(),
+                entity.getCurrentAttendees(),
+                entity.getStatus(),
+                entity.getApprovedBy(),
+                entity.getCreatedAt(),
+                entity.getUpdatedAt()
         );
     }
 }

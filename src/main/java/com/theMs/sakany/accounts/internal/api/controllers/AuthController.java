@@ -61,6 +61,10 @@ public class AuthController {
                 request.firstName(),
                 request.lastName(),
                 request.phoneNumber(),
+                request.email(),
+                request.password(),
+                request.type(),
+                request.unitId(),
                 request.loginMethod()));
 
         User user = userRepository.findById(userId)

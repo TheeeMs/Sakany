@@ -1,10 +1,8 @@
 package com.theMs.sakany.events.internal.application.queries;
 
-import com.theMs.sakany.events.internal.domain.EventStatus;
 import com.theMs.sakany.events.internal.infrastructure.persistence.CommunityEventEntity;
 import com.theMs.sakany.events.internal.infrastructure.persistence.CommunityEventJpaRepository;
 import com.theMs.sakany.shared.cqrs.QueryHandler;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,24 +29,33 @@ public class ListEventsQueryHandler implements QueryHandler<ListEventsQuery, Lis
         }
 
         return entities.stream()
-            .map(this::mapToDto)
-            .collect(Collectors.toList());
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
     }
 
     private EventDto mapToDto(CommunityEventEntity entity) {
         return new EventDto(
-            entity.getId(),
-            entity.getOrganizerId(),
-            entity.getTitle(),
-            entity.getDescription(),
-            entity.getLocation(),
-            entity.getEventDate(),
-            entity.getMaxAttendees(),
-            entity.getCurrentAttendees(),
-            entity.getStatus(),
-            entity.getApprovedBy(),
-            entity.getCreatedAt(),
-            entity.getUpdatedAt()
+                entity.getId(),
+                entity.getOrganizerId(),
+                entity.getTitle(),
+                entity.getDescription(),
+                entity.getLocation(),
+                entity.getStartDate(),
+                entity.getEndDate(),
+                entity.getImageUrl(),
+                entity.getHostName(),
+                entity.getPrice(),
+                entity.getMaxAttendees(),
+                entity.getCategory(),
+                entity.getHostRole(),
+                entity.getContactPhone(),
+                entity.getLatitude(),
+                entity.getLongitude(),
+                entity.getCurrentAttendees(),
+                entity.getStatus(),
+                entity.getApprovedBy(),
+                entity.getCreatedAt(),
+                entity.getUpdatedAt()
         );
     }
 }

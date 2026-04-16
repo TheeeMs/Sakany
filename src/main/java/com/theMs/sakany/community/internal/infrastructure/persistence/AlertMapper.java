@@ -16,8 +16,11 @@ public class AlertMapper {
         }
         entity.setReporterId(domain.getReporterId());
         entity.setType(domain.getType());
+        entity.setCategory(domain.getCategory());
         entity.setTitle(domain.getTitle());
         entity.setDescription(domain.getDescription());
+        entity.setLocation(domain.getLocation());
+        entity.setEventTime(domain.getEventTime());
         entity.setPhotoUrls(domain.getPhotoUrls());
         entity.setResolved(domain.isResolved());
         entity.setResolvedAt(domain.getResolvedAt());
@@ -30,8 +33,11 @@ public class AlertMapper {
             entity.getId(),
             entity.getReporterId(),
             entity.getType(),
+            entity.getCategory(),
             entity.getTitle(),
             entity.getDescription(),
+            entity.getLocation(),
+            entity.getEventTime(),
             entity.getPhotoUrls(),
             entity.isResolved(),
             entity.getResolvedAt()

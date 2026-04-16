@@ -18,6 +18,7 @@ public record NotificationResponse(
         NotificationStatus status,
         Instant sentAt,
         Instant readAt,
-        String failureReason
+        String failureReason,
+        boolean isUrgent
 ) {
 }

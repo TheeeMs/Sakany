@@ -6,16 +6,25 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record EventDto(
-    UUID id,
-    UUID organizerId,
-    String title,
-    String description,
-    String location,
-    Instant eventDate,
-    Integer maxAttendees,
-    int currentAttendees,
-    EventStatus status,
-    UUID approvedBy,
-    Instant createdAt,
-    Instant updatedAt
+        UUID id,
+        UUID organizerId,
+        String title,
+        String description,
+        String location,
+        Instant startDate,
+        Instant endDate,
+        String imageUrl,
+        String hostName,
+        Double price,
+        Integer maxAttendees,
+        String category,
+        String hostRole,
+        String contactPhone,
+        Double latitude,
+        Double longitude,
+        int currentAttendees,
+        EventStatus status,
+        UUID approvedBy,
+        Instant createdAt,
+        Instant updatedAt
 ) {}

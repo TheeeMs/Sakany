@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
 import java.util.UUID;
@@ -46,6 +47,7 @@ public class AccessController {
     private final GetAccessCodeQueryHandler getAccessCodeHandler;
     private final ListAccessCodesQueryHandler listAccessCodesHandler;
     private final ListVisitLogsQueryHandler listVisitLogsHandler;
+    private final com.theMs.sakany.access.internal.application.commands.ReactivateAccessCodeCommandHandler reactivateAccessCodeHandler;
 
     public AccessController(
         CreateAccessCodeCommandHandler createAccessCodeHandler,
@@ -54,7 +56,8 @@ public class AccessController {
         LogVisitorExitCommandHandler logVisitorExitHandler,
         GetAccessCodeQueryHandler getAccessCodeHandler,
         ListAccessCodesQueryHandler listAccessCodesHandler,
-        ListVisitLogsQueryHandler listVisitLogsHandler
+        ListVisitLogsQueryHandler listVisitLogsHandler,
+        com.theMs.sakany.access.internal.application.commands.ReactivateAccessCodeCommandHandler reactivateAccessCodeHandler
     ) {
         this.createAccessCodeHandler = createAccessCodeHandler;
         this.scanAccessCodeHandler = scanAccessCodeHandler;
@@ -63,6 +66,7 @@ public class AccessController {
         this.getAccessCodeHandler = getAccessCodeHandler;
         this.listAccessCodesHandler = listAccessCodesHandler;
         this.listVisitLogsHandler = listVisitLogsHandler;
+        this.reactivateAccessCodeHandler = reactivateAccessCodeHandler;
     }
 
     /**
@@ -104,6 +108,7 @@ public class AccessController {
             accessCode.getVisitorPhone(),
             accessCode.getPurpose(),
             accessCode.getCode(),
+            accessCode.getQrData(),
             accessCode.isSingleUse(),
             accessCode.getValidFrom(),
             accessCode.getValidUntil(),
@@ -133,6 +138,7 @@ public class AccessController {
                 ac.getVisitorPhone(),
                 ac.getPurpose(),
                 ac.getCode(),
+                ac.getQrData(),
                 ac.isSingleUse(),
                 ac.getValidFrom(),
                 ac.getValidUntil(),
@@ -169,6 +175,24 @@ public class AccessController {
         RevokeAccessCodeCommand command = new RevokeAccessCodeCommand(id);
         revokeAccessCodeHandler.handle(command);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * POST /v1/access/codes/{codeId}/reactivate — Reactivate an expired/used access code
+     */
+    @PostMapping("/codes/{codeId}/reactivate")
+    public ResponseEntity<UUID> reactivateAccessCode(
+            @PathVariable UUID codeId,
+            @RequestHeader(name = "X-Resident-Id") UUID residentId,
+            @RequestBody com.theMs.sakany.access.internal.api.dtos.ReactivateAccessCodeRequest request
+    ) {
+        // NOTE: Make sure ReactivateAccessCodeCommandHandler is wired into AccessController
+        com.theMs.sakany.access.internal.application.commands.ReactivateAccessCodeCommand command = 
+                new com.theMs.sakany.access.internal.application.commands.ReactivateAccessCodeCommand(
+                        residentId, codeId, request.validFrom(), request.validUntil()
+                );
+        UUID newCodeId = reactivateAccessCodeHandler.handle(command);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newCodeId);
     }
 
     /**

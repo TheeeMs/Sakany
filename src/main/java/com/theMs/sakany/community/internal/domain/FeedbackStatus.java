@@ -4,5 +4,6 @@ public enum FeedbackStatus {
     OPEN,
     UNDER_REVIEW,
     ADDRESSED,
+    APPROVED,
     CLOSED
 }

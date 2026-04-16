@@ -10,5 +10,9 @@ public record SubmitFeedbackCommand(
     String title,
     String content,
     FeedbackType type,
-    boolean isPublic
+    boolean isPublic,
+    String category,
+    String location,
+    boolean isAnonymous,
+    String imageUrl
 ) implements Command<UUID> {}

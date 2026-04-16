@@ -4,9 +4,12 @@
 CREATE TABLE alerts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     reporter_id UUID NOT NULL,
-    type VARCHAR(50) NOT NULL CHECK (type IN ('MISSING_PET', 'MISSING_PERSON', 'MISSING_ITEM', 'SUSPICIOUS_ACTIVITY', 'OTHER')),
+    type VARCHAR(50) NOT NULL CHECK (type IN ('MISSING', 'FOUND', 'SUSPICIOUS_ACTIVITY', 'OTHER')),
+    category VARCHAR(50) NOT NULL CHECK (category IN ('PET', 'ITEM', 'VEHICLE', 'PERSON', 'OTHER')),
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
+    location VARCHAR(255),
+    event_time TIMESTAMPTZ,
     photo_urls TEXT[],
     is_resolved BOOLEAN DEFAULT FALSE,
     resolved_at TIMESTAMPTZ,

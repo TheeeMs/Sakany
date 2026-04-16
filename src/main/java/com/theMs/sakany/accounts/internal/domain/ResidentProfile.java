@@ -8,18 +8,18 @@ public class ResidentProfile {
     private UUID userId;
     private UUID unitId;
     private LocalDate moveInDate;
-    private boolean isOwner;
+    private ResidentType type;
 
-    public ResidentProfile(UUID id, UUID userId, UUID unitId, LocalDate moveInDate, boolean isOwner) {
+    public ResidentProfile(UUID id, UUID userId, UUID unitId, LocalDate moveInDate, ResidentType type) {
         this.id = id;
         this.userId = userId;
         this.unitId = unitId;
         this.moveInDate = moveInDate;
-        this.isOwner = isOwner;
+        this.type = type;
     }
 
-    public static ResidentProfile create(UUID userId, UUID unitId, LocalDate moveInDate, boolean isOwner) {
-        return new ResidentProfile(UUID.randomUUID(), userId, unitId, moveInDate, isOwner);
+    public static ResidentProfile create(UUID userId, UUID unitId, LocalDate moveInDate, ResidentType type) {
+        return new ResidentProfile(UUID.randomUUID(), userId, unitId, moveInDate, type);
     }
 
     public UUID getId() {
@@ -38,7 +38,7 @@ public class ResidentProfile {
         return moveInDate;
     }
 
-    public boolean isOwner() {
-        return isOwner;
+    public ResidentType getType() {
+        return type;
     }
 }

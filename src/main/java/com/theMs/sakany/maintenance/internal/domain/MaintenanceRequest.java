@@ -22,10 +22,11 @@ public class MaintenanceRequest extends AggregateRoot {
     private boolean isPublic;
     private List<String> photoUrls;
     private Instant resolvedAt;
+    private Instant createdAt;
 
     private MaintenanceRequest(UUID id, UUID residentId, UUID unitId, UUID technicianId, String title,
                                String description, MaintenanceCategory category, MaintenancePriority priority,
-                               MaintenanceStatus status, boolean isPublic, List<String> photoUrls, Instant resolvedAt) {
+                               MaintenanceStatus status, boolean isPublic, List<String> photoUrls, Instant resolvedAt, Instant createdAt) {
         this.id = id;
         this.residentId = residentId;
         this.unitId = unitId;
@@ -38,13 +39,14 @@ public class MaintenanceRequest extends AggregateRoot {
         this.isPublic = isPublic;
         this.photoUrls = photoUrls;
         this.resolvedAt = resolvedAt;
+        this.createdAt = createdAt;
     }
     
     // For mapping from persistence
     public static MaintenanceRequest reconstitute(UUID id, UUID residentId, UUID unitId, UUID technicianId, String title,
                                                   String description, MaintenanceCategory category, MaintenancePriority priority,
-                                                  MaintenanceStatus status, boolean isPublic, List<String> photoUrls, Instant resolvedAt) {
-        return new MaintenanceRequest(id, residentId, unitId, technicianId, title, description, category, priority, status, isPublic, photoUrls, resolvedAt);
+                                                  MaintenanceStatus status, boolean isPublic, List<String> photoUrls, Instant resolvedAt, Instant createdAt) {
+        return new MaintenanceRequest(id, residentId, unitId, technicianId, title, description, category, priority, status, isPublic, photoUrls, resolvedAt, createdAt);
     }
 
     public static MaintenanceRequest create(UUID residentId, UUID unitId, String title, String description,
@@ -55,18 +57,19 @@ public class MaintenanceRequest extends AggregateRoot {
         if (title == null || title.trim().isEmpty()) throw new BusinessRuleException("Title is required");
         if (description == null || description.trim().isEmpty()) throw new BusinessRuleException("Description is required");
         if (category == null) throw new BusinessRuleException("Category is required");
-        if (priority == null) throw new BusinessRuleException("Priority is required");
+
+        MaintenancePriority effectivePriority = (priority != null) ? priority : MaintenancePriority.NORMAL;
 
         UUID id = UUID.randomUUID();
         MaintenanceRequest request = new MaintenanceRequest(
-                id, residentId, unitId, null, title, description, category, priority,
+                id, residentId, unitId, null, title, description, category, effectivePriority,
                 MaintenanceStatus.SUBMITTED, isPublic, 
                 photoUrls == null ? new ArrayList<>() : new ArrayList<>(photoUrls), 
-                null
+                null, Instant.now()
         );
 
         request.registerEvent(new MaintenanceRequestCreated(
-                id, residentId, unitId, title, category, priority, Instant.now()
+                id, residentId, unitId, title, category, effectivePriority, Instant.now()
         ));
 
         return request;
@@ -150,4 +153,5 @@ public class MaintenanceRequest extends AggregateRoot {
     public boolean isPublic() { return isPublic; }
     public List<String> getPhotoUrls() { return new ArrayList<>(photoUrls); }
     public Instant getResolvedAt() { return resolvedAt; }
+    public Instant getCreatedAt() { return createdAt; }
 }

@@ -14,43 +14,49 @@ public class Alert extends AggregateRoot {
     private UUID id;
     private UUID reporterId;
     private AlertType type;
+    private AlertCategory category;
     private String title;
     private String description;
+    private String location;
+    private Instant eventTime;
     private List<String> photoUrls;
     private boolean isResolved;
     private Instant resolvedAt;
 
-    private Alert(UUID id, UUID reporterId, AlertType type, String title, String description, List<String> photoUrls, boolean isResolved, Instant resolvedAt) {
+    private Alert(UUID id, UUID reporterId, AlertType type, AlertCategory category, String title, String description, String location, Instant eventTime, List<String> photoUrls, boolean isResolved, Instant resolvedAt) {
         this.id = id;
         this.reporterId = reporterId;
         this.type = type;
+        this.category = category;
         this.title = title;
         this.description = description;
+        this.location = location;
+        this.eventTime = eventTime;
         this.photoUrls = photoUrls == null ? new ArrayList<>() : new ArrayList<>(photoUrls);
         this.isResolved = isResolved;
         this.resolvedAt = resolvedAt;
     }
 
-    public static Alert create(UUID reporterId, AlertType type, String title, String description, List<String> photoUrls) {
+    public static Alert create(UUID reporterId, AlertType type, AlertCategory category, String title, String description, String location, Instant eventTime, List<String> photoUrls) {
         if (title == null || title.isBlank()) {
             throw new BusinessRuleException("Title cannot be blank");
         }
         if (description == null || description.isBlank()) {
             throw new BusinessRuleException("Description cannot be blank");
         }
-        if (reporterId == null || type == null) {
-            throw new BusinessRuleException("Reporter ID and Type are required");
+        if (reporterId == null || type == null || category == null) {
+            throw new BusinessRuleException("Reporter ID, Type, and Category are required");
         }
 
         UUID id = UUID.randomUUID();
-        Alert alert = new Alert(id, reporterId, type, title, description, photoUrls, false, null);
-        alert.registerEvent(new AlertCreated(id, reporterId, type, title, description, alert.getPhotoUrls(), Instant.now()));
+        Alert alert = new Alert(id, reporterId, type, category, title, description, location, eventTime, photoUrls, false, null);
+        alert.registerEvent(new AlertCreated(id, reporterId, type, category, title, description, location, eventTime, alert.getPhotoUrls(), Instant.now()));
         return alert;
     }
 
     // For mapping from DB entity
-    public static Alert reconstitute(UUID id, UUID reporterId, AlertType type, String title, String description, List<String> photoUrls, boolean isResolved, Instant resolvedAt) {
-        return new Alert(id, reporterId, type, title, description, photoUrls, isResolved, resolvedAt);
+    public static Alert reconstitute(UUID id, UUID reporterId, AlertType type, AlertCategory category, String title, String description, String location, Instant eventTime, List<String> photoUrls, boolean isResolved, Instant resolvedAt) {
+        return new Alert(id, reporterId, type, category, title, description, location, eventTime, photoUrls, isResolved, resolvedAt);
     }
 
     public void resolve() {
@@ -74,12 +80,24 @@ public class Alert extends AggregateRoot {
         return type;
     }
 
+    public AlertCategory getCategory() {
+        return category;
+    }
+
     public String getTitle() {
         return title;
     }
 
     public String getDescription() {
         return description;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public Instant getEventTime() {
+        return eventTime;
     }
 
     public List<String> getPhotoUrls() {

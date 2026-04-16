@@ -21,7 +21,8 @@ public class CreateAccessCodeCommandHandler {
 
     @Transactional
     public UUID handle(CreateAccessCodeCommand command) {
-        String code = codeGenerator.generateCode();
+        String prefix = command.purpose().name().substring(0, 3).toUpperCase();
+        String code = codeGenerator.generateCode(prefix);
         String qrData = code; // For now, QR data is just the code. Later: JWT or encryption
 
         AccessCode accessCode = AccessCode.create(

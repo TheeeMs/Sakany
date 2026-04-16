@@ -36,12 +36,12 @@ public class User extends AggregateRoot {
         this.loginMethod = loginMethod;
     }
 
-    public static User create(String firstName, String lastName, String phoneNumber, LoginMethod loginMethod) {
+    public static User create(String firstName, String lastName, String phoneNumber, String email, String hashedPassword, LoginMethod loginMethod) {
         if (phoneNumber == null || phoneNumber.isEmpty()) {
             throw new BusinessRuleException("Phone number cannot be null or empty");
         }
         UUID id = UUID.randomUUID();
-        User user = new User(id, firstName, lastName, phoneNumber, null, null, Role.RESIDENT, true, false, loginMethod);
+        User user = new User(id, firstName, lastName, phoneNumber, email, hashedPassword, Role.RESIDENT, true, false, loginMethod);
         user.registerEvent(new UserCreated(id, firstName, lastName, phoneNumber, loginMethod));
         return user;
     }

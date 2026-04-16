@@ -1,5 +1,7 @@
 package com.theMs.sakany.notifications.internal.api.controllers;
 
+import com.theMs.sakany.notifications.internal.application.commands.MarkAllNotificationsReadCommand;
+import com.theMs.sakany.notifications.internal.application.commands.MarkAllNotificationsReadCommandHandler;
 import com.theMs.sakany.notifications.internal.api.dtos.NotificationResponse;
 import com.theMs.sakany.notifications.internal.api.dtos.SendNotificationRequest;
 import com.theMs.sakany.notifications.internal.application.commands.MarkNotificationReadCommand;
@@ -30,15 +32,18 @@ public class NotificationController {
 
     private final ListNotificationsQueryHandler listNotificationsQueryHandler;
     private final MarkNotificationReadCommandHandler markNotificationReadCommandHandler;
+    private final MarkAllNotificationsReadCommandHandler markAllNotificationsReadCommandHandler;
     private final SendNotificationCommandHandler sendNotificationCommandHandler;
 
     public NotificationController(
             ListNotificationsQueryHandler listNotificationsQueryHandler,
             MarkNotificationReadCommandHandler markNotificationReadCommandHandler,
+            MarkAllNotificationsReadCommandHandler markAllNotificationsReadCommandHandler,
             SendNotificationCommandHandler sendNotificationCommandHandler
     ) {
         this.listNotificationsQueryHandler = listNotificationsQueryHandler;
         this.markNotificationReadCommandHandler = markNotificationReadCommandHandler;
+        this.markAllNotificationsReadCommandHandler = markAllNotificationsReadCommandHandler;
         this.sendNotificationCommandHandler = sendNotificationCommandHandler;
     }
 
@@ -60,6 +65,12 @@ public class NotificationController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/read-all")
+    public ResponseEntity<Void> markAllAsRead(@RequestParam UUID recipientId) {
+        markAllNotificationsReadCommandHandler.handle(new MarkAllNotificationsReadCommand(recipientId));
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/send")
     public ResponseEntity<UUID> sendNotification(@RequestBody SendNotificationRequest request) {
         UUID id = sendNotificationCommandHandler.handle(new SendNotificationCommand(
@@ -74,6 +85,11 @@ public class NotificationController {
     }
 
     private NotificationResponse toResponse(NotificationLog notificationLog) {
+        boolean isUrgent = switch (notificationLog.getType()) {
+            case ALERT, ANNOUNCEMENT, PAYMENT_DUE, MAINTENANCE_UPDATE -> true;
+            default -> false;
+        };
+
         return new NotificationResponse(
                 notificationLog.getId(),
                 notificationLog.getRecipientId(),
@@ -85,7 +101,8 @@ public class NotificationController {
                 notificationLog.getStatus(),
                 notificationLog.getSentAt(),
                 notificationLog.getReadAt(),
-                notificationLog.getFailureReason()
+                notificationLog.getFailureReason(),
+                isUrgent
         );
     }
 }

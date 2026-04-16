@@ -16,37 +16,60 @@ public class CommunityEvent extends AggregateRoot {
     private final String title;
     private final String description;
     private final String location;
-    private final Instant eventDate;
+    private final Instant startDate;
+    private final Instant endDate;
+    private final String imageUrl;
+    private final String hostName;
+    private final Double price;
     private final Integer maxAttendees;
+    private final String category;
+    private final String hostRole;
+    private final String contactPhone;
+    private final Double latitude;
+    private final Double longitude;
     private int currentAttendees;
     private EventStatus status;
     private UUID approvedBy;
 
     // Constructor for reconstruction from persistence
     public CommunityEvent(UUID id, UUID organizerId, String title, String description, String location,
-                   Instant eventDate, Integer maxAttendees, int currentAttendees, EventStatus status, UUID approvedBy) {
+                   Instant startDate, Instant endDate, String imageUrl, String hostName, Double price, Integer maxAttendees, 
+                   String category, String hostRole, String contactPhone, Double latitude, Double longitude, 
+                   int currentAttendees, EventStatus status, UUID approvedBy) {
         this.id = id;
         this.organizerId = organizerId;
         this.title = title;
         this.description = description;
         this.location = location;
-        this.eventDate = eventDate;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.imageUrl = imageUrl;
+        this.hostName = hostName;
+        this.price = price;
         this.maxAttendees = maxAttendees;
+        this.category = category;
+        this.hostRole = hostRole;
+        this.contactPhone = contactPhone;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.currentAttendees = currentAttendees;
         this.status = status;
         this.approvedBy = approvedBy;
     }
 
     public static CommunityEvent propose(UUID organizerId, String title, String description, String location,
-                                         Instant eventDate, Integer maxAttendees) {
+                                         Instant startDate, Instant endDate, String imageUrl, String hostName, Double price, Integer maxAttendees,
+                                         String category, String hostRole, String contactPhone, Double latitude, Double longitude) {
         if (title == null || title.isBlank()) throw new BusinessRuleException("Title is required");
         if (description == null || description.isBlank()) throw new BusinessRuleException("Description is required");
         if (location == null || location.isBlank()) throw new BusinessRuleException("Location is required");
-        if (eventDate == null || eventDate.isBefore(Instant.now())) throw new BusinessRuleException("Event date must be in the future");
+        if (startDate == null || startDate.isBefore(Instant.now())) throw new BusinessRuleException("Start date must be in the future");
+        if (endDate != null && endDate.isBefore(startDate)) throw new BusinessRuleException("End date must be after start date");
         if (maxAttendees != null && maxAttendees <= 0) throw new BusinessRuleException("Max attendees must be greater than 0");
 
         UUID id = UUID.randomUUID();
-        CommunityEvent event = new CommunityEvent(id, organizerId, title, description, location, eventDate, maxAttendees, 0, EventStatus.PROPOSED, null);
+        CommunityEvent event = new CommunityEvent(id, organizerId, title, description, location, startDate, endDate, imageUrl, hostName, price, maxAttendees, 
+                                                  category, hostRole, contactPhone, latitude, longitude, 0, EventStatus.PROPOSED, null);
         event.registerEvent(new EventProposed(id, organizerId, title));
         return event;
     }
@@ -104,8 +127,17 @@ public class CommunityEvent extends AggregateRoot {
     public String getTitle() { return title; }
     public String getDescription() { return description; }
     public String getLocation() { return location; }
-    public Instant getEventDate() { return eventDate; }
+    public Instant getStartDate() { return startDate; }
+    public Instant getEndDate() { return endDate; }
+    public String getImageUrl() { return imageUrl; }
+    public String getHostName() { return hostName; }
+    public Double getPrice() { return price; }
     public Integer getMaxAttendees() { return maxAttendees; }
+    public String getCategory() { return category; }
+    public String getHostRole() { return hostRole; }
+    public String getContactPhone() { return contactPhone; }
+    public Double getLatitude() { return latitude; }
+    public Double getLongitude() { return longitude; }
     public int getCurrentAttendees() { return currentAttendees; }
     public EventStatus getStatus() { return status; }
     public UUID getApprovedBy() { return approvedBy; }

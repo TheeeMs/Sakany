@@ -1,0 +1,4 @@
+ALTER TABLE feedback 
+ADD COLUMN admin_response TEXT,
+ADD COLUMN image_url VARCHAR(500),
+ADD COLUMN view_count INT NOT NULL DEFAULT 0;

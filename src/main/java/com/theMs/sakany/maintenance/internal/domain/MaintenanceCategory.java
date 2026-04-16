@@ -3,7 +3,11 @@ package com.theMs.sakany.maintenance.internal.domain;
 public enum MaintenanceCategory {
     PLUMBING,
     ELECTRICAL,
-    HVAC,
-    ELEVATOR,
+    AC_HEATING,
+    HOUSEKEEPING,
+    PAINTING,
+    CARPENTRY,
+    GARDEN,
+    ALUMINUM,
     OTHER
 }

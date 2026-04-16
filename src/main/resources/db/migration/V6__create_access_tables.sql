@@ -6,7 +6,7 @@ CREATE TABLE access_codes (
     visitor_name VARCHAR(255) NOT NULL,
     visitor_phone VARCHAR(20),
     purpose VARCHAR(50) NOT NULL, -- GUEST, DELIVERY, SERVICE, OTHER
-    code VARCHAR(8) NOT NULL UNIQUE,
+    code VARCHAR(20) NOT NULL UNIQUE,
     qr_data TEXT NOT NULL,
     is_single_use BOOLEAN NOT NULL DEFAULT TRUE,
     valid_from TIMESTAMPTZ NOT NULL,

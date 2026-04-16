@@ -23,8 +23,11 @@ public class ReportAlertCommandHandler implements CommandHandler<ReportAlertComm
         Alert alert = Alert.create(
             command.reporterId(),
             command.type(),
+            command.category(),
             command.title(),
             command.description(),
+            command.location(),
+            command.eventTime(),
             command.photoUrls()
         );
         Alert savedAlert = alertRepository.save(alert);

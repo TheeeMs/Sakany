@@ -25,7 +25,11 @@ public class SubmitFeedbackCommandHandler implements CommandHandler<SubmitFeedba
             command.title(),
             command.content(),
             command.type(),
-            command.isPublic()
+            command.isPublic(),
+            command.category(),
+            command.location(),
+            command.isAnonymous(),
+            command.imageUrl()
         );
         Feedback savedFeedback = feedbackRepository.save(feedback);
         return savedFeedback.getId();

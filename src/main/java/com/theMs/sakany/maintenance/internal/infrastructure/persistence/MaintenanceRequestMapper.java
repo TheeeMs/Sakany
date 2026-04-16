@@ -25,7 +25,8 @@ public class MaintenanceRequestMapper {
                 entity.getStatus(),
                 entity.isPublic(),
                 entity.getPhotoUrls() != null ? new ArrayList<>(entity.getPhotoUrls()) : new ArrayList<>(),
-                entity.getResolvedAt()
+                entity.getResolvedAt(),
+                entity.getCreatedAt()
         );
     }
 

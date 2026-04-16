@@ -6,7 +6,7 @@ CREATE TABLE resident_profiles (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     unit_id UUID, -- Will reference units table once property module is created
     move_in_date DATE,
-    is_owner BOOLEAN DEFAULT FALSE,
+    resident_type VARCHAR(50) NOT NULL,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );

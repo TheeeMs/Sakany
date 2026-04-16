@@ -1,5 +1,6 @@
 package com.theMs.sakany.community.internal.infrastructure.persistence;
 
+import com.theMs.sakany.community.internal.domain.AlertCategory;
 import com.theMs.sakany.community.internal.domain.AlertType;
 import com.theMs.sakany.shared.jpa.BaseEntity;
 import jakarta.persistence.Column;
@@ -25,11 +26,21 @@ public class AlertEntity extends BaseEntity {
     @Column(nullable = false)
     private AlertType type;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AlertCategory category;
+
     @Column(nullable = false)
     private String title;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
+
+    @Column(nullable = true)
+    private String location;
+
+    @Column(name = "event_time", nullable = true)
+    private Instant eventTime;
 
     @JdbcTypeCode(SqlTypes.ARRAY)
     @Column(name = "photo_urls", columnDefinition = "text[]")
@@ -56,6 +67,14 @@ public class AlertEntity extends BaseEntity {
         this.type = type;
     }
 
+    public AlertCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(AlertCategory category) {
+        this.category = category;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -70,6 +89,22 @@ public class AlertEntity extends BaseEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public Instant getEventTime() {
+        return eventTime;
+    }
+
+    public void setEventTime(Instant eventTime) {
+        this.eventTime = eventTime;
     }
 
     public List<String> getPhotoUrls() {

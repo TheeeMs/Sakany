@@ -9,4 +9,5 @@ import java.util.UUID;
 @Repository
 public interface FeedbackJpaRepository extends JpaRepository<FeedbackEntity, UUID> {
     List<FeedbackEntity> findByIsPublicTrueOrderByCreatedAtDesc();
+    List<FeedbackEntity> findByAuthorIdOrderByCreatedAtDesc(UUID authorId);
 }

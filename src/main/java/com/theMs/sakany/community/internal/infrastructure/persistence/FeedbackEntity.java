@@ -37,6 +37,24 @@ public class FeedbackEntity extends BaseEntity {
     @Column(nullable = false)
     private int downvotes = 0;
 
+    @Column(name = "category", length = 100)
+    private String category;
+
+    @Column(name = "location", length = 150)
+    private String location;
+
+    @Column(name = "is_anonymous")
+    private boolean isAnonymous;
+
+    @Column(name = "admin_response", columnDefinition = "TEXT")
+    private String adminResponse;
+
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
+
+    @Column(name = "view_count", nullable = false)
+    private int viewCount = 0;
+
     public UUID getAuthorId() {
         return authorId;
     }
@@ -99,5 +117,53 @@ public class FeedbackEntity extends BaseEntity {
 
     public void setDownvotes(int downvotes) {
         this.downvotes = downvotes;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public boolean isAnonymous() {
+        return isAnonymous;
+    }
+
+    public void setAnonymous(boolean anonymous) {
+        isAnonymous = anonymous;
+    }
+
+    public String getAdminResponse() {
+        return adminResponse;
+    }
+
+    public void setAdminResponse(String adminResponse) {
+        this.adminResponse = adminResponse;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public int getViewCount() {
+        return viewCount;
+    }
+
+    public void setViewCount(int viewCount) {
+        this.viewCount = viewCount;
     }
 }

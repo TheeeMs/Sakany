@@ -51,6 +51,13 @@ public class FeedbackRepositoryImpl implements FeedbackRepository {
     }
 
     @Override
+    public List<Feedback> findByAuthorId(UUID authorId) {
+        return jpaRepository.findByAuthorIdOrderByCreatedAtDesc(authorId).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public boolean hasVoted(UUID feedbackId, UUID voterId) {
         return voteJpaRepository.existsByFeedbackIdAndVoterId(feedbackId, voterId);
     }

@@ -1,6 +1,6 @@
 # Sakany Implementation Checklist
 
-**Last Updated:** December 25, 2025
+**Last Updated:** April 16, 2026
 
 ---
 
@@ -43,110 +43,101 @@
 
 ---
 
-## Phase 3: Verify Foundation ✅ COMPLETE
-- [x] `docker-compose up -d` successful
-- [x] `./gradlew build` passes
-- [x] `./gradlew bootRun` starts without errors
-- [x] Flyway migration applied (check logs)
-- [x] Connect to PgAdmin at localhost:5433
-
----
-
-## Phase 4: Accounts Module ⏳ IN PROGRESS
+## Phase 4: Accounts Module ✅ COMPLETE
 
 ### Domain Layer (Pure Java)
 - [x] `accounts/internal/domain/User.java` (aggregate root)
 - [x] `accounts/internal/domain/Role.java` (enum)
 - [x] `accounts/internal/domain/LoginMethod.java` (enum)
 - [x] `accounts/internal/domain/events/UserCreated.java` (domain event - Java record)
-- [ ] Add getters to User.java
-- [ ] Add domain methods (deactivate, verifyPhone, etc.)
-- [ ] `accounts/internal/domain/ResidentProfile.java`
-- [ ] `accounts/internal/domain/TechnicianProfile.java`
-- [ ] `accounts/internal/domain/AdminProfile.java`
+- [x] Add getters to User.java
+- [x] Add domain methods (deactivate, verifyPhone, etc.)
+- [x] `accounts/internal/domain/ResidentProfile.java`
+- [x] `accounts/internal/domain/TechnicianProfile.java`
+- [x] `accounts/internal/domain/AdminProfile.java`
 
 ### Database Migrations
 - [x] `V1__create_users_table.sql` (updated: name → first_name + last_name)
-- [ ] `V3__create_profile_tables.sql` (resident, technician, admin profiles)
-- [ ] Reset database to apply updated V1
+- [x] `V3__create_profile_tables.sql` (resident, technician, admin profiles)
+- [x] Reset database to apply updated V1
 
 ### Infrastructure Layer (JPA)
-- [ ] `accounts/internal/infrastructure/persistence/UserEntity.java`
-- [ ] `accounts/internal/infrastructure/persistence/UserMapper.java`
-- [ ] `accounts/internal/infrastructure/persistence/UserRepositoryImpl.java`
+- [x] `accounts/internal/infrastructure/persistence/UserEntity.java`
+- [x] `accounts/internal/infrastructure/persistence/UserMapper.java`
+- [x] `accounts/internal/infrastructure/persistence/UserRepositoryImpl.java`
 
 ### Module Configuration
-- [ ] `accounts/package-info.java`
-- [ ] `shared/package-info.java` (@ApplicationModule type=OPEN)
+- [x] `accounts/package-info.java`
+- [x] `shared/package-info.java` (@ApplicationModule type=OPEN)
 
 ---
 
-## Phase 5: Property Module
-- [ ] `V3__create_property_tables.sql`
-- [ ] `property/internal/domain/Compound.java`
-- [ ] `property/internal/domain/Building.java`
-- [ ] `property/internal/domain/Unit.java`
-- [ ] `property/package-info.java`
+## Phase 5: Property Module ✅ COMPLETE
+- [x] `V4__create_property_tables.sql`
+- [x] `property/internal/domain/Compound.java`
+- [x] `property/internal/domain/Building.java`
+- [x] `property/internal/domain/Unit.java`
+- [x] `property/package-info.java`
 
 ---
 
-## Phase 6: Maintenance Module
-- [ ] `V4__create_maintenance_tables.sql`
-- [ ] `maintenance/internal/domain/MaintenanceRequest.java`
-- [ ] `maintenance/internal/domain/events/` (domain events)
-- [ ] `maintenance/internal/application/commands/CreateMaintenanceRequestCommand.java`
-- [ ] `maintenance/internal/application/commands/CreateMaintenanceRequestHandler.java`
-- [ ] `maintenance/internal/infrastructure/MaintenanceRequestRepository.java`
-- [ ] `maintenance/package-info.java`
+## Phase 6: Maintenance Module ✅ COMPLETE
+- [x] `V5__create_maintenance_tables.sql`
+- [x] `maintenance/internal/domain/MaintenanceRequest.java`
+- [x] `maintenance/internal/domain/events/` (domain events)
+- [x] `maintenance/internal/application/commands/CreateMaintenanceRequestCommand.java`
+- [x] `maintenance/internal/application/commands/CreateMaintenanceRequestHandler.java`
+- [x] `maintenance/internal/infrastructure/MaintenanceRequestRepository.java`
+- [x] `maintenance/package-info.java`
 
 ---
 
-## Phase 7: Access Module (Visitors & QR)
-- [ ] `V5__create_access_tables.sql`
-- [ ] Visitor entity
-- [ ] AccessCode entity (QR codes)
-- [ ] VisitLog entity
-- [ ] QR code generation service
+## Phase 7: Access Module (Visitors & QR) ✅ COMPLETE
+- [x] `V6__create_access_tables.sql`
+- [x] Visitor entity
+- [x] AccessCode entity (QR codes)
+- [x] VisitLog entity
+- [x] QR code generation service
 
 ---
 
-## Phase 8: Billing Module
-- [ ] `V6__create_billing_tables.sql`
-- [ ] Invoice entity
-- [ ] Payment entity
-- [ ] Payment gateway integration
+## Phase 8: Billing Module ✅ COMPLETE
+- [x] `V7__create_billing_tables.sql`
+- [x] Invoice entity
+- [x] Payment entity
+- [x] Payment gateway integration
 
 ---
 
-## Phase 9: Events Module
-- [ ] `V7__create_events_tables.sql`
-- [ ] CommunityEvent entity
-- [ ] EventRegistration entity
+## Phase 9: Events Module ✅ COMPLETE
+- [x] `V8__create_events_tables.sql`
+- [x] CommunityEvent entity
+- [x] EventRegistration entity
 
 ---
 
-## Phase 10: Community Module
-- [ ] `V8__create_community_tables.sql`
-- [ ] Alert entity
-- [ ] Feedback entity (with voting)
-- [ ] Announcement entity
+## Phase 10: Community Module ✅ COMPLETE
+- [x] `V9__create_community_tables.sql`
+- [x] Alert entity
+- [x] Feedback entity (with voting)
+- [x] Announcement entity
 
 ---
 
-## Phase 11: Notifications Module
-- [ ] `V9__create_notifications_tables.sql`
-- [ ] DeviceToken entity
-- [ ] NotificationLog entity
-- [ ] Firebase FCM integration
+## Phase 11: Notifications Module ✅ COMPLETE
+- [x] `V10__create_notifications_tables.sql`
+- [x] DeviceToken entity
+- [x] NotificationLog entity
+- [x] Firebase FCM integration
 
 ---
 
-## Phase 12: Authentication & Security
-- [ ] JWT implementation
-- [ ] Spring Security configuration
-- [ ] Phone OTP flow
-- [ ] Google OAuth integration
-- [ ] Role-based access control
+## Phase 12: Authentication & Security ✅ COMPLETE
+- [x] JWT implementation
+- [x] Spring Security configuration
+- [x] Phone OTP flow
+- [x] Google OAuth integration
+- [x] Role-based access control
 
 ---
 

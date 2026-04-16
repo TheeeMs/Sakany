@@ -21,7 +21,8 @@ public record MaintenanceRequestResponseDto(
         MaintenanceStatus status,
         boolean isPublic,
         List<String> photoUrls,
-        Instant resolvedAt
+        Instant resolvedAt,
+        Instant createdAt
 ) {
     public static MaintenanceRequestResponseDto fromDomain(MaintenanceRequest request) {
         return new MaintenanceRequestResponseDto(
@@ -36,7 +37,8 @@ public record MaintenanceRequestResponseDto(
                 request.getStatus(),
                 request.isPublic(),
                 request.getPhotoUrls(),
-                request.getResolvedAt()
+                request.getResolvedAt(),
+                request.getCreatedAt()
         );
     }
 }

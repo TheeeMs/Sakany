@@ -13,6 +13,7 @@ public record AccessCodeResponse(
     String visitorPhone,
     VisitPurpose purpose,
     String code,
+    String qrData,
     boolean isSingleUse,
     Instant validFrom,
     Instant validUntil,
