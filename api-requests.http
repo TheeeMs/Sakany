@@ -1,0 +1,169 @@
+### Sakany API Sequential Test Flow
+# This file is compatible with IntelliJ IDEA HTTP Client and VS Code REST Client.
+# It uses variables to chain requests sequentially (e.g. login -> token -> create entity -> use entity ID)
+
+@host = http://localhost:8080
+@email = testuser@example.com
+@password = Password123!
+@phone = +1234567890
+
+### 1. Register a new user (Admin/Owner)
+# @name registerUser
+POST {{host}}/v1/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Admin",
+  "lastName": "User",
+  "phoneNumber": "{{phone}}",
+  "email": "{{email}}",
+  "password": "{{password}}",
+  "type": "OWNER",
+  "loginMethod": "EMAIL"
+}
+
+> {%
+    client.global.set("auth_token", response.body.accessToken);
+    client.global.set("user_id", response.body.userId);
+%}
+
+### 2. Login via Email (to get fresh tokens)
+# @name loginEmail
+POST {{host}}/v1/auth/login/email
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+> {%
+    client.global.set("auth_token", response.body.accessToken);
+    // client.global.set("user_id", response.body.userId); // Assuming response contains userId 
+%}
+
+### 3. Create a Compound
+# @name createCompound
+POST {{host}}/v1/compounds
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "Sunset Paradise Real Estate",
+  "address": "123 Main St, City"
+}
+
+> {%
+    client.global.set("compound_id", response.body.id);
+%}
+
+### 4. Create a Building (Assuming building controller exists and uses compoundId)
+# @name createBuilding
+POST {{host}}/v1/buildings
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "compoundId": "{{compound_id}}",
+  "name": "Building A",
+  "floors": 10
+}
+
+> {%
+    client.global.set("building_id", response.body.id);
+%}
+
+### 5. Create a Unit inside the Building (Type: RESIDENTIAL, COMMERCIAL, etc)
+# @name createUnit
+POST {{host}}/v1/units
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "buildingId": "{{building_id}}",
+  "unitNumber": "101A",
+  "floor": 1,
+  "type": "RESIDENTIAL"
+}
+
+> {%
+    client.global.set("unit_id", response.body.id);
+%}
+
+### 6. Create a Maintenance Request
+# @name createMaintenanceReq
+POST {{host}}/v1/maintenance-requests
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "residentId": "{{user_id}}",
+  "unitId": "{{unit_id}}",
+  "title": "Leaking Pipe in Kitchen",
+  "description": "Water is leaking from under the sink.",
+  "category": "PLUMBING",
+  "priority": "HIGH",
+  "isPublic": false,
+  "photoUrls": []
+}
+
+> {%
+    client.global.set("maintenance_id", response.body.id);
+%}
+
+### 7. Assign a Technician to the Maintenance Request
+# @name assignMaintenance
+POST {{host}}/v1/maintenance-requests/{{maintenance_id}}/assign
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "technicianId": "tech-123"
+}
+
+### 8. Start Maintenance Work
+# @name startMaintenance
+POST {{host}}/v1/maintenance-requests/{{maintenance_id}}/start
+Authorization: Bearer {{auth_token}}
+
+### 9. Resolve Maintenance Work
+# @name resolveMaintenance
+POST {{host}}/v1/maintenance-requests/{{maintenance_id}}/resolve
+Authorization: Bearer {{auth_token}}
+
+### 10. Issue an Invoice
+# @name createInvoice
+POST {{host}}/v1/invoices
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "residentId": "{{user_id}}",
+  "unitId": "{{unit_id}}",
+  "type": "MAINTENANCE_FEE",
+  "amount": 150.00,
+  "currency": "USD",
+  "description": "Fixing the leaking pipe",
+  "dueDate": "2026-05-01T00:00:00Z"
+}
+
+> {%
+    client.global.set("invoice_id", response.body.id);
+%}
+
+### 11. Pay the Invoice
+# @name payInvoice
+POST {{host}}/v1/invoices/{{invoice_id}}/pay
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "residentId": "{{user_id}}",
+  "paymentMethod": "CREDIT_CARD",
+  "transactionReference": "tx-987654321"
+}
+
+### 12. Get the specific invoice to verify Payment Status
+# @name getInvoice
+GET {{host}}/v1/invoices/{{invoice_id}}
+Authorization: Bearer {{auth_token}}
