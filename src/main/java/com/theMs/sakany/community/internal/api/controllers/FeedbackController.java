@@ -11,7 +11,10 @@ import com.theMs.sakany.community.internal.domain.FeedbackType;
 import com.theMs.sakany.community.internal.domain.VoteType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import com.theMs.sakany.shared.exception.BusinessRuleException;
 
 import java.time.Instant;
 import java.util.List;
@@ -43,7 +46,6 @@ public class FeedbackController {
     }
 
     public record SubmitFeedbackRequest(
-        UUID authorId,
         String title,
         String content,
         FeedbackType type,
@@ -101,14 +103,28 @@ public class FeedbackController {
         List<FeedbackResponse> posts
     ) {}
 
-    public record VoteFeedbackRequest(UUID voterId, VoteType voteType) {}
+    public record VoteFeedbackRequest(VoteType voteType) {}
 
     public record UpdateFeedbackStatusRequest(FeedbackStatus newStatus) {}
 
+    private UUID getAuthenticatedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new BusinessRuleException("No authenticated user");
+        }
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UUID uuid) {
+            return uuid;
+        } else {
+            return UUID.fromString(principal.toString());
+        }
+    }
+
     @PostMapping
     public ResponseEntity<UUID> submitFeedback(@RequestBody SubmitFeedbackRequest request) {
+        UUID authorId = getAuthenticatedUserId();
         UUID feedbackId = submitFeedbackHandler.handle(new SubmitFeedbackCommand(
-            request.authorId(),
+            authorId,
             request.title(),
             request.content(),
             request.type(),
@@ -129,7 +145,8 @@ public class FeedbackController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<MyFeedbackSummaryResponse> getMyFeedback(@RequestHeader("X-User-Id") UUID userId) {
+    public ResponseEntity<MyFeedbackSummaryResponse> getMyFeedback() {
+        UUID userId = getAuthenticatedUserId();
         List<Feedback> myFeedbackList = getMyFeedbackHandler.handle(new GetMyFeedbackQuery(userId));
         List<FeedbackResponse> posts = myFeedbackList.stream().map(FeedbackResponse::from).collect(Collectors.toList());
         
@@ -142,7 +159,8 @@ public class FeedbackController {
 
     @PostMapping("/{id}/vote")
     public ResponseEntity<Void> voteFeedback(@PathVariable UUID id, @RequestBody VoteFeedbackRequest request) {
-        voteFeedbackHandler.handle(new VoteFeedbackCommand(id, request.voterId(), request.voteType()));
+        UUID voterId = getAuthenticatedUserId();
+        voteFeedbackHandler.handle(new VoteFeedbackCommand(id, voterId, request.voteType()));
         return ResponseEntity.noContent().build();
     }
 

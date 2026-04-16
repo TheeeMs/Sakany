@@ -21,9 +21,20 @@ public class VisitLogRepositoryImpl implements VisitLogRepository {
     }
 
     @Override
-    public void save(VisitLog visitLog) {
-        VisitLogEntity entity = mapper.toEntity(visitLog);
-        jpaRepository.save(entity);
+    public VisitLog save(VisitLog visitLog) {
+        VisitLogEntity entity = visitLog.getId() == null
+            ? new VisitLogEntity()
+            : jpaRepository.findById(visitLog.getId()).orElseGet(VisitLogEntity::new);
+
+        entity.setId(visitLog.getId());
+        entity.setAccessCodeId(visitLog.getAccessCodeId());
+        entity.setResidentId(visitLog.getResidentId());
+        entity.setVisitorName(visitLog.getVisitorName());
+        entity.setEntryTime(visitLog.getEntryTime());
+        entity.setExitTime(visitLog.getExitTime());
+        entity.setGateNumber(visitLog.getGateNumber());
+        VisitLogEntity saved = jpaRepository.save(entity);
+        return mapper.toDomain(saved);
     }
 
     @Override

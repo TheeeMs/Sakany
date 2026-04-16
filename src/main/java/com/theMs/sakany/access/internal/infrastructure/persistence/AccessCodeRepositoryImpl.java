@@ -21,9 +21,25 @@ public class AccessCodeRepositoryImpl implements AccessCodeRepository {
     }
 
     @Override
-    public void save(AccessCode accessCode) {
-        AccessCodeEntity entity = mapper.toEntity(accessCode);
-        jpaRepository.save(entity);
+    public AccessCode save(AccessCode accessCode) {
+        AccessCodeEntity entity = accessCode.getId() == null
+            ? new AccessCodeEntity()
+            : jpaRepository.findById(accessCode.getId()).orElseGet(AccessCodeEntity::new);
+
+        entity.setId(accessCode.getId());
+        entity.setResidentId(accessCode.getResidentId());
+        entity.setVisitorName(accessCode.getVisitorName());
+        entity.setVisitorPhone(accessCode.getVisitorPhone());
+        entity.setPurpose(accessCode.getPurpose());
+        entity.setCode(accessCode.getCode());
+        entity.setQrData(accessCode.getQrData());
+        entity.setSingleUse(accessCode.isSingleUse());
+        entity.setValidFrom(accessCode.getValidFrom());
+        entity.setValidUntil(accessCode.getValidUntil());
+        entity.setStatus(accessCode.getStatus());
+        entity.setUsedAt(accessCode.getUsedAt());
+        AccessCodeEntity saved = jpaRepository.save(entity);
+        return mapper.toDomain(saved);
     }
 
     @Override

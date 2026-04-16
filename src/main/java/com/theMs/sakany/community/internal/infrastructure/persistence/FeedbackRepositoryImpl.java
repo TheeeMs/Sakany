@@ -65,6 +65,13 @@ public class FeedbackRepositoryImpl implements FeedbackRepository {
     @Override
     public void recordVote(UUID feedbackId, UUID voterId, VoteType voteType) {
         FeedbackVoteEntity voteEntity = new FeedbackVoteEntity();
+        try {
+            java.lang.reflect.Field idField = com.theMs.sakany.shared.jpa.BaseEntity.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(voteEntity, UUID.randomUUID());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to set ID on FeedbackVoteEntity", e);
+        }
         voteEntity.setFeedbackId(feedbackId);
         voteEntity.setVoterId(voterId);
         voteEntity.setVoteType(voteType);

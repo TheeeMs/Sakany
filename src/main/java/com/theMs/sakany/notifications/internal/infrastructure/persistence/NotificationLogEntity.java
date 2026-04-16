@@ -81,39 +81,79 @@ public class NotificationLogEntity extends BaseEntity {
         return recipientId;
     }
 
+    public void setRecipientId(UUID recipientId) {
+        this.recipientId = recipientId;
+    }
+
     public String getTitle() {
         return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getBody() {
         return body;
     }
 
+    public void setBody(String body) {
+        this.body = body;
+    }
+
     public NotificationType getType() {
         return type;
+    }
+
+    public void setType(NotificationType type) {
+        this.type = type;
     }
 
     public UUID getReferenceId() {
         return referenceId;
     }
 
+    public void setReferenceId(UUID referenceId) {
+        this.referenceId = referenceId;
+    }
+
     public NotificationChannel getChannel() {
         return channel;
+    }
+
+    public void setChannel(NotificationChannel channel) {
+        this.channel = channel;
     }
 
     public NotificationStatus getStatus() {
         return status;
     }
 
+    public void setStatus(NotificationStatus status) {
+        this.status = status;
+    }
+
     public Instant getSentAt() {
         return sentAt;
+    }
+
+    public void setSentAt(Instant sentAt) {
+        this.sentAt = sentAt;
     }
 
     public Instant getReadAt() {
         return readAt;
     }
 
+    public void setReadAt(Instant readAt) {
+        this.readAt = readAt;
+    }
+
     public String getFailureReason() {
         return failureReason;
+    }
+
+    public void setFailureReason(String failureReason) {
+        this.failureReason = failureReason;
     }
 }

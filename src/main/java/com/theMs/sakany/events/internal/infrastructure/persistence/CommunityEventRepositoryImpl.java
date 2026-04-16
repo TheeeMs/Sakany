@@ -20,7 +20,30 @@ public class CommunityEventRepositoryImpl implements CommunityEventRepository {
 
     @Override
     public CommunityEvent save(CommunityEvent event) {
-        CommunityEventEntity entity = mapper.toEntity(event);
+        CommunityEventEntity entity = event.getId() == null
+            ? new CommunityEventEntity()
+            : jpaRepository.findById(event.getId()).orElseGet(CommunityEventEntity::new);
+
+        entity.setId(event.getId());
+        entity.setOrganizerId(event.getOrganizerId());
+        entity.setTitle(event.getTitle());
+        entity.setDescription(event.getDescription());
+        entity.setLocation(event.getLocation());
+        entity.setStartDate(event.getStartDate());
+        entity.setEndDate(event.getEndDate());
+        entity.setImageUrl(event.getImageUrl());
+        entity.setHostName(event.getHostName());
+        entity.setPrice(event.getPrice());
+        entity.setMaxAttendees(event.getMaxAttendees());
+        entity.setCategory(event.getCategory());
+        entity.setHostRole(event.getHostRole());
+        entity.setContactPhone(event.getContactPhone());
+        entity.setLatitude(event.getLatitude());
+        entity.setLongitude(event.getLongitude());
+        entity.setCurrentAttendees(event.getCurrentAttendees());
+        entity.setStatus(event.getStatus());
+        entity.setApprovedBy(event.getApprovedBy());
+
         CommunityEventEntity saved = jpaRepository.save(entity);
         return mapper.toDomain(saved);
     }

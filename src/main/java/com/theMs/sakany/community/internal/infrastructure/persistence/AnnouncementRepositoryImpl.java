@@ -25,7 +25,19 @@ public class AnnouncementRepositoryImpl implements AnnouncementRepository {
 
     @Override
     public Announcement save(Announcement announcement) {
-        AnnouncementEntity entity = mapper.toEntity(announcement);
+        AnnouncementEntity entity;
+        if (announcement.getId() != null && jpaRepository.existsById(announcement.getId())) {
+             entity = jpaRepository.findById(announcement.getId()).orElseThrow();
+             // Map fields from domain to existing entity
+             entity.setTitle(announcement.getTitle());
+             entity.setContent(announcement.getContent());
+             entity.setPriority(announcement.getPriority());
+             entity.setActive(announcement.isActive());
+             entity.setExpiresAt(announcement.getExpiresAt());
+        } else {
+             entity = mapper.toEntity(announcement);
+        }
+        
         AnnouncementEntity savedEntity = jpaRepository.save(entity);
 
         // Publish events

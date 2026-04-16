@@ -37,7 +37,7 @@ public class CreateAccessCodeCommandHandler {
             command.validUntil()
         );
 
-        repository.save(accessCode);
-        return accessCode.getId();
+        AccessCode saved = repository.save(accessCode);
+        return saved.getId();
     }
 }

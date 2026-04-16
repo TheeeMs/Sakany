@@ -1,7 +1,5 @@
 package com.theMs.sakany.shared.jpa;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import org.hibernate.annotations.CreationTimestamp;
@@ -28,6 +26,10 @@ public abstract class BaseEntity implements Persistable<UUID> {
         return id;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
     public Instant getCreatedAt() {
         return createdAt;
     }
@@ -38,7 +40,7 @@ public abstract class BaseEntity implements Persistable<UUID> {
 
     @Override
     public boolean isNew() {
-        // If createdAt is null, this is a newly created entity that hasn't been saved yet.
+        // For entities with application-assigned UUIDs, createdAt indicates persisted state.
         return this.createdAt == null;
     }
 }

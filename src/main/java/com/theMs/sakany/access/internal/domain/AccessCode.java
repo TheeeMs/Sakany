@@ -94,6 +94,36 @@ public class AccessCode extends AggregateRoot {
         return accessCode;
     }
 
+    public static AccessCode rehydrate(
+        UUID id,
+        UUID residentId,
+        String visitorName,
+        String visitorPhone,
+        VisitPurpose purpose,
+        String code,
+        String qrData,
+        boolean isSingleUse,
+        Instant validFrom,
+        Instant validUntil,
+        AccessCodeStatus status,
+        Instant usedAt
+    ) {
+        return new AccessCode(
+            id,
+            residentId,
+            visitorName,
+            visitorPhone,
+            purpose,
+            code,
+            qrData,
+            isSingleUse,
+            validFrom,
+            validUntil,
+            status,
+            usedAt
+        );
+    }
+
     /**
      * Use (scan) this access code. Validates state and applies single-use logic.
      * @throws IllegalStateException if code is expired, revoked, or already used (single-use)

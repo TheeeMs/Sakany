@@ -42,9 +42,11 @@ public class FeedbackMapper {
             idField.setAccessible(true);
             idField.set(entity, domain.getId());
             
-            java.lang.reflect.Field createdAtField = com.theMs.sakany.shared.jpa.BaseEntity.class.getDeclaredField("createdAt");
-            createdAtField.setAccessible(true);
-            createdAtField.set(entity, domain.getCreatedAt());
+            if (domain.getCreatedAt() != null) {
+                java.lang.reflect.Field createdAtField = com.theMs.sakany.shared.jpa.BaseEntity.class.getDeclaredField("createdAt");
+                createdAtField.setAccessible(true);
+                createdAtField.set(entity, domain.getCreatedAt().atZone(java.time.ZoneId.systemDefault()).toInstant());
+            }
         } catch (Exception e) {
             throw new RuntimeException("Failed to set ID or CreatedAt on FeedbackEntity", e);
         }

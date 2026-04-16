@@ -21,7 +21,16 @@ public class EventRegistrationRepositoryImpl implements EventRegistrationReposit
 
     @Override
     public EventRegistration save(EventRegistration registration) {
-        EventRegistrationEntity entity = mapper.toEntity(registration);
+        EventRegistrationEntity entity = registration.getId() == null
+            ? new EventRegistrationEntity()
+            : jpaRepository.findById(registration.getId()).orElseGet(EventRegistrationEntity::new);
+
+        entity.setId(registration.getId());
+        entity.setEventId(registration.getEventId());
+        entity.setResidentId(registration.getResidentId());
+        entity.setRegisteredAt(registration.getRegisteredAt());
+        entity.setStatus(registration.getStatus());
+
         EventRegistrationEntity saved = jpaRepository.save(entity);
         return mapper.toDomain(saved);
     }

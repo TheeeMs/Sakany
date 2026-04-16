@@ -30,9 +30,25 @@ public class NotificationLogRepositoryImpl implements NotificationLogRepository 
 
     @Override
     public NotificationLog save(NotificationLog notificationLog) {
-        NotificationLogEntity savedEntity = jpaRepository.save(
-            Objects.requireNonNull(mapper.toEntity(notificationLog), "NotificationLog entity cannot be null")
-        );
+        Objects.requireNonNull(notificationLog, "NotificationLog cannot be null");
+
+        NotificationLogEntity entity = notificationLog.getId() == null
+            ? new NotificationLogEntity()
+            : jpaRepository.findById(notificationLog.getId()).orElseGet(NotificationLogEntity::new);
+
+        entity.setId(notificationLog.getId());
+        entity.setRecipientId(notificationLog.getRecipientId());
+        entity.setTitle(notificationLog.getTitle());
+        entity.setBody(notificationLog.getBody());
+        entity.setType(notificationLog.getType());
+        entity.setReferenceId(notificationLog.getReferenceId());
+        entity.setChannel(notificationLog.getChannel());
+        entity.setStatus(notificationLog.getStatus());
+        entity.setSentAt(notificationLog.getSentAt());
+        entity.setReadAt(notificationLog.getReadAt());
+        entity.setFailureReason(notificationLog.getFailureReason());
+
+        NotificationLogEntity savedEntity = jpaRepository.save(entity);
 
         notificationLog.getDomainEvents().forEach(eventPublisher::publishEvent);
         notificationLog.clearDomainEvents();

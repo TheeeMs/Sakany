@@ -42,8 +42,8 @@ public class ScanAccessCodeCommandHandler {
             command.gateNumber()
         );
 
-        visitLogRepository.save(visitLog);
+        VisitLog savedVisitLog = visitLogRepository.save(visitLog);
 
-        return visitLog.getId();
+        return savedVisitLog.getId();
     }
 }

@@ -37,14 +37,18 @@ public class MaintenanceRequestMapper {
 
         MaintenanceRequestEntity entity = new MaintenanceRequestEntity();
         
-        // Since we don't have an explicit setId in BaseEntity we need to handle reflection or use reflection inside BaseEntity to set it.
-        // Assuming BaseEntity has an ID we need to find a way to set it. We can do it using reflection.
         try {
-            var idField = com.theMs.sakany.shared.jpa.BaseEntity.class.getDeclaredField("id");
+            java.lang.reflect.Field idField = com.theMs.sakany.shared.jpa.BaseEntity.class.getDeclaredField("id");
             idField.setAccessible(true);
             idField.set(entity, domain.getId());
+            
+            if (domain.getCreatedAt() != null) {
+                java.lang.reflect.Field createdAtField = com.theMs.sakany.shared.jpa.BaseEntity.class.getDeclaredField("createdAt");
+                createdAtField.setAccessible(true);
+                createdAtField.set(entity, domain.getCreatedAt().atZone(java.time.ZoneId.systemDefault()).toInstant());
+            }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to set entity ID", e);
+            throw new RuntimeException("Failed to set ID or CreatedAt on MaintenanceRequestEntity", e);
         }
 
         entity.setResidentId(domain.getResidentId());

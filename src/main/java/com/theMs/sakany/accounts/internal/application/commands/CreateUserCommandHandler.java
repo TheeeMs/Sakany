@@ -4,6 +4,7 @@ import com.theMs.sakany.accounts.internal.domain.ResidentProfile;
 import com.theMs.sakany.accounts.internal.domain.User;
 import com.theMs.sakany.accounts.internal.domain.UserRepository;
 import com.theMs.sakany.shared.cqrs.CommandHandler;
+import com.theMs.sakany.shared.exception.BusinessRuleException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,14 @@ public class CreateUserCommandHandler implements CommandHandler<CreateUserComman
     @Override
     @Transactional
     public UUID handle(CreateUserCommand command) {
+        userRepository.findByEmail(command.email()).ifPresent(existing -> {
+            throw new BusinessRuleException("Email already registered");
+        });
+
+        userRepository.findByPhoneNumber(command.phoneNumber()).ifPresent(existing -> {
+            throw new BusinessRuleException("Phone number already registered");
+        });
+
         String hashedPassword = command.password() != null ? passwordEncoder.encode(command.password()) : null;
 
         User user = User.create(

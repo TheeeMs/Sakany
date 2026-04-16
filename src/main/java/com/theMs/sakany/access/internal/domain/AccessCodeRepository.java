@@ -5,7 +5,7 @@ import java.util.UUID;
 import java.util.List;
 
 public interface AccessCodeRepository {
-    void save(AccessCode accessCode);
+    AccessCode save(AccessCode accessCode);
     Optional<AccessCode> findById(UUID id);
     Optional<AccessCode> findByCode(String code);
     List<AccessCode> findByResidentId(UUID residentId);

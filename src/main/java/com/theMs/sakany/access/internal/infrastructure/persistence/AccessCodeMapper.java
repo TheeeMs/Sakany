@@ -7,7 +7,8 @@ import org.springframework.stereotype.Component;
 public class AccessCodeMapper {
 
     public AccessCode toDomain(AccessCodeEntity entity) {
-        return AccessCode.create(
+        return AccessCode.rehydrate(
+            entity.getId(),
             entity.getResidentId(),
             entity.getVisitorName(),
             entity.getVisitorPhone(),
@@ -16,12 +17,14 @@ public class AccessCodeMapper {
             entity.getQrData(),
             entity.isSingleUse(),
             entity.getValidFrom(),
-            entity.getValidUntil()
+            entity.getValidUntil(),
+            entity.getStatus(),
+            entity.getUsedAt()
         );
     }
 
     public AccessCodeEntity toEntity(AccessCode domain) {
-        return new AccessCodeEntity(
+        AccessCodeEntity entity = new AccessCodeEntity(
             domain.getResidentId(),
             domain.getVisitorName(),
             domain.getVisitorPhone(),
@@ -34,5 +37,7 @@ public class AccessCodeMapper {
             domain.getStatus(),
             domain.getUsedAt()
         );
+        entity.setId(domain.getId());
+        return entity;
     }
 }

@@ -3,9 +3,13 @@
 # It uses variables to chain requests sequentially.
 
 @host = http://localhost:8080
-@email = testuser@example.com
+@email = testuser+{{$timestamp}}@example.com
 @password = Password123!
-@phone = +1234567890
+@phone = +12345{{$timestamp}}
+@otp_code = 123456
+@visit_log_id = 
+@event_id_reject = 
+@notification_id = 
 
 # ==========================================
 # 1. AUTHENTICATION & USERS
@@ -22,8 +26,8 @@ Content-Type: application/json
   "phoneNumber": "{{phone}}",
   "email": "{{email}}",
   "password": "{{password}}",
-  "type": "OWNER",
-  "loginMethod": "EMAIL"
+  "type": "PROPERTY_OWNER",
+  "loginMethod": "EMAIL_PASSWORD"
 }
 
 > {%
@@ -33,6 +37,7 @@ Content-Type: application/json
 %}
 
 ### Send OTP
+# @name sendOtp
 POST {{host}}/v1/auth/send-otp
 Content-Type: application/json
 
@@ -40,13 +45,19 @@ Content-Type: application/json
   "phoneNumber": "{{phone}}"
 }
 
+> {%
+    if (response.body && response.body.otpCode) {
+      client.global.set("otp_code", response.body.otpCode);
+    }
+%}
+
 ### Login with Phone
 POST {{host}}/v1/auth/login/phone
 Content-Type: application/json
 
 {
   "phoneNumber": "{{phone}}",
-  "otpCode": "123456"
+  "otpCode": "{{otp_code}}"
 }
 
 ### Login with Email
@@ -111,7 +122,7 @@ Content-Type: application/json
   "address": "123 Main St, City"
 }
 
-> {% client.global.set("compound_id", response.body.id); %}
+> {% client.global.set("compound_id", response.body); %}
 
 ### Get Compound by ID
 GET {{host}}/v1/compounds/{{compound_id}}
@@ -129,7 +140,7 @@ Content-Type: application/json
   "numberOfFloors": 10
 }
 
-> {% client.global.set("building_id", response.body.id); %}
+> {% client.global.set("building_id", response.body); %}
 
 ### Get Buildings by Compound
 GET {{host}}/v1/buildings/compound/{{compound_id}}
@@ -145,10 +156,10 @@ Content-Type: application/json
   "buildingId": "{{building_id}}",
   "unitNumber": "101A",
   "floor": 1,
-  "type": "RESIDENTIAL"
+  "type": "APARTMENT"
 }
 
-> {% client.global.set("unit_id", response.body.id); %}
+> {% client.global.set("unit_id", response.body); %}
 
 ### Get Units by Building
 GET {{host}}/v1/units/building/{{building_id}}
@@ -171,12 +182,12 @@ Content-Type: application/json
   "title": "Leaking Pipe in Kitchen",
   "description": "Water is leaking from under the sink.",
   "category": "PLUMBING",
-  "priority": "HIGH",
+  "priority": "URGENT",
   "isPublic": false,
   "photoUrls": []
 }
 
-> {% client.global.set("maintenance_id", response.body.id); %}
+> {% client.global.set("maintenance_id", response.body); %}
 
 ### Get Request by ID
 GET {{host}}/v1/maintenance-requests/{{maintenance_id}}
@@ -187,7 +198,7 @@ GET {{host}}/v1/maintenance-requests/resident/{{user_id}}
 Authorization: Bearer {{auth_token}}
 
 ### Get by Status
-GET {{host}}/v1/maintenance-requests/status/PENDING
+GET {{host}}/v1/maintenance-requests/status/SUBMITTED
 Authorization: Bearer {{auth_token}}
 
 ### Assign Technician
@@ -295,10 +306,9 @@ Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {
-  "authorId": "{{user_id}}",
   "title": "Great Service",
   "content": "The maintenance guy was really fast.",
-  "type": "PRAISE",
+  "type": "SUGGESTION",
   "isPublic": true,
   "category": "MAINTENANCE",
   "location": "Building A",
@@ -306,7 +316,7 @@ Content-Type: application/json
   "imageUrl": null
 }
 
-> {% client.global.set("feedback_id", response.body.id); %}
+> {% client.global.set("feedback_id", response.body); %}
 
 ### Get Public Feedback
 GET {{host}}/v1/feedback
@@ -315,7 +325,6 @@ Authorization: Bearer {{auth_token}}
 ### Get My Feedback
 GET {{host}}/v1/feedback/me
 Authorization: Bearer {{auth_token}}
-X-User-Id: {{user_id}}
 
 ### Vote on Feedback
 POST {{host}}/v1/feedback/{{feedback_id}}/vote
@@ -323,8 +332,7 @@ Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {
-  "voterId": "{{user_id}}",
-  "voteType": "UPVOTE"
+  "voteType": "UP"
 }
 
 ### Update Feedback Status
@@ -333,7 +341,7 @@ Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {
-  "newStatus": "APPROVED"
+  "newStatus": "UNDER_REVIEW"
 }
 
 
@@ -351,7 +359,7 @@ Content-Type: application/json
   "authorId": "{{user_id}}",
   "title": "Pool Maintenance",
   "content": "The pool will be closed tomorrow.",
-  "priority": "MEDIUM",
+  "priority": "NORMAL",
   "expiresAt": "2026-04-20T10:00:00Z"
 }
 
@@ -383,8 +391,8 @@ Content-Type: application/json
 
 {
   "reporterId": "{{user_id}}",
-  "type": "SECURITY",
-  "category": "SUSPICIOUS_ACTIVITY",
+  "type": "SUSPICIOUS_ACTIVITY",
+  "category": "PERSON",
   "title": "Suspicious person in lobby",
   "description": "Someone is wandering around without access card.",
   "location": "Building A Lobby",
@@ -454,10 +462,13 @@ Content-Type: application/json
   "gateNumber": 1
 }
 
+> {%
+    client.global.set("visit_log_id", response.body.visitLogId);
+%}
+
 ### Reactivate Access Code
 POST {{host}}/v1/access/codes/{{access_code_id}}/reactivate
 Authorization: Bearer {{auth_token}}
-X-Resident-Id: {{user_id}}
 Content-Type: application/json
 
 {
@@ -470,7 +481,7 @@ GET {{host}}/v1/access/visit-logs
 Authorization: Bearer {{auth_token}}
 
 ### Log Visitor Exit
-PATCH {{host}}/v1/access/visit-logs/visit-log-uuid-here/exit
+PATCH {{host}}/v1/access/visit-logs/{{visit_log_id}}/exit
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -492,18 +503,31 @@ Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {
-  "proposerId": "{{user_id}}",
+  "organizerId": "{{user_id}}",
   "title": "Community BBQ",
   "description": "Annual summer BBQ event for all residents.",
-  "eventDate": "2026-06-01T14:00:00Z",
+  "startDate": "2027-06-01T14:00:00Z",
+  "endDate": "2027-06-01T18:00:00Z",
   "location": "Main Pool Area",
-  "maxCapacity": 50
+  "maxAttendees": 50,
+  "category": "SOCIAL",
+  "hostName": "Community Team",
+  "hostRole": "ADMIN",
+  "contactPhone": "+1234567890",
+  "price": 0,
+  "latitude": 30.0444,
+  "longitude": 31.2357
 }
 
-> {% client.global.set("event_id", response.body.id); %}
+> {%
+    const location = response.headers["location"] || response.headers["Location"];
+    if (location) {
+      client.global.set("event_id", location.split("/").pop());
+    }
+%}
 
 ### List Events
-GET {{host}}/v1/events?status=PENDING
+GET {{host}}/v1/events?status=PROPOSED
 Authorization: Bearer {{auth_token}}
 
 ### Get Event Details
@@ -517,8 +541,38 @@ Content-Type: application/json
 
 {}
 
+### Propose Event For Reject Path
+# @name proposeEventReject
+POST {{host}}/v1/events
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "organizerId": "{{user_id}}",
+  "title": "Community Cleanup",
+  "description": "Cleanup day for all residents.",
+  "startDate": "2027-07-01T09:00:00Z",
+  "endDate": "2027-07-01T12:00:00Z",
+  "location": "Central Garden",
+  "maxAttendees": 30,
+  "category": "COMMUNITY",
+  "hostName": "Community Team",
+  "hostRole": "ADMIN",
+  "contactPhone": "+1234567890",
+  "price": 0,
+  "latitude": 30.0444,
+  "longitude": 31.2357
+}
+
+> {%
+    const location = response.headers["location"] || response.headers["Location"];
+    if (location) {
+      client.global.set("event_id_reject", location.split("/").pop());
+    }
+%}
+
 ### Reject Event
-PATCH {{host}}/v1/events/{{event_id}}/reject?adminId={{user_id}}
+PATCH {{host}}/v1/events/{{event_id_reject}}/reject?adminId={{user_id}}
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
@@ -541,6 +595,7 @@ Authorization: Bearer {{auth_token}}
 # ==========================================
 
 ### Send Notification
+# @name sendNotification
 POST {{host}}/v1/notifications/send
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
@@ -554,12 +609,16 @@ Content-Type: application/json
   "channel": "PUSH"
 }
 
+> {%
+    client.global.set("notification_id", response.body);
+%}
+
 ### List Notifications
 GET {{host}}/v1/notifications?recipientId={{user_id}}
 Authorization: Bearer {{auth_token}}
 
 ### Mark Notification as Read (Depends on getting id from above)
-PATCH {{host}}/v1/notifications/some-notification-id/read?recipientId={{user_id}}
+PATCH {{host}}/v1/notifications/{{notification_id}}/read?recipientId={{user_id}}
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 

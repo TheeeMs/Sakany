@@ -44,7 +44,7 @@ public class ReactivateAccessCodeCommandHandler {
                 command.validUntil()
         );
 
-        repository.save(newAccessCode);
-        return newAccessCode.getId();
+            AccessCode saved = repository.save(newAccessCode);
+            return saved.getId();
     }
 }

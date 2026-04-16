@@ -13,6 +13,7 @@ import com.theMs.sakany.shared.auth.AccessTokenPayload;
 import com.theMs.sakany.shared.auth.JwtService;
 import com.theMs.sakany.shared.exception.BusinessRuleException;
 import com.theMs.sakany.shared.exception.NotFoundException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -37,18 +38,21 @@ public class AuthController {
     private final JwtService jwtService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final com.theMs.sakany.shared.firebase.OtpService otpService;
+    private final boolean includeOtpInResponse;
 
     public AuthController(
             CreateUserCommandHandler createUserCommandHandler,
             UserRepository userRepository,
             JwtService jwtService,
             BCryptPasswordEncoder passwordEncoder,
-            com.theMs.sakany.shared.firebase.OtpService otpService) {
+            com.theMs.sakany.shared.firebase.OtpService otpService,
+            @Value("${auth.otp.include-in-response:false}") boolean includeOtpInResponse) {
         this.createUserCommandHandler = createUserCommandHandler;
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
         this.otpService = otpService;
+        this.includeOtpInResponse = includeOtpInResponse;
     }
 
     @PostMapping("/register")
@@ -89,10 +93,14 @@ public class AuthController {
                 .orElseThrow(() -> new NotFoundException("User", phoneNumber));
 
         String otp = otpService.generateOtp(phoneNumber);
+        Map<String, String> response = new LinkedHashMap<>();
+        response.put("message", "OTP sent successfully");
+        response.put("phoneNumber", phoneNumber);
+        if (includeOtpInResponse) {
+            response.put("otpCode", otp);
+        }
 
-        return ResponseEntity.ok(Map.of(
-                "message", "OTP sent successfully",
-                "phoneNumber", phoneNumber));
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login/phone")

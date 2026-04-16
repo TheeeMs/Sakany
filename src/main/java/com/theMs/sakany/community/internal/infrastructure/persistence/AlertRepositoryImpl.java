@@ -25,7 +25,23 @@ public class AlertRepositoryImpl implements AlertRepository {
 
     @Override
     public Alert save(Alert alert) {
-        AlertEntity entity = mapper.toEntity(alert);
+        AlertEntity entity;
+        if (alert.getId() != null && jpaRepository.existsById(alert.getId())) {
+             entity = jpaRepository.findById(alert.getId()).orElseThrow();
+             entity.setReporterId(alert.getReporterId());
+             entity.setType(alert.getType());
+             entity.setCategory(alert.getCategory());
+             entity.setTitle(alert.getTitle());
+             entity.setDescription(alert.getDescription());
+             entity.setLocation(alert.getLocation());
+             entity.setEventTime(alert.getEventTime());
+             entity.setPhotoUrls(alert.getPhotoUrls());
+             entity.setResolved(alert.isResolved());
+             entity.setResolvedAt(alert.getResolvedAt());
+        } else {
+             entity = mapper.toEntity(alert);
+        }
+        
         AlertEntity savedEntity = jpaRepository.save(entity);
 
         // Publish events

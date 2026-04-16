@@ -5,7 +5,7 @@ import java.util.UUID;
 import java.util.List;
 
 public interface VisitLogRepository {
-    void save(VisitLog visitLog);
+    VisitLog save(VisitLog visitLog);
     Optional<VisitLog> findById(UUID id);
     List<VisitLog> findByResidentId(UUID residentId);
     List<VisitLog> findByAccessCodeId(UUID accessCodeId);

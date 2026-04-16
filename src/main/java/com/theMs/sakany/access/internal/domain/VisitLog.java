@@ -64,6 +64,26 @@ public class VisitLog extends AggregateRoot {
         return visitLog;
     }
 
+    public static VisitLog rehydrate(
+        UUID id,
+        UUID accessCodeId,
+        UUID residentId,
+        String visitorName,
+        Instant entryTime,
+        Instant exitTime,
+        String gateNumber
+    ) {
+        return new VisitLog(
+            id,
+            accessCodeId,
+            residentId,
+            visitorName,
+            entryTime,
+            exitTime,
+            gateNumber
+        );
+    }
+
     /**
      * Log the visitor's exit time.
      */
