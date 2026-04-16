@@ -1,0 +1,573 @@
+### Sakany API Complete Sequential Test Flow (54 Endpoints)
+# This file is compatible with IntelliJ IDEA HTTP Client and VS Code REST Client.
+# It uses variables to chain requests sequentially.
+
+@host = http://localhost:8080
+@email = testuser@example.com
+@password = Password123!
+@phone = +1234567890
+
+# ==========================================
+# 1. AUTHENTICATION & USERS
+# ==========================================
+
+### Register User
+# @name registerUser
+POST {{host}}/v1/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Admin",
+  "lastName": "User",
+  "phoneNumber": "{{phone}}",
+  "email": "{{email}}",
+  "password": "{{password}}",
+  "type": "OWNER",
+  "loginMethod": "EMAIL"
+}
+
+> {%
+    client.global.set("auth_token", response.body.accessToken);
+    client.global.set("refresh_token", response.body.refreshToken);
+    client.global.set("user_id", response.body.userId);
+%}
+
+### Send OTP
+POST {{host}}/v1/auth/send-otp
+Content-Type: application/json
+
+{
+  "phoneNumber": "{{phone}}"
+}
+
+### Login with Phone
+POST {{host}}/v1/auth/login/phone
+Content-Type: application/json
+
+{
+  "phoneNumber": "{{phone}}",
+  "otpCode": "123456"
+}
+
+### Login with Email
+# @name loginEmail
+POST {{host}}/v1/auth/login/email
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+> {%
+    client.global.set("auth_token", response.body.accessToken);
+%}
+
+### Refresh Token
+POST {{host}}/v1/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refresh_token}}"
+}
+
+### Get Current User (Assuming /v1/auth/me exists)
+GET {{host}}/v1/auth/me
+Authorization: Bearer {{auth_token}}
+
+# ==========================================
+# 2. DEVICE TOKENS
+# ==========================================
+
+### Register Device Token
+# @name registerDeviceToken
+POST {{host}}/v1/device-tokens
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "userId": "{{user_id}}",
+  "token": "dummy-fcm-token-12345",
+  "platform": "WEB"
+}
+
+### Deactivate Device Token (Needs actual token ID returned from above, assuming UUID)
+DELETE {{host}}/v1/device-tokens/some-uuid-here
+Authorization: Bearer {{auth_token}}
+
+
+# ==========================================
+# 3. PROPERTIES (COMPOUND, BUILDING, UNIT)
+# ==========================================
+
+### Create Compound
+# @name createCompound
+POST {{host}}/v1/compounds
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "Sunset Paradise Real Estate",
+  "address": "123 Main St, City"
+}
+
+> {% client.global.set("compound_id", response.body.id); %}
+
+### Get Compound by ID
+GET {{host}}/v1/compounds/{{compound_id}}
+Authorization: Bearer {{auth_token}}
+
+### Create Building
+# @name createBuilding
+POST {{host}}/v1/buildings
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "compoundId": "{{compound_id}}",
+  "name": "Building A",
+  "numberOfFloors": 10
+}
+
+> {% client.global.set("building_id", response.body.id); %}
+
+### Get Buildings by Compound
+GET {{host}}/v1/buildings/compound/{{compound_id}}
+Authorization: Bearer {{auth_token}}
+
+### Create Unit
+# @name createUnit
+POST {{host}}/v1/units
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "buildingId": "{{building_id}}",
+  "unitNumber": "101A",
+  "floor": 1,
+  "type": "RESIDENTIAL"
+}
+
+> {% client.global.set("unit_id", response.body.id); %}
+
+### Get Units by Building
+GET {{host}}/v1/units/building/{{building_id}}
+Authorization: Bearer {{auth_token}}
+
+
+# ==========================================
+# 4. MAINTENANCE REQUESTS
+# ==========================================
+
+### Create Maintenance Request
+# @name createMaintenanceReq
+POST {{host}}/v1/maintenance-requests
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "residentId": "{{user_id}}",
+  "unitId": "{{unit_id}}",
+  "title": "Leaking Pipe in Kitchen",
+  "description": "Water is leaking from under the sink.",
+  "category": "PLUMBING",
+  "priority": "HIGH",
+  "isPublic": false,
+  "photoUrls": []
+}
+
+> {% client.global.set("maintenance_id", response.body.id); %}
+
+### Get Request by ID
+GET {{host}}/v1/maintenance-requests/{{maintenance_id}}
+Authorization: Bearer {{auth_token}}
+
+### Get by Resident
+GET {{host}}/v1/maintenance-requests/resident/{{user_id}}
+Authorization: Bearer {{auth_token}}
+
+### Get by Status
+GET {{host}}/v1/maintenance-requests/status/PENDING
+Authorization: Bearer {{auth_token}}
+
+### Assign Technician
+POST {{host}}/v1/maintenance-requests/{{maintenance_id}}/assign
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "technicianId": "tech-uuid-here"
+}
+
+### Start Work
+POST {{host}}/v1/maintenance-requests/{{maintenance_id}}/start
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{}
+
+### Resolve Work
+POST {{host}}/v1/maintenance-requests/{{maintenance_id}}/resolve
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{}
+
+### Reject Work
+POST {{host}}/v1/maintenance-requests/{{maintenance_id}}/reject
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "reason": "Not enough parts"
+}
+
+### Cancel Work
+POST {{host}}/v1/maintenance-requests/{{maintenance_id}}/cancel
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{}
+
+
+# ==========================================
+# 5. INVOICES & PAYMENTS
+# ==========================================
+
+### Create Invoice
+# @name createInvoice
+POST {{host}}/v1/invoices
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "residentId": "{{user_id}}",
+  "unitId": "{{unit_id}}",
+  "type": "MAINTENANCE_FEE",
+  "amount": 150.00,
+  "currency": "USD",
+  "description": "Fixing the leaking pipe",
+  "dueDate": "2026-05-01T00:00:00Z"
+}
+
+> {% client.global.set("invoice_id", response.body.id); %}
+
+### List Invoices
+GET {{host}}/v1/invoices?residentId={{user_id}}
+Authorization: Bearer {{auth_token}}
+
+### Get Invoice by ID
+GET {{host}}/v1/invoices/{{invoice_id}}
+Authorization: Bearer {{auth_token}}
+
+### Pay Invoice
+# @name payInvoice
+POST {{host}}/v1/invoices/{{invoice_id}}/pay
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "residentId": "{{user_id}}",
+  "paymentMethod": "CREDIT_CARD",
+  "transactionReference": "tx-987654321"
+}
+
+### List Payments
+GET {{host}}/v1/payments?residentId={{user_id}}
+Authorization: Bearer {{auth_token}}
+
+### Cancel Invoice
+PATCH {{host}}/v1/invoices/{{invoice_id}}/cancel
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{}
+
+
+# ==========================================
+# 6. FEEDBACK
+# ==========================================
+
+### Submit Feedback
+# @name submitFeedback
+POST {{host}}/v1/feedback
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "authorId": "{{user_id}}",
+  "title": "Great Service",
+  "content": "The maintenance guy was really fast.",
+  "type": "PRAISE",
+  "isPublic": true,
+  "category": "MAINTENANCE",
+  "location": "Building A",
+  "isAnonymous": false,
+  "imageUrl": null
+}
+
+> {% client.global.set("feedback_id", response.body.id); %}
+
+### Get Public Feedback
+GET {{host}}/v1/feedback
+Authorization: Bearer {{auth_token}}
+
+### Get My Feedback
+GET {{host}}/v1/feedback/me
+Authorization: Bearer {{auth_token}}
+X-User-Id: {{user_id}}
+
+### Vote on Feedback
+POST {{host}}/v1/feedback/{{feedback_id}}/vote
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "voterId": "{{user_id}}",
+  "voteType": "UPVOTE"
+}
+
+### Update Feedback Status
+PATCH {{host}}/v1/feedback/{{feedback_id}}/status
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "newStatus": "APPROVED"
+}
+
+
+# ==========================================
+# 7. ANNOUNCEMENTS
+# ==========================================
+
+### Create Announcement
+# @name createAnnouncement
+POST {{host}}/v1/announcements
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "authorId": "{{user_id}}",
+  "title": "Pool Maintenance",
+  "content": "The pool will be closed tomorrow.",
+  "priority": "MEDIUM",
+  "expiresAt": "2026-04-20T10:00:00Z"
+}
+
+> {% client.global.set("announcement_id", response.body.id); %}
+
+### Get Active Announcements
+GET {{host}}/v1/announcements
+Authorization: Bearer {{auth_token}}
+
+### Deactivate Announcement
+PATCH {{host}}/v1/announcements/{{announcement_id}}/deactivate
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "requestingUserId": "{{user_id}}"
+}
+
+
+# ==========================================
+# 8. ALERTS
+# ==========================================
+
+### Report Alert
+# @name reportAlert
+POST {{host}}/v1/alerts
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "reporterId": "{{user_id}}",
+  "type": "SECURITY",
+  "category": "SUSPICIOUS_ACTIVITY",
+  "title": "Suspicious person in lobby",
+  "description": "Someone is wandering around without access card.",
+  "location": "Building A Lobby",
+  "eventTime": "2026-04-16T10:00:00Z",
+  "photoUrls": []
+}
+
+> {% client.global.set("alert_id", response.body.id); %}
+
+### Get Active Alerts
+GET {{host}}/v1/alerts
+Authorization: Bearer {{auth_token}}
+
+### Get Alert by ID
+GET {{host}}/v1/alerts/{{alert_id}}
+Authorization: Bearer {{auth_token}}
+
+### Resolve Alert
+PATCH {{host}}/v1/alerts/{{alert_id}}/resolve
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "requestingUserId": "{{user_id}}"
+}
+
+
+# ==========================================
+# 9. ACCESS CODES (VISITORS)
+# ==========================================
+
+### Create Access Code
+# @name createAccessCode
+POST {{host}}/v1/access/codes
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "visitorName": "John Doe",
+  "visitorPhone": "+19876543210",
+  "purpose": "Visiting for dinner",
+  "isSingleUse": true,
+  "validFrom": "2026-04-16T10:00:00Z",
+  "validUntil": "2026-04-17T10:00:00Z"
+}
+
+> {% 
+    client.global.set("access_code_id", response.body.id); 
+    client.global.set("access_code_str", response.body.code); 
+%}
+
+### Get Access Code
+GET {{host}}/v1/access/codes/{{access_code_id}}
+Authorization: Bearer {{auth_token}}
+
+### List My Access Codes
+GET {{host}}/v1/access/codes/my
+Authorization: Bearer {{auth_token}}
+
+### Scan Access Code
+# @name scanAccessCode
+POST {{host}}/v1/access/codes/{{access_code_str}}/scan
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "gateNumber": 1
+}
+
+### Reactivate Access Code
+POST {{host}}/v1/access/codes/{{access_code_id}}/reactivate
+Authorization: Bearer {{auth_token}}
+X-Resident-Id: {{user_id}}
+Content-Type: application/json
+
+{
+  "validFrom": "2026-04-18T10:00:00Z",
+  "validUntil": "2026-04-19T10:00:00Z"
+}
+
+### List Visit Logs
+GET {{host}}/v1/access/visit-logs
+Authorization: Bearer {{auth_token}}
+
+### Log Visitor Exit
+PATCH {{host}}/v1/access/visit-logs/visit-log-uuid-here/exit
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{}
+
+### Revoke Access Code
+DELETE {{host}}/v1/access/codes/{{access_code_id}}
+Authorization: Bearer {{auth_token}}
+
+
+# ==========================================
+# 10. EVENTS
+# ==========================================
+
+### Propose Event
+# @name proposeEvent
+POST {{host}}/v1/events
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "proposerId": "{{user_id}}",
+  "title": "Community BBQ",
+  "description": "Annual summer BBQ event for all residents.",
+  "eventDate": "2026-06-01T14:00:00Z",
+  "location": "Main Pool Area",
+  "maxCapacity": 50
+}
+
+> {% client.global.set("event_id", response.body.id); %}
+
+### List Events
+GET {{host}}/v1/events?status=PENDING
+Authorization: Bearer {{auth_token}}
+
+### Get Event Details
+GET {{host}}/v1/events/{{event_id}}
+Authorization: Bearer {{auth_token}}
+
+### Approve Event
+PATCH {{host}}/v1/events/{{event_id}}/approve?adminId={{user_id}}
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{}
+
+### Reject Event
+PATCH {{host}}/v1/events/{{event_id}}/reject?adminId={{user_id}}
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{}
+
+### Register for Event
+POST {{host}}/v1/events/{{event_id}}/register?residentId={{user_id}}
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{}
+
+### Cancel Registration
+DELETE {{host}}/v1/events/{{event_id}}/register?residentId={{user_id}}
+Authorization: Bearer {{auth_token}}
+
+
+# ==========================================
+# 11. NOTIFICATIONS
+# ==========================================
+
+### Send Notification
+POST {{host}}/v1/notifications/send
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "recipientId": "{{user_id}}",
+  "title": "Welcome to Sakany!",
+  "body": "Your account has been successfully set up.",
+  "type": "ANNOUNCEMENT",
+  "referenceId": null,
+  "channel": "PUSH"
+}
+
+### List Notifications
+GET {{host}}/v1/notifications?recipientId={{user_id}}
+Authorization: Bearer {{auth_token}}
+
+### Mark Notification as Read (Depends on getting id from above)
+PATCH {{host}}/v1/notifications/some-notification-id/read?recipientId={{user_id}}
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{}
+
+### Mark All as Read
+PATCH {{host}}/v1/notifications/read-all?recipientId={{user_id}}
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{}
