@@ -1,0 +1,1214 @@
+### Sakany Sequential API Collection (Generated)
+# Generated from controller source. Update by rerunning generate-api-artifacts.ps1
+
+@host = http://localhost:8080
+@auth_token = 
+@admin_token = 
+@refresh_token = 
+@user_id = 
+# Update these two values between registration runs to avoid duplicate user errors.
+@test_phone = +201000000000
+@test_email = user@example.com
+@test_password = Password123!
+@admin_email =
+@admin_password =
+@otp_code = 000000
+@compound_id = 
+@building_id = 
+@unit_id = 
+@access_code_id = 
+@access_code = 
+@visit_log_id = 
+@invoice_id = 
+@maintenance_id = 
+@feedback_id = 
+@announcement_id = 
+@alert_id = 
+@event_id = 
+@notification_id = 
+@device_token_id = 
+@admin_report_id = 
+@resident_id = 
+@employee_id = 
+# Update these values between admin resident creation runs to avoid duplicate conflicts.
+@admin_resident_phone = +201000000001
+@admin_resident_email = admin.resident@example.com
+@admin_resident_password = Password123!
+@admin_resident_national_id = 29801011234567
+# Update these values between admin employee creation runs to avoid duplicate conflicts.
+@admin_employee_phone = +201000000002
+@admin_employee_email = admin.employee@example.com
+@admin_employee_password = Password123!
+
+# ==========================================
+# Authentication and Users
+# ==========================================
+
+### POST /v1/auth/register
+# @name POST_v1_auth_register
+POST {{host}}/v1/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Sample name",
+  "lastName": "Sample name",
+  "phoneNumber": "{{test_phone}}",
+  "email": "{{test_email}}",
+  "password": "{{test_password}}",
+  "type": "PROPERTY_OWNER",
+  "loginMethod": "PHONE_OTP"
+}
+
+> {%
+    if (response.body && response.body.accessToken) client.global.set("auth_token", response.body.accessToken);
+    if (response.body && response.body.refreshToken) client.global.set("refresh_token", response.body.refreshToken);
+    if (response.body && response.body.userId) client.global.set("user_id", response.body.userId);
+%}
+
+### POST /v1/auth/send-otp
+# @name POST_v1_auth_send_otp
+POST {{host}}/v1/auth/send-otp
+Content-Type: application/json
+
+{
+  "phoneNumber": "{{test_phone}}"
+}
+
+> {% if (response.body && response.body.otpCode) client.global.set("otp_code", response.body.otpCode); %}
+
+### POST /v1/auth/login/phone
+# @name POST_v1_auth_login_phone
+POST {{host}}/v1/auth/login/phone
+Content-Type: application/json
+
+{
+  "phoneNumber": "{{test_phone}}",
+  "otpCode": "{{otp_code}}"
+}
+
+> {%
+    if (response.body && response.body.accessToken) client.global.set("auth_token", response.body.accessToken);
+    if (response.body && response.body.refreshToken) client.global.set("refresh_token", response.body.refreshToken);
+%}
+
+### POST /v1/auth/login/email
+# @name POST_v1_auth_login_email
+POST {{host}}/v1/auth/login/email
+Content-Type: application/json
+
+{
+  "email": "{{test_email}}",
+  "password": "{{test_password}}"
+}
+
+> {%
+    if (response.body && response.body.accessToken) client.global.set("auth_token", response.body.accessToken);
+    if (response.body && response.body.refreshToken) client.global.set("refresh_token", response.body.refreshToken);
+%}
+
+### POST /v1/auth/login/email (admin)
+# @name POST_v1_auth_login_email_admin
+# Run this once before any /v1/admin/** request.
+POST {{host}}/v1/auth/login/email
+Content-Type: application/json
+
+{
+  "email": "{{admin_email}}",
+  "password": "{{admin_password}}"
+}
+
+> {% if (response.body && response.body.accessToken) client.global.set("admin_token", response.body.accessToken); %}
+
+### POST /v1/auth/refresh
+# @name POST_v1_auth_refresh
+POST {{host}}/v1/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refresh_token}}"
+}
+
+### GET /v1/auth/me
+# @name GET_v1_auth_me
+GET {{host}}/v1/auth/me
+Authorization: Bearer {{auth_token}}
+
+# ==========================================
+# Properties (Compound, Building, Unit)
+# ==========================================
+
+### POST /v1/compounds
+# @name POST_v1_compounds
+POST {{host}}/v1/compounds
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "Sample name",
+  "address": "sample"
+}
+
+> {% if (response.body) client.global.set("compound_id", response.body.id || response.body); %}
+
+### GET /v1/compounds/{id}
+# @name GET_v1_compounds_id_
+GET {{host}}/v1/compounds/{{compound_id}}
+Authorization: Bearer {{auth_token}}
+
+### POST /v1/buildings
+# @name POST_v1_buildings
+POST {{host}}/v1/buildings
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "compoundId": "{{compound_id}}",
+  "name": "Sample name",
+  "numberOfFloors": 1
+}
+
+> {% if (response.body) client.global.set("building_id", response.body.id || response.body); %}
+
+### GET /v1/buildings/compound/{compoundId}
+# @name GET_v1_buildings_compound_compoundId_
+GET {{host}}/v1/buildings/compound/{{compound_id}}
+Authorization: Bearer {{auth_token}}
+
+### POST /v1/units
+# @name POST_v1_units
+POST {{host}}/v1/units
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "buildingId": "{{building_id}}",
+  "unitNumber": "sample",
+  "floor": 1,
+  "type": "APARTMENT"
+}
+
+> {% if (response.body) client.global.set("unit_id", response.body.id || response.body); %}
+
+### GET /v1/units/building/{buildingId}
+# @name GET_v1_units_building_buildingId_
+GET {{host}}/v1/units/building/{{building_id}}
+Authorization: Bearer {{auth_token}}
+
+# ==========================================
+# Access Codes and QR Access
+# ==========================================
+
+### POST /v1/access/codes
+# @name POST_v1_access_codes
+POST {{host}}/v1/access/codes
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "visitorName": "Sample name",
+  "visitorPhone": "+201000000000",
+  "purpose": "GUEST",
+  "validFrom": "2027-01-01T10:00:00Z",
+  "validUntil": "2027-01-01T10:00:00Z"
+}
+
+> {% 
+    if (response.body && response.body.id) client.global.set("access_code_id", response.body.id);
+    if (response.body && response.body.code) client.global.set("access_code", response.body.code);
+%}
+
+### GET /v1/access/codes/my
+# @name GET_v1_access_codes_my
+GET {{host}}/v1/access/codes/my
+Authorization: Bearer {{auth_token}}
+
+### GET /v1/access/codes/{id}
+# @name GET_v1_access_codes_id_
+GET {{host}}/v1/access/codes/{{access_code_id}}
+Authorization: Bearer {{auth_token}}
+
+### POST /v1/access/codes/{code}/scan
+# @name POST_v1_access_codes_code_scan
+POST {{host}}/v1/access/codes/{{code}}/scan
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "code": "sample",
+  "gateNumber": "sample"
+}
+
+> {% if (response.body && response.body.visitLogId) client.global.set("visit_log_id", response.body.visitLogId); %}
+
+### GET /v1/access/visit-logs
+# @name GET_v1_access_visit_logs
+GET {{host}}/v1/access/visit-logs
+Authorization: Bearer {{auth_token}}
+
+### PATCH /v1/access/visit-logs/{id}/exit
+# @name PATCH_v1_access_visit_logs_id_exit
+PATCH {{host}}/v1/access/visit-logs/{{visit_log_id}}/exit
+Authorization: Bearer {{auth_token}}
+
+### POST /v1/access/codes/{codeId}/reactivate
+# @name POST_v1_access_codes_codeId_reactivate
+POST {{host}}/v1/access/codes/{{access_code_id}}/reactivate
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "validFrom": "2027-01-01T10:00:00Z",
+  "validUntil": "2027-01-01T10:00:00Z"
+}
+
+### DELETE /v1/access/codes/{id}
+# @name DELETE_v1_access_codes_id_
+DELETE {{host}}/v1/access/codes/{{access_code_id}}
+Authorization: Bearer {{auth_token}}
+
+### GET /v1/admin/access/codes
+# @name GET_v1_admin_access_codes
+GET {{host}}/v1/admin/access/codes?tab=ALL&page=0&size=25
+Authorization: Bearer {{admin_token}}
+
+### DELETE /v1/admin/access/codes/{accessCodeId}
+# @name DELETE_v1_admin_access_codes_accessCodeId_
+DELETE {{host}}/v1/admin/access/codes/{{access_code_id}}
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/access/codes/{accessCodeId}/details
+# @name GET_v1_admin_access_codes_accessCodeId_details
+GET {{host}}/v1/admin/access/codes/{{access_code_id}}/details
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/access/codes/{accessCodeId}/download
+# @name GET_v1_admin_access_codes_accessCodeId_download
+GET {{host}}/v1/admin/access/codes/{{access_code_id}}/download
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/access/residents/{residentId}/codes
+# @name GET_v1_admin_access_residents_residentId_codes
+GET {{host}}/v1/admin/access/residents/{{resident_id}}/codes?tab=ALL&page=0&size=25
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/access/statuses
+# @name GET_v1_admin_access_statuses
+GET {{host}}/v1/admin/access/statuses
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/access/types
+# @name GET_v1_admin_access_types
+GET {{host}}/v1/admin/access/types
+Authorization: Bearer {{admin_token}}
+
+# ==========================================
+# Billing (Invoices and Payments)
+# ==========================================
+
+### POST /v1/invoices
+# @name POST_v1_invoices
+POST {{host}}/v1/invoices
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "residentId": "{{user_id}}",
+  "unitId": "{{unit_id}}",
+  "type": "MONTHLY_FEE",
+  "amount": 150.0,
+  "description": "Sample text"
+}
+
+> {% if (response.body) client.global.set("invoice_id", response.body.id || response.body); %}
+
+### GET /v1/invoices
+# @name GET_v1_invoices
+GET {{host}}/v1/invoices
+Authorization: Bearer {{auth_token}}
+
+### GET /v1/invoices/{id}
+# @name GET_v1_invoices_id_
+GET {{host}}/v1/invoices/{{invoice_id}}
+Authorization: Bearer {{auth_token}}
+
+### POST /v1/invoices/{id}/pay
+# @name POST_v1_invoices_id_pay
+POST {{host}}/v1/invoices/{{invoice_id}}/pay
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "residentId": "{{user_id}}",
+  "paymentMethod": "CASH",
+  "transactionReference": "tx-123456"
+}
+
+### GET /v1/payments
+# @name GET_v1_payments
+GET {{host}}/v1/payments
+Authorization: Bearer {{auth_token}}
+
+### PATCH /v1/invoices/{id}/cancel
+# @name PATCH_v1_invoices_id_cancel
+PATCH {{host}}/v1/invoices/{{invoice_id}}/cancel
+Authorization: Bearer {{auth_token}}
+
+# ==========================================
+# Maintenance Requests and Admin Command Center
+# ==========================================
+
+### POST /v1/maintenance-requests
+# @name POST_v1_maintenance_requests
+POST {{host}}/v1/maintenance-requests
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "residentId": "{{user_id}}",
+  "unitId": "{{unit_id}}",
+  "title": "Sample title",
+  "description": "Sample text",
+  "category": "PLUMBING",
+  "priority": "LOW"
+}
+
+> {% if (response.body) client.global.set("maintenance_id", response.body.id || response.body); %}
+
+### GET /v1/maintenance-requests/{id}
+# @name GET_v1_maintenance_requests_id_
+GET {{host}}/v1/maintenance-requests/{{maintenance_id}}
+Authorization: Bearer {{auth_token}}
+
+### GET /v1/maintenance-requests/resident/{residentId}
+# @name GET_v1_maintenance_requests_resident_residentId_
+GET {{host}}/v1/maintenance-requests/resident/{{residentId}}
+Authorization: Bearer {{auth_token}}
+
+### GET /v1/maintenance-requests/status/{status}
+# @name GET_v1_maintenance_requests_status_status_
+GET {{host}}/v1/maintenance-requests/status/{{status}}
+Authorization: Bearer {{auth_token}}
+
+### POST /v1/maintenance-requests/{id}/assign
+# @name POST_v1_maintenance_requests_id_assign
+POST {{host}}/v1/maintenance-requests/{{maintenance_id}}/assign
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "technicianId": "00000000-0000-0000-0000-000000000000"
+}
+
+### POST /v1/maintenance-requests/{id}/start
+# @name POST_v1_maintenance_requests_id_start
+POST {{host}}/v1/maintenance-requests/{{maintenance_id}}/start
+Authorization: Bearer {{auth_token}}
+
+### POST /v1/maintenance-requests/{id}/resolve
+# @name POST_v1_maintenance_requests_id_resolve
+POST {{host}}/v1/maintenance-requests/{{maintenance_id}}/resolve
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "resolution": "sample",
+  "totalCost": 150.0
+}
+
+### POST /v1/maintenance-requests/{id}/reject
+# @name POST_v1_maintenance_requests_id_reject
+POST {{host}}/v1/maintenance-requests/{{maintenance_id}}/reject
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "reason": "Sample text"
+}
+
+### POST /v1/maintenance-requests/{id}/cancel
+# @name POST_v1_maintenance_requests_id_cancel
+POST {{host}}/v1/maintenance-requests/{{maintenance_id}}/cancel
+Authorization: Bearer {{auth_token}}
+
+### GET /v1/admin/maintenance/areas
+# @name GET_v1_admin_maintenance_areas
+GET {{host}}/v1/admin/maintenance/areas
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/maintenance/categories
+# @name GET_v1_admin_maintenance_categories
+GET {{host}}/v1/admin/maintenance/categories
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/maintenance/requests
+# @name GET_v1_admin_maintenance_requests
+GET {{host}}/v1/admin/maintenance/requests?tab=ALL&sortBy=NEWEST&page=0&size=25
+Authorization: Bearer {{admin_token}}
+
+### POST /v1/admin/maintenance/requests/{requestId}/assign
+# @name POST_v1_admin_maintenance_requests_requestId_assign
+POST {{host}}/v1/admin/maintenance/requests/{{maintenance_id}}/assign
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "sample": "value"
+}
+
+### GET /v1/admin/maintenance/requests/{requestId}/card
+# @name GET_v1_admin_maintenance_requests_requestId_card
+GET {{host}}/v1/admin/maintenance/requests/{{maintenance_id}}/card
+Authorization: Bearer {{admin_token}}
+
+### PATCH /v1/admin/maintenance/requests/{requestId}/priority
+# @name PATCH_v1_admin_maintenance_requests_requestId_priority
+PATCH {{host}}/v1/admin/maintenance/requests/{{maintenance_id}}/priority
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "sample": "value"
+}
+
+### GET /v1/admin/maintenance/requests/{requestId}/receipt
+# @name GET_v1_admin_maintenance_requests_requestId_receipt
+GET {{host}}/v1/admin/maintenance/requests/{{maintenance_id}}/receipt
+Authorization: Bearer {{admin_token}}
+
+### POST /v1/admin/maintenance/requests/{requestId}/viewed
+# @name POST_v1_admin_maintenance_requests_requestId_viewed
+POST {{host}}/v1/admin/maintenance/requests/{{maintenance_id}}/viewed
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "actorId": "00000000-0000-0000-0000-000000000000"
+}
+
+### GET /v1/admin/maintenance/technicians
+# @name GET_v1_admin_maintenance_technicians
+GET {{host}}/v1/admin/maintenance/technicians?availableOnly=true
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/maintenance/types
+# @name GET_v1_admin_maintenance_types
+GET {{host}}/v1/admin/maintenance/types
+Authorization: Bearer {{admin_token}}
+
+# ==========================================
+# Feedback (Resident and Admin)
+# ==========================================
+
+### POST /v1/feedback
+# @name POST_v1_feedback
+POST {{host}}/v1/feedback
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "title": "Sample title",
+  "content": "Sample text",
+  "type": "COMPLAINT",
+  "category": "OTHER"
+}
+
+> {% if (response.body) client.global.set("feedback_id", response.body.id || response.body); %}
+
+### GET /v1/feedback
+# @name GET_v1_feedback
+GET {{host}}/v1/feedback
+Authorization: Bearer {{auth_token}}
+
+### GET /v1/feedback/me
+# @name GET_v1_feedback_me
+GET {{host}}/v1/feedback/me
+Authorization: Bearer {{auth_token}}
+
+### POST /v1/feedback/{id}/vote
+# @name POST_v1_feedback_id_vote
+POST {{host}}/v1/feedback/{{feedback_id}}/vote
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "voteType": "UP"
+}
+
+### PATCH /v1/feedback/{id}/status
+# @name PATCH_v1_feedback_id_status
+# Resident can update own feedback status; admin can update any feedback status.
+PATCH {{host}}/v1/feedback/{{feedback_id}}/status
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "newStatus": "OPEN"
+}
+
+### GET /v1/admin/feedback
+# @name GET_v1_admin_feedback
+GET {{host}}/v1/admin/feedback?tab=PUBLIC_SUGGESTIONS&status=ALL&page=0&size=25
+Authorization: Bearer {{admin_token}}
+
+### POST /v1/admin/feedback
+# @name POST_v1_admin_feedback
+POST {{host}}/v1/admin/feedback
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "authorId": "00000000-0000-0000-0000-000000000000",
+  "title": "Sample title",
+  "content": "Sample text",
+  "type": "COMPLAINT",
+  "category": "OTHER"
+}
+
+### DELETE /v1/admin/feedback/{feedbackId}
+# @name DELETE_v1_admin_feedback_feedbackId_
+DELETE {{host}}/v1/admin/feedback/{{feedback_id}}
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/feedback/{feedbackId}/details
+# @name GET_v1_admin_feedback_feedbackId_details
+GET {{host}}/v1/admin/feedback/{{feedback_id}}/details
+Authorization: Bearer {{admin_token}}
+
+### PATCH /v1/admin/feedback/{feedbackId}/respond
+# @name PATCH_v1_admin_feedback_feedbackId_respond
+PATCH {{host}}/v1/admin/feedback/{{feedback_id}}/respond
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "response": "sample",
+  "newStatus": "UNDER_REVIEW"
+}
+
+### PATCH /v1/admin/feedback/{feedbackId}/status
+# @name PATCH_v1_admin_feedback_feedbackId_status
+PATCH {{host}}/v1/admin/feedback/{{feedback_id}}/status
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "newStatus": "RESOLVED"
+}
+
+### GET /v1/admin/feedback/categories
+# @name GET_v1_admin_feedback_categories
+GET {{host}}/v1/admin/feedback/categories
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/feedback/statuses
+# @name GET_v1_admin_feedback_statuses
+GET {{host}}/v1/admin/feedback/statuses
+Authorization: Bearer {{admin_token}}
+
+# ==========================================
+# Announcements and Alerts
+# ==========================================
+
+### POST /v1/announcements
+# @name POST_v1_announcements
+POST {{host}}/v1/announcements
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "title": "Sample title",
+  "content": "Sample text",
+  "priority": "LOW"
+}
+
+> {% if (response.body) client.global.set("announcement_id", response.body.id || response.body); %}
+
+### GET /v1/announcements
+# @name GET_v1_announcements
+GET {{host}}/v1/announcements
+Authorization: Bearer {{auth_token}}
+
+### PATCH /v1/announcements/{id}/deactivate
+# @name PATCH_v1_announcements_id_deactivate
+PATCH {{host}}/v1/announcements/{{announcement_id}}/deactivate
+Authorization: Bearer {{auth_token}}
+
+### POST /v1/alerts
+# @name POST_v1_alerts
+POST {{host}}/v1/alerts
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "type": "MISSING",
+  "category": "PET",
+  "title": "Sample title",
+  "description": "Sample text"
+}
+
+> {% if (response.body) client.global.set("alert_id", response.body.id || response.body); %}
+
+### GET /v1/alerts
+# @name GET_v1_alerts
+GET {{host}}/v1/alerts
+Authorization: Bearer {{auth_token}}
+
+### GET /v1/alerts/{id}
+# @name GET_v1_alerts_id_
+GET {{host}}/v1/alerts/{{alert_id}}
+Authorization: Bearer {{auth_token}}
+
+### PATCH /v1/alerts/{id}/resolve
+# @name PATCH_v1_alerts_id_resolve
+PATCH {{host}}/v1/alerts/{{alert_id}}/resolve
+Authorization: Bearer {{auth_token}}
+
+# ==========================================
+# Events (Resident and Admin)
+# ==========================================
+
+### POST /v1/events
+# @name POST_v1_events
+POST {{host}}/v1/events
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "organizerId": "{{user_id}}",
+  "title": "Sample title",
+  "description": "Sample text",
+  "location": "Community Hall",
+  "startDate": "2027-01-01T10:00:00Z",
+  "endDate": "2027-01-01T12:00:00Z",
+  "hostName": "Sample name",
+  "category": "OTHER",
+  "contactPhone": "+201000000000"
+}
+
+> {% 
+    const location = response.headers["location"] || response.headers["Location"];
+    if (location) client.global.set("event_id", location.split("/").pop());
+%}
+
+### GET /v1/events
+# @name GET_v1_events
+GET {{host}}/v1/events
+Authorization: Bearer {{auth_token}}
+
+### GET /v1/events/{id}
+# @name GET_v1_events_id_
+GET {{host}}/v1/events/{{event_id}}
+Authorization: Bearer {{auth_token}}
+
+### PATCH /v1/events/{id}/approve
+# @name PATCH_v1_events_id_approve
+PATCH {{host}}/v1/events/{{event_id}}/approve
+Authorization: Bearer {{admin_token}}
+
+### PATCH /v1/events/{id}/reject
+# @name PATCH_v1_events_id_reject
+PATCH {{host}}/v1/events/{{event_id}}/reject
+Authorization: Bearer {{admin_token}}
+
+### POST /v1/events/{id}/register
+# @name POST_v1_events_id_register
+POST {{host}}/v1/events/{{event_id}}/register
+Authorization: Bearer {{auth_token}}
+
+### DELETE /v1/events/{id}/register
+# @name DELETE_v1_events_id_register
+DELETE {{host}}/v1/events/{{event_id}}/register
+Authorization: Bearer {{auth_token}}
+
+### GET /v1/admin/events
+# @name GET_v1_admin_events
+GET {{host}}/v1/admin/events?status=ALL&page=0&size=9
+Authorization: Bearer {{admin_token}}
+
+### POST /v1/admin/events
+# @name POST_v1_admin_events
+POST {{host}}/v1/admin/events
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "title": "Sample title",
+  "description": "Sample text",
+  "location": "Community Hall",
+  "startDate": "2027-01-01T10:00:00Z",
+  "endDate": "2027-01-01T12:00:00Z",
+  "hostName": "Sample name",
+  "category": "OTHER",
+  "contactPhone": "+201000000000"
+}
+
+### DELETE /v1/admin/events/{eventId}
+# @name DELETE_v1_admin_events_eventId_
+DELETE {{host}}/v1/admin/events/{{event_id}}
+Authorization: Bearer {{admin_token}}
+
+### PATCH /v1/admin/events/{eventId}
+# @name PATCH_v1_admin_events_eventId_
+PATCH {{host}}/v1/admin/events/{{event_id}}
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "sample": "value"
+}
+
+### PATCH /v1/admin/events/{eventId}/approve
+# @name PATCH_v1_admin_events_eventId_approve
+PATCH {{host}}/v1/admin/events/{{event_id}}/approve
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/events/{eventId}/attendees/export
+# @name GET_v1_admin_events_eventId_attendees_export
+GET {{host}}/v1/admin/events/{{event_id}}/attendees/export
+Authorization: Bearer {{admin_token}}
+
+### PATCH /v1/admin/events/{eventId}/complete
+# @name PATCH_v1_admin_events_eventId_complete
+PATCH {{host}}/v1/admin/events/{{event_id}}/complete
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/events/{eventId}/details
+# @name GET_v1_admin_events_eventId_details
+GET {{host}}/v1/admin/events/{{event_id}}/details
+Authorization: Bearer {{admin_token}}
+
+### POST /v1/admin/events/{eventId}/notify-residents
+# @name POST_v1_admin_events_eventId_notify_residents
+POST {{host}}/v1/admin/events/{{event_id}}/notify-residents
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "title": "Sample title",
+  "message": "Sample text",
+  "channel": "PUSH"
+}
+
+### PATCH /v1/admin/events/{eventId}/reject
+# @name PATCH_v1_admin_events_eventId_reject
+PATCH {{host}}/v1/admin/events/{{event_id}}/reject
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/events/categories
+# @name GET_v1_admin_events_categories
+GET {{host}}/v1/admin/events/categories
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/events/statuses
+# @name GET_v1_admin_events_statuses
+GET {{host}}/v1/admin/events/statuses
+Authorization: Bearer {{admin_token}}
+
+# ==========================================
+# Notifications and Communications Center
+# ==========================================
+
+### POST /v1/device-tokens
+# @name POST_v1_device_tokens
+POST {{host}}/v1/device-tokens
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "userId": "{{user_id}}",
+  "token": "sample",
+  "platform": "ANDROID"
+}
+
+> {% if (response.body) client.global.set("device_token_id", response.body.id || response.body); %}
+
+### GET /v1/notifications
+# @name GET_v1_notifications
+GET {{host}}/v1/notifications?recipientId={{user_id}}
+Authorization: Bearer {{auth_token}}
+
+### POST /v1/notifications/send
+# @name POST_v1_notifications_send
+POST {{host}}/v1/notifications/send
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "recipientId": "{{user_id}}",
+  "title": "Sample title",
+  "body": "Sample text",
+  "type": "MAINTENANCE_UPDATE",
+  "referenceId": "00000000-0000-0000-0000-000000000000"
+}
+
+> {% if (response.body) client.global.set("notification_id", response.body.id || response.body); %}
+
+### PATCH /v1/notifications/{id}/read
+# @name PATCH_v1_notifications_id_read
+PATCH {{host}}/v1/notifications/{{notification_id}}/read?recipientId={{user_id}}
+Authorization: Bearer {{auth_token}}
+
+### PATCH /v1/notifications/read-all
+# @name PATCH_v1_notifications_read_all
+PATCH {{host}}/v1/notifications/read-all?recipientId={{user_id}}
+Authorization: Bearer {{auth_token}}
+
+### DELETE /v1/device-tokens/{id}
+# @name DELETE_v1_device_tokens_id_
+DELETE {{host}}/v1/device-tokens/{{device_token_id}}
+Authorization: Bearer {{auth_token}}
+
+### POST /v1/admin/communications/announcements
+# @name POST_v1_admin_communications_announcements
+POST {{host}}/v1/admin/communications/announcements
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "title": "Sample title",
+  "content": "Sample text",
+  "priority": "NORMAL"
+}
+
+### DELETE /v1/admin/communications/announcements/{announcementId}
+# @name DELETE_v1_admin_communications_announcements_announcementId_
+DELETE {{host}}/v1/admin/communications/announcements/{{announcement_id}}
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/communications/announcements/{announcementId}
+# @name GET_v1_admin_communications_announcements_announcementId_
+GET {{host}}/v1/admin/communications/announcements/{{announcement_id}}
+Authorization: Bearer {{admin_token}}
+
+### PATCH /v1/admin/communications/announcements/{announcementId}
+# @name PATCH_v1_admin_communications_announcements_announcementId_
+PATCH {{host}}/v1/admin/communications/announcements/{{announcement_id}}
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "title": "Sample title",
+  "content": "Sample text",
+  "priority": "NORMAL"
+}
+
+### GET /v1/admin/communications/center
+# @name GET_v1_admin_communications_center
+GET {{host}}/v1/admin/communications/center?tab=PUSH_NOTIFICATIONS&status=ALL
+Authorization: Bearer {{admin_token}}
+
+### POST /v1/admin/communications/notifications
+# @name POST_v1_admin_communications_notifications
+POST {{host}}/v1/admin/communications/notifications
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "recipientIds": ["{{user_id}}"],
+  "title": "Sample title",
+  "message": "Sample text",
+  "priority": "NORMAL"
+}
+
+### DELETE /v1/admin/communications/notifications/{itemId}
+# @name DELETE_v1_admin_communications_notifications_itemId_
+DELETE {{host}}/v1/admin/communications/notifications/{{notification_id}}?tab=PUSH_NOTIFICATIONS
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/communications/notifications/{itemId}
+# @name GET_v1_admin_communications_notifications_itemId_
+GET {{host}}/v1/admin/communications/notifications/{{notification_id}}?tab=PUSH_NOTIFICATIONS
+Authorization: Bearer {{admin_token}}
+
+### PATCH /v1/admin/communications/notifications/{itemId}
+# @name PATCH_v1_admin_communications_notifications_itemId_
+PATCH {{host}}/v1/admin/communications/notifications/{{notification_id}}?tab=PUSH_NOTIFICATIONS
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "title": "Sample title",
+  "priority": "NORMAL"
+}
+
+# ==========================================
+# Admin Missing and Found
+# ==========================================
+
+### GET /v1/admin/missing-found/categories
+# @name GET_v1_admin_missing_found_categories
+GET {{host}}/v1/admin/missing-found/categories
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/missing-found/reports
+# @name GET_v1_admin_missing_found_reports
+GET {{host}}/v1/admin/missing-found/reports?type=ALL&status=ALL&page=0&size=25
+Authorization: Bearer {{admin_token}}
+
+### POST /v1/admin/missing-found/reports
+# @name POST_v1_admin_missing_found_reports
+POST {{host}}/v1/admin/missing-found/reports
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "reporterId": "00000000-0000-0000-0000-000000000000",
+  "residentId": "{{user_id}}",
+  "type": "sample",
+  "category": "OTHER",
+  "description": "Sample text"
+}
+
+> {% if (response.body) client.global.set("admin_report_id", response.body.id || response.body); %}
+
+### DELETE /v1/admin/missing-found/reports/{reportId}
+# @name DELETE_v1_admin_missing_found_reports_reportId_
+DELETE {{host}}/v1/admin/missing-found/reports/{{admin_report_id}}
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/missing-found/reports/{reportId}
+# @name GET_v1_admin_missing_found_reports_reportId_
+GET {{host}}/v1/admin/missing-found/reports/{{admin_report_id}}
+Authorization: Bearer {{admin_token}}
+
+### PATCH /v1/admin/missing-found/reports/{reportId}
+# @name PATCH_v1_admin_missing_found_reports_reportId_
+PATCH {{host}}/v1/admin/missing-found/reports/{{admin_report_id}}
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "type": "sample",
+  "category": "OTHER",
+  "description": "Sample text"
+}
+
+### GET /v1/admin/missing-found/reports/{reportId}/details
+# @name GET_v1_admin_missing_found_reports_reportId_details
+GET {{host}}/v1/admin/missing-found/reports/{{admin_report_id}}/details
+Authorization: Bearer {{admin_token}}
+
+### PATCH /v1/admin/missing-found/reports/{reportId}/mark-matched
+# @name PATCH_v1_admin_missing_found_reports_reportId_mark_matched
+PATCH {{host}}/v1/admin/missing-found/reports/{{admin_report_id}}/mark-matched
+Authorization: Bearer {{admin_token}}
+
+### PATCH /v1/admin/missing-found/reports/{reportId}/mark-resolved
+# @name PATCH_v1_admin_missing_found_reports_reportId_mark_resolved
+PATCH {{host}}/v1/admin/missing-found/reports/{{admin_report_id}}/mark-resolved
+Authorization: Bearer {{admin_token}}
+
+### POST /v1/admin/missing-found/reports/{reportId}/notify-user
+# @name POST_v1_admin_missing_found_reports_reportId_notify_user
+POST {{host}}/v1/admin/missing-found/reports/{{admin_report_id}}/notify-user
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "title": "Sample title"
+}
+
+### PATCH /v1/admin/missing-found/reports/{reportId}/status
+# @name PATCH_v1_admin_missing_found_reports_reportId_status
+PATCH {{host}}/v1/admin/missing-found/reports/{{admin_report_id}}/status
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "status": "OPEN"
+}
+
+### GET /v1/admin/missing-found/residents/options
+# @name GET_v1_admin_missing_found_residents_options
+GET {{host}}/v1/admin/missing-found/residents/options?page=0&size=25
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/missing-found/statuses
+# @name GET_v1_admin_missing_found_statuses
+GET {{host}}/v1/admin/missing-found/statuses
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/missing-found/summary
+# @name GET_v1_admin_missing_found_summary
+GET {{host}}/v1/admin/missing-found/summary?type=ALL&status=ALL
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/missing-found/types
+# @name GET_v1_admin_missing_found_types
+GET {{host}}/v1/admin/missing-found/types
+Authorization: Bearer {{admin_token}}
+
+# ==========================================
+# Admin Residents Directory
+# ==========================================
+
+### GET /v1/admin/residents
+# @name GET_v1_admin_residents
+GET {{host}}/v1/admin/residents?page=0&size=25
+Authorization: Bearer {{admin_token}}
+
+### POST /v1/admin/residents
+# @name POST_v1_admin_residents
+POST {{host}}/v1/admin/residents
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "firstName": "Sample name",
+  "lastName": "Sample name",
+  "phoneNumber": "{{admin_resident_phone}}",
+  "email": "{{admin_resident_email}}",
+  "password": "{{admin_resident_password}}",
+  "type": "PROPERTY_OWNER",
+  "unitId": "{{unit_id}}",
+  "loginMethod": "EMAIL_PASSWORD",
+  "approvalStatus": "PENDING",
+  "nationalId": "{{admin_resident_national_id}}"
+}
+
+### DELETE /v1/admin/residents/{residentId}
+# @name DELETE_v1_admin_residents_residentId_
+DELETE {{host}}/v1/admin/residents/{{resident_id}}
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/residents/{residentId}
+# @name GET_v1_admin_residents_residentId_
+GET {{host}}/v1/admin/residents/{{resident_id}}
+Authorization: Bearer {{admin_token}}
+
+### PATCH /v1/admin/residents/{residentId}
+# @name PATCH_v1_admin_residents_residentId_
+PATCH {{host}}/v1/admin/residents/{{resident_id}}
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "firstName": "Sample name",
+  "lastName": "Sample name",
+  "phoneNumber": "{{admin_resident_phone}}",
+  "email": "{{admin_resident_email}}",
+  "unitId": "{{unit_id}}",
+  "type": "PROPERTY_OWNER",
+  "nationalId": "{{admin_resident_national_id}}"
+}
+
+### PATCH /v1/admin/residents/{residentId}/approval
+# @name PATCH_v1_admin_residents_residentId_approval
+PATCH {{host}}/v1/admin/residents/{{resident_id}}/approval
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "approvalStatus": "PENDING"
+}
+
+### GET /v1/admin/residents/{residentId}/card
+# @name GET_v1_admin_residents_residentId_card
+GET {{host}}/v1/admin/residents/{{resident_id}}/card
+Authorization: Bearer {{admin_token}}
+
+### POST /v1/admin/residents/{residentId}/reset-password
+# @name POST_v1_admin_residents_residentId_reset_password
+POST {{host}}/v1/admin/residents/{{resident_id}}/reset-password
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "newPassword": "Password123!"
+}
+
+### GET /v1/admin/residents/buildings
+# @name GET_v1_admin_residents_buildings
+GET {{host}}/v1/admin/residents/buildings
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/residents/units
+# @name GET_v1_admin_residents_units
+GET {{host}}/v1/admin/residents/units
+Authorization: Bearer {{admin_token}}
+
+# ==========================================
+# Admin Employee Management
+# ==========================================
+
+### GET /v1/admin/employees
+# @name GET_v1_admin_employees
+GET {{host}}/v1/admin/employees?role=ALL&status=ALL&page=0&size=25
+Authorization: Bearer {{admin_token}}
+
+### POST /v1/admin/employees
+# @name POST_v1_admin_employees
+POST {{host}}/v1/admin/employees
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "fullName": "Employee Sample",
+  "phoneNumber": "{{admin_employee_phone}}",
+  "email": "{{admin_employee_email}}",
+  "password": "{{admin_employee_password}}",
+  "confirmPassword": "{{admin_employee_password}}",
+  "role": "SECURITY_STAFF",
+  "hireDate": "2026-04-01",
+  "department": "Gate",
+  "loginMethod": "EMAIL_PASSWORD",
+  "isActive": true
+}
+
+> {% if (response.body && response.body.employeeId) client.global.set("employee_id", response.body.employeeId); %}
+
+### DELETE /v1/admin/employees/{employeeId}
+# @name DELETE_v1_admin_employees_employeeId_
+DELETE {{host}}/v1/admin/employees/{{employee_id}}
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/employees/{employeeId}
+# @name GET_v1_admin_employees_employeeId_
+GET {{host}}/v1/admin/employees/{{employee_id}}
+Authorization: Bearer {{admin_token}}
+
+### PATCH /v1/admin/employees/{employeeId}
+# @name PATCH_v1_admin_employees_employeeId_
+PATCH {{host}}/v1/admin/employees/{{employee_id}}
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "fullName": "Employee Updated",
+  "department": "Operations",
+  "role": "TECHNICIAN",
+  "specializations": ["PLUMBING", "ELECTRICAL"],
+  "technicianAvailable": false,
+  "isPhoneVerified": true
+}
+
+### POST /v1/admin/employees/{employeeId}/reset-password
+# @name POST_v1_admin_employees_employeeId_reset_password
+POST {{host}}/v1/admin/employees/{{employee_id}}/reset-password
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "newPassword": "Password123!"
+}
+
+### PATCH /v1/admin/employees/{employeeId}/status
+# @name PATCH_v1_admin_employees_employeeId_status
+PATCH {{host}}/v1/admin/employees/{{employee_id}}/status
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "status": "SUSPENDED"
+}
+
+### GET /v1/admin/employees/roles
+# @name GET_v1_admin_employees_roles
+GET {{host}}/v1/admin/employees/roles
+Authorization: Bearer {{admin_token}}
+
+### GET /v1/admin/employees/statuses
+# @name GET_v1_admin_employees_statuses
+GET {{host}}/v1/admin/employees/statuses
+Authorization: Bearer {{admin_token}}
+

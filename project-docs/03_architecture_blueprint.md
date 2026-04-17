@@ -10,14 +10,15 @@ The following changes were made to adapt the blueprint for Sakany:
 
 ### Database: PostgreSQL instead of MongoDB
 
-| Original | Sakany |
-|----------|--------|
-| MongoDB with Replica Set | PostgreSQL 17.4 |
+| Original                          | Sakany                        |
+| --------------------------------- | ----------------------------- |
+| MongoDB with Replica Set          | PostgreSQL 17.4               |
 | `spring-modulith-starter-mongodb` | `spring-modulith-starter-jpa` |
-| `@Document` annotations | `@Entity` annotations |
-| No migrations needed | Flyway migrations |
+| `@Document` annotations           | `@Entity` annotations         |
+| No migrations needed              | Flyway migrations             |
 
 ### Why PostgreSQL?
+
 - Strong relationships (User → Request → Technician)
 - ACID transactions for payments
 - Familiar SQL for team
@@ -36,6 +37,7 @@ src/main/resources/db/migration/
 ```
 
 **Key config:**
+
 ```properties
 spring.flyway.enabled=true
 spring.flyway.locations=classpath:db/migration
@@ -54,10 +56,10 @@ public abstract class BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    
+
     @CreationTimestamp
     private LocalDateTime createdAt;
-    
+
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 }
@@ -72,7 +74,7 @@ PostgreSQL transactions work out of the box:
 ```java
 @Service
 public class CreateOrderHandler extends CommandHandler<CreateOrder, OrderResponse> {
-    
+
     @Override
     @Transactional  // Works with PostgreSQL!
     public OrderResponse handle(CreateOrder command) {
@@ -107,8 +109,8 @@ The Property module now enforces stricter invariants at both API and database le
 - `floor` is required when creating a unit (missing field returns `400 Bad Request`)
 - Unit numbers must be unique inside the same building (case-insensitive, trimmed comparison)
 - Uniqueness is enforced twice:
-    - Application layer guard (`BusinessRuleException` -> `409 Conflict`)
-    - Database layer unique index migration (`V29__add_unique_unit_number_per_building.sql`)
+  - Application layer guard (`BusinessRuleException` -> `409 Conflict`)
+  - Database layer unique index migration (`V29__add_unique_unit_number_per_building.sql`)
 
 ---
 
@@ -129,12 +131,29 @@ The Events module now enforces identity integrity and role-correct actions:
 Live API logic validation (April 2026) surfaced a critical role-safety defect and an integrity error-mapping gap in the residents admin endpoints.
 
 - `DELETE /v1/admin/residents/{residentId}` now enforces that the target user role is `RESIDENT` before deactivation.
-    - Prevents accidental deactivation of `ADMIN` users through a resident-only route.
+  - Prevents accidental deactivation of `ADMIN` users through a resident-only route.
 - Resident `nationalId` is now normalized (`trim`, blank -> `null`) and validated for uniqueness in both create and update flows.
-    - Prevents database-level unique-constraint failures from leaking as generic 500s.
+  - Prevents database-level unique-constraint failures from leaking as generic 500s.
 - Global exception mapping now translates `DataIntegrityViolationException` to `409 Conflict` with domain-friendly messages (e.g., duplicate `nationalId`, duplicate email, duplicate phone).
 
 Result: Admin Residents Directory now rejects cross-role destructive actions and returns consistent business-level conflict responses for duplicate identity fields.
+
+---
+
+### Admin Employee Management Hardening
+
+Live API logic validation (April 2026) surfaced critical persistence and error-mapping defects in the employee admin endpoints.
+
+- `POST /v1/admin/employees` could fail with `500 Internal Server Error` because `users.id` is application-assigned in this codebase and no UUID was set before persist.
+- `PATCH /v1/admin/employees/{employeeId}` role transitions to `ADMIN` or `TECHNICIAN` could fail with `500` when creating `admin_profiles` / `technician_profiles` rows without IDs.
+- `PATCH /v1/admin/employees/{employeeId}/status` with invalid values (for example `OPEN`) leaked an uncaught `IllegalArgumentException` as `500` instead of a business validation error.
+
+Applied hardening:
+
+- Employee create path now assigns a UUID to `UserEntity` before `save`.
+- Profile upsert paths now assign UUIDs when inserting new `AdminProfileEntity` or `TechnicianProfileEntity` rows.
+- Invalid role/status parsing in employee command flows is now translated to `BusinessRuleException`, yielding consistent conflict responses instead of generic internal errors.
+- The sequential API collection was updated so Admin Employee payloads reflect real contract requirements (`role` + `hireDate` required, status must be `ACTIVE|INACTIVE|SUSPENDED`, and `employee_id` is captured from create response).
 
 ---
 
@@ -147,8 +166,8 @@ The Notifications + Communications Center module now enforces actor/recipient in
 - Device token deactivation now validates token ownership (`token.userId == authenticatedUserId`) before deactivation
 - Existing device token values cannot be re-registered under a different user (prevents cross-user token hijacking)
 - Admin communications create endpoints enforce audit actor integrity:
-    - `POST /v1/admin/communications/notifications`: body `adminId` must match authenticated admin if provided
-    - `POST /v1/admin/communications/announcements`: body `authorId` must match authenticated admin if provided
+  - `POST /v1/admin/communications/notifications`: body `adminId` must match authenticated admin if provided
+  - `POST /v1/admin/communications/announcements`: body `authorId` must match authenticated admin if provided
 - Device token persistence update path was fixed to perform update-safe saves (no duplicate-insert behavior), eliminating runtime `500` failures during deactivation
 
 ---
@@ -196,10 +215,11 @@ sakany/
 
 ---
 
-<!-- 
+<!--
 Paste the full original Modular Monolith Blueprint below this line.
 The modifications above explain what's different for Sakany.
 -->
+
 # 🏗️ Modular Monolith Project Blueprint
 
 **A reusable architecture template for any domain**
@@ -623,9 +643,9 @@ public class EventBus implements IEventBus {
 services:
   mongodb:
     image: mongo:7
-    command: ['--replSet', 'rs0', '--bind_ip_all']
+    command: ["--replSet", "rs0", "--bind_ip_all"]
     ports:
-      - '27017:27017'
+      - "27017:27017"
     volumes:
       - mongodb_data:/data/db
 
@@ -802,17 +822,14 @@ rate-limit.window-seconds=60
 When starting a new project:
 
 1. **[ ] Define your modules** (bounded contexts)
-
    - What are the main business areas?
    - Example: `orders`, `inventory`, `customers`, `payments`
 
 2. **[ ] Create shared infrastructure**
-
    - Copy `shared/` folder structure
    - Set up base classes (AggregateRoot, Entity, etc.)
 
 3. **[ ] For each module:**
-
    - [ ] Create `package-info.java` with dependencies
    - [ ] Define public API interface in `module/shared/`
    - [ ] Create domain models (Aggregates, Entities)
@@ -822,7 +839,6 @@ When starting a new project:
    - [ ] Create Repositories
 
 4. **[ ] Set up inter-module communication**
-
    - APIs for synchronous calls
    - Events for async notifications
 

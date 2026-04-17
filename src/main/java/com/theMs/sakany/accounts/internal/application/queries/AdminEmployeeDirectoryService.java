@@ -171,6 +171,7 @@ public class AdminEmployeeDirectoryService {
                 phoneVerified,
                 loginMethod
         );
+        user.setId(UUID.randomUUID());
 
         user.setEmploymentStatus(accountStatus);
         user.setHireDate(request.hireDate());
@@ -474,7 +475,11 @@ public class AdminEmployeeDirectoryService {
             permissionSet.removeIf(value -> SUPER_ADMIN_PERMISSION.equalsIgnoreCase(value));
         }
 
-        AdminProfileEntity adminProfile = existing.orElseGet(AdminProfileEntity::new);
+        AdminProfileEntity adminProfile = existing.orElseGet(() -> {
+            AdminProfileEntity entity = new AdminProfileEntity();
+            entity.setId(UUID.randomUUID());
+            return entity;
+        });
         adminProfile.setUser(user);
         adminProfile.setScopePermissions(new ArrayList<>(permissionSet));
         adminProfileJpaRepository.save(adminProfile);
@@ -489,7 +494,11 @@ public class AdminEmployeeDirectoryService {
                 ? normalizeList(requestedSpecializations)
                 : existing.map(TechnicianProfileEntity::getSpecializations).map(this::normalizeList).orElseGet(ArrayList::new);
 
-        TechnicianProfileEntity technicianProfile = existing.orElseGet(TechnicianProfileEntity::new);
+        TechnicianProfileEntity technicianProfile = existing.orElseGet(() -> {
+            TechnicianProfileEntity entity = new TechnicianProfileEntity();
+            entity.setId(UUID.randomUUID());
+            return entity;
+        });
         technicianProfile.setUser(user);
         technicianProfile.setSpecializations(specializations);
         technicianProfile.setAvailable(technicianAvailable != null
@@ -520,7 +529,11 @@ public class AdminEmployeeDirectoryService {
         if (rawRole == null || rawRole.isBlank()) {
             roleFilter = defaultToAdmin ? AdminEmployeeRoleFilter.ADMIN : AdminEmployeeRoleFilter.ALL;
         } else {
-            roleFilter = AdminEmployeeRoleFilter.from(rawRole);
+            try {
+                roleFilter = AdminEmployeeRoleFilter.from(rawRole);
+            } catch (IllegalArgumentException ex) {
+                throw new BusinessRuleException(ex.getMessage());
+            }
         }
 
         if (roleFilter == AdminEmployeeRoleFilter.ALL) {
@@ -573,7 +586,12 @@ public class AdminEmployeeDirectoryService {
 
     private EmployeeAccountStatus resolveAccountStatus(Boolean isActive, String statusRawValue) {
         if (statusRawValue != null && !statusRawValue.isBlank()) {
-            AdminEmployeeStatusFilter statusFilter = AdminEmployeeStatusFilter.from(statusRawValue);
+            AdminEmployeeStatusFilter statusFilter;
+            try {
+                statusFilter = AdminEmployeeStatusFilter.from(statusRawValue);
+            } catch (IllegalArgumentException ex) {
+                throw new BusinessRuleException(ex.getMessage());
+            }
             if (statusFilter == AdminEmployeeStatusFilter.ALL) {
                 throw new BusinessRuleException("status must be ACTIVE, INACTIVE, or SUSPENDED");
             }
