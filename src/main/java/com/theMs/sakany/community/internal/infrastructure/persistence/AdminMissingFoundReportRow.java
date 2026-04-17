@@ -3,16 +3,14 @@ package com.theMs.sakany.community.internal.infrastructure.persistence;
 import java.time.Instant;
 import java.util.UUID;
 
-public interface AdminMissingFoundRow {
+public interface AdminMissingFoundReportRow {
     UUID getReportId();
 
     UUID getReporterId();
 
-    String getType();
+    String getReportType();
 
     String getCategory();
-
-    String getStatus();
 
     String getTitle();
 
@@ -22,19 +20,15 @@ public interface AdminMissingFoundRow {
 
     Instant getEventTime();
 
-    Boolean getResolved();
+    String getStatus();
 
     Instant getResolvedAt();
 
+    String getContactNumber();
+
     Instant getCreatedAt();
 
-    Instant getUpdatedAt();
+    String getReporterName();
 
-    String getReporterFirstName();
-
-    String getReporterLastName();
-
-    String getReporterUnitNumber();
-
-    String getReporterBuildingName();
+    String getReporterUnitLabel();
 }

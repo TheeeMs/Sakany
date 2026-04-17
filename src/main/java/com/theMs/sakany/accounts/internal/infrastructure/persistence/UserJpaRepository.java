@@ -19,8 +19,25 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, UUID> {
 			WHERE u.role IN :roles
 			  AND (
 					:status IS NULL
-					OR (:status = 'ACTIVE' AND u.isActive = TRUE)
-					OR (:status = 'INACTIVE' AND u.isActive = FALSE)
+					OR :status = 'ALL'
+					OR (
+						:status = 'ACTIVE'
+						AND (
+							u.employmentStatus = com.theMs.sakany.accounts.internal.domain.EmployeeAccountStatus.ACTIVE
+							OR (u.employmentStatus IS NULL AND u.isActive = TRUE)
+						)
+					)
+					OR (
+						:status = 'INACTIVE'
+						AND (
+							u.employmentStatus = com.theMs.sakany.accounts.internal.domain.EmployeeAccountStatus.INACTIVE
+							OR (u.employmentStatus IS NULL AND u.isActive = FALSE)
+						)
+					)
+					OR (
+						:status = 'SUSPENDED'
+						AND u.employmentStatus = com.theMs.sakany.accounts.internal.domain.EmployeeAccountStatus.SUSPENDED
+					)
 			  )
 			  AND (
 					:searchTerm IS NULL

@@ -1,5 +1,6 @@
 package com.theMs.sakany.accounts.internal.application.queries;
 
+import com.theMs.sakany.accounts.internal.domain.EmployeeAccountStatus;
 import com.theMs.sakany.accounts.internal.domain.LoginMethod;
 import com.theMs.sakany.accounts.internal.domain.Role;
 import com.theMs.sakany.accounts.internal.infrastructure.persistence.AdminProfileEntity;
@@ -17,22 +18,31 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 public class AdminEmployeeDirectoryService {
 
-    private static final List<Role> STAFF_ROLES = List.of(Role.ADMIN, Role.TECHNICIAN, Role.SECURITY_GUARD);
+    private static final List<Role> STAFF_ROLES = List.of(
+            Role.ADMIN,
+            Role.TECHNICIAN,
+            Role.SECURITY_GUARD
+    );
+
     private static final int DEFAULT_PAGE_SIZE = 25;
     private static final int MAX_PAGE_SIZE = 100;
+    private static final String SUPER_ADMIN_PERMISSION = "SUPER_ADMIN";
     private static final String TEMP_PASSWORD_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
 
     private final UserJpaRepository userJpaRepository;
@@ -60,133 +70,123 @@ public class AdminEmployeeDirectoryService {
             int page,
             int size
     ) {
-        AdminEmployeeRoleFilter roleFilter = role == null ? AdminEmployeeRoleFilter.ALL : role;
-        String statusFilter = resolveStatusFilter(status);
-        String normalizedSearch = normalizeSearch(search);
-
-        List<UserEntity> users = userJpaRepository.findStaffForAdmin(
-                normalizedSearch,
-                statusFilter,
-                resolveDbRoles(roleFilter)
-        );
-
-        Map<UUID, AdminProfileEntity> adminProfiles = loadAdminProfiles(users);
-        Map<UUID, TechnicianProfileEntity> technicianProfiles = loadTechnicianProfiles(users);
-
-        List<AdminEmployeeItem> filteredItems = users.stream()
-                .map(user -> mapEmployee(user, adminProfiles.get(user.getId()), technicianProfiles.get(user.getId())))
-                .filter(item -> matchesRoleFilter(item.roleCode(), roleFilter))
-                .toList();
-
         int safePage = Math.max(page, 0);
         int safeSize = size <= 0 ? DEFAULT_PAGE_SIZE : Math.min(size, MAX_PAGE_SIZE);
-        int fromIndex = Math.min(safePage * safeSize, filteredItems.size());
-        int toIndex = Math.min(fromIndex + safeSize, filteredItems.size());
-        List<AdminEmployeeItem> pageItems = filteredItems.subList(fromIndex, toIndex);
 
-        long totalElements = filteredItems.size();
+        String normalizedSearch = normalize(search);
+        AdminEmployeeRoleFilter effectiveRole = role == null ? AdminEmployeeRoleFilter.ALL : role;
+        AdminEmployeeStatusFilter effectiveStatus = status == null ? AdminEmployeeStatusFilter.ALL : status;
+
+        List<UserEntity> candidates = userJpaRepository.findStaffForAdmin(
+                normalizedSearch,
+                effectiveStatus.name(),
+                STAFF_ROLES
+        );
+
+        ProfileSnapshot profileSnapshot = loadProfiles(candidates);
+        Map<UUID, AdminProfileEntity> adminProfileByUserId = profileSnapshot.adminProfileByUserId();
+
+        List<UserEntity> filtered = candidates.stream()
+                .filter(user -> matchesRoleFilter(user, effectiveRole, adminProfileByUserId))
+                .toList();
+
+        long totalElements = filtered.size();
+        int fromIndex = Math.min(safePage * safeSize, filtered.size());
+        int toIndex = Math.min(fromIndex + safeSize, filtered.size());
+
+        List<AdminEmployeeItem> items = filtered.subList(fromIndex, toIndex)
+                .stream()
+                .map(user -> mapItem(user, profileSnapshot))
+                .toList();
+
         int totalPages = totalElements == 0 ? 0 : (int) Math.ceil((double) totalElements / safeSize);
-        boolean hasNext = safePage + 1 < totalPages;
-        boolean hasPrevious = safePage > 0 && totalElements > 0;
 
         return new AdminEmployeesDashboardResponse(
-                pageItems,
+                items,
                 safePage,
                 safeSize,
                 totalElements,
                 totalPages,
-                hasNext,
-                hasPrevious,
-                buildSummary(),
-                getRoleOptions(),
-                getStatusOptions()
+                safePage + 1 < totalPages,
+                safePage > 0 && totalPages > 0,
+                buildSummary()
         );
     }
 
     public AdminEmployeeItem getEmployee(UUID employeeId) {
-        UserEntity employee = findStaffUser(employeeId);
-        AdminProfileEntity adminProfile = findFirstAdminProfile(employeeId);
-        TechnicianProfileEntity technicianProfile = findFirstTechnicianProfile(employeeId);
-        return mapEmployee(employee, adminProfile, technicianProfile);
+        UserEntity user = getStaffEmployee(employeeId);
+        ProfileSnapshot profileSnapshot = loadProfiles(List.of(user));
+        return mapItem(user, profileSnapshot);
     }
 
     public List<String> getRoleOptions() {
-        return Arrays.stream(AdminEmployeeRoleFilter.values()).map(Enum::name).toList();
+        return ArraysAsList(
+                AdminEmployeeRoleFilter.ALL.name(),
+                AdminEmployeeRoleFilter.SUPER_ADMIN.name(),
+                AdminEmployeeRoleFilter.ADMIN.name(),
+                AdminEmployeeRoleFilter.TECHNICIAN.name(),
+                AdminEmployeeRoleFilter.SECURITY_STAFF.name()
+        );
     }
 
     public List<String> getStatusOptions() {
-        return Arrays.stream(AdminEmployeeStatusFilter.values()).map(Enum::name).toList();
+        return ArraysAsList(
+                AdminEmployeeStatusFilter.ALL.name(),
+                AdminEmployeeStatusFilter.ACTIVE.name(),
+                AdminEmployeeStatusFilter.INACTIVE.name(),
+                AdminEmployeeStatusFilter.SUSPENDED.name()
+        );
     }
 
     @Transactional
     public CreateEmployeeResult createEmployee(CreateEmployeeRequest request) {
-        validateCreateRequest(request);
-
-        NameParts nameParts = resolveNameParts(request.fullName(), request.firstName(), request.lastName());
-        String firstName = nameParts.firstName();
-        String lastName = nameParts.lastName();
-        String phoneNumber = normalizePhone(request.phoneNumber());
-        String email = normalizeEmail(request.email());
-        LoginMethod loginMethod = request.loginMethod() == null ? LoginMethod.EMAIL_PASSWORD : request.loginMethod();
-
-        ensureUniquePhone(phoneNumber, null);
-        ensureUniqueEmail(email, null);
-
-        RoleSelection roleSelection = resolveRoleForCreate(request.role(), request.isSuperAdmin());
-
-        String rawPassword = request.password();
-        String temporaryPassword = null;
-        if (loginMethod == LoginMethod.EMAIL_PASSWORD) {
-            if (request.confirmPassword() != null && rawPassword == null) {
-                throw new BusinessRuleException("password is required when confirmPassword is provided");
-            }
-            if (rawPassword != null && request.confirmPassword() != null && !rawPassword.equals(request.confirmPassword())) {
-                throw new BusinessRuleException("password and confirmPassword do not match");
-            }
-            if (isBlank(rawPassword)) {
-                rawPassword = generateTempPassword(10);
-                temporaryPassword = rawPassword;
-            }
-            if (rawPassword.length() < 8) {
-                throw new BusinessRuleException("Password must be at least 8 characters");
-            }
+        if (request == null) {
+            throw new BusinessRuleException("Request body is required");
         }
 
-        String hashedPassword = isBlank(rawPassword) ? null : passwordEncoder.encode(rawPassword);
+        NameParts nameParts = resolveNameParts(request.fullName(), request.firstName(), request.lastName());
+        String normalizedPhone = requireNonBlank(request.phoneNumber(), "phoneNumber is required");
+        String normalizedEmail = normalizeEmail(requireNonBlank(request.email(), "email is required"));
+        LoginMethod loginMethod = request.loginMethod() == null ? LoginMethod.EMAIL_PASSWORD : request.loginMethod();
 
-        UserEntity employee = new UserEntity(
-                firstName,
-                lastName,
-                phoneNumber,
-                email,
-                hashedPassword,
-                roleSelection.databaseRole(),
-                request.isActive() == null || request.isActive(),
-                Boolean.TRUE.equals(request.isPhoneVerified()),
+        RoleSelection roleSelection = resolveRoleSelection(request.role(), request.isSuperAdmin(), false);
+        EmployeeAccountStatus accountStatus = resolveAccountStatus(request.isActive(), null);
+        boolean phoneVerified = Boolean.TRUE.equals(request.isPhoneVerified());
+
+        if (request.hireDate() == null) {
+            throw new BusinessRuleException("hireDate is required");
+        }
+
+        validatePassword(request.password(), request.confirmPassword(), loginMethod, true, true);
+        validateUserUniqueness(null, normalizedEmail, normalizedPhone);
+
+        UserEntity user = new UserEntity(
+                nameParts.firstName(),
+                nameParts.lastName(),
+                normalizedPhone,
+                normalizedEmail,
+                request.password() == null ? null : passwordEncoder.encode(request.password()),
+                roleSelection.role(),
+                accountStatus == EmployeeAccountStatus.ACTIVE,
+                phoneVerified,
                 loginMethod
         );
-        employee.setId(UUID.randomUUID());
-        employee.setHireDate(request.hireDate());
-        employee.setDepartment(resolveDepartmentValue(request.department()));
 
-        UserEntity savedEmployee = userJpaRepository.save(employee);
+        user.setEmploymentStatus(accountStatus);
+        user.setHireDate(request.hireDate());
+        user.setDepartment(normalize(request.department()));
 
-        ProfileSnapshot profiles = synchronizeProfiles(
-                savedEmployee,
+        UserEntity saved = userJpaRepository.save(user);
+
+        syncProfiles(
+                saved,
                 roleSelection,
                 request.scopePermissions(),
                 request.specializations(),
-                request.technicianAvailable(),
-                null,
-                null
+                request.technicianAvailable()
         );
 
-        return new CreateEmployeeResult(
-                savedEmployee.getId(),
-                "Employee created successfully",
-                temporaryPassword,
-                mapEmployee(savedEmployee, profiles.adminProfile(), profiles.technicianProfile())
-        );
+        return new CreateEmployeeResult(saved.getId(), "Employee created successfully");
     }
 
     @Transactional
@@ -195,590 +195,528 @@ public class AdminEmployeeDirectoryService {
             throw new BusinessRuleException("Request body is required");
         }
 
-        UserEntity employee = findStaffUser(employeeId);
-        AdminProfileEntity existingAdminProfile = findFirstAdminProfile(employeeId);
-        TechnicianProfileEntity existingTechnicianProfile = findFirstTechnicianProfile(employeeId);
+        UserEntity user = getStaffEmployee(employeeId);
+
+        if (request.fullName() != null) {
+            NameParts parts = splitFullName(request.fullName());
+            user.setFirstName(parts.firstName());
+            user.setLastName(parts.lastName());
+        }
 
         if (request.firstName() != null) {
-            if (request.firstName().isBlank()) {
-                throw new BusinessRuleException("firstName cannot be blank");
-            }
-            employee.setFirstName(request.firstName().trim());
+            user.setFirstName(requireNonBlank(request.firstName(), "firstName cannot be blank"));
         }
+
         if (request.lastName() != null) {
-            if (request.lastName().isBlank()) {
-                throw new BusinessRuleException("lastName cannot be blank");
-            }
-            employee.setLastName(request.lastName().trim());
+            user.setLastName(requireNonBlank(request.lastName(), "lastName cannot be blank"));
         }
-        if (request.fullName() != null) {
-            NameParts nameParts = resolveNameParts(request.fullName(), null, null);
-            employee.setFirstName(nameParts.firstName());
-            employee.setLastName(nameParts.lastName());
-        }
+
         if (request.phoneNumber() != null) {
-            String normalizedPhone = normalizePhone(request.phoneNumber());
-            ensureUniquePhone(normalizedPhone, employeeId);
-            employee.setPhone(normalizedPhone);
+            String normalizedPhone = requireNonBlank(request.phoneNumber(), "phoneNumber cannot be blank");
+            validateUserUniqueness(user.getId(), null, normalizedPhone);
+            user.setPhone(normalizedPhone);
         }
+
         if (request.email() != null) {
             String normalizedEmail = normalizeEmail(request.email());
-            ensureUniqueEmail(normalizedEmail, employeeId);
-            employee.setEmail(normalizedEmail);
+            validateUserUniqueness(user.getId(), normalizedEmail, null);
+            user.setEmail(normalizedEmail);
         }
-        if (request.isActive() != null) {
-            employee.setActive(request.isActive());
-        }
-        if (request.isPhoneVerified() != null) {
-            employee.setPhoneVerified(request.isPhoneVerified());
-        }
-        if (request.loginMethod() != null) {
-            employee.setAuthProvider(request.loginMethod());
-        }
+
         if (request.password() != null) {
-            if (request.password().isBlank() || request.password().length() < 8) {
-                throw new BusinessRuleException("Password must be at least 8 characters");
-            }
-            if (request.confirmPassword() != null && !request.password().equals(request.confirmPassword())) {
-                throw new BusinessRuleException("password and confirmPassword do not match");
-            }
-            employee.setPasswordHash(passwordEncoder.encode(request.password()));
-            if (employee.getAuthProvider() != LoginMethod.EMAIL_PASSWORD) {
-                employee.setAuthProvider(LoginMethod.EMAIL_PASSWORD);
+            LoginMethod effectiveLoginMethod = request.loginMethod() == null ? user.getAuthProvider() : request.loginMethod();
+            validatePassword(request.password(), request.confirmPassword(), effectiveLoginMethod, false, false);
+            if (!request.password().isBlank()) {
+                user.setPasswordHash(passwordEncoder.encode(request.password()));
             }
         }
+
+        if (request.loginMethod() != null) {
+            user.setAuthProvider(request.loginMethod());
+        }
+
         if (request.hireDate() != null) {
-            employee.setHireDate(request.hireDate());
+            user.setHireDate(request.hireDate());
         }
+
         if (request.department() != null) {
-            employee.setDepartment(resolveDepartmentValue(request.department()));
+            user.setDepartment(normalize(request.department()));
         }
 
-        RoleSelection roleSelection = resolveRoleForUpdate(
-                employee.getRole(),
-                existingAdminProfile,
-                request.role(),
-                request.isSuperAdmin()
-        );
-        employee.setRole(roleSelection.databaseRole());
+        if (request.isPhoneVerified() != null) {
+            user.setPhoneVerified(request.isPhoneVerified());
+        }
 
-        UserEntity savedEmployee = userJpaRepository.save(employee);
-        synchronizeProfiles(
-                savedEmployee,
-                roleSelection,
+        RoleSelection currentRoleSelection = resolveCurrentRoleSelection(user);
+        RoleSelection targetRoleSelection = currentRoleSelection;
+
+        if (request.role() != null || request.isSuperAdmin() != null) {
+            targetRoleSelection = resolveRoleSelection(
+                    request.role() == null ? currentRoleSelection.filter().name() : request.role(),
+                    request.isSuperAdmin(),
+                    false
+            );
+            user.setRole(targetRoleSelection.role());
+        }
+
+        if (request.isActive() != null) {
+            user.setEmploymentStatus(request.isActive() ? EmployeeAccountStatus.ACTIVE : EmployeeAccountStatus.INACTIVE);
+        }
+
+        userJpaRepository.save(user);
+
+        syncProfiles(
+                user,
+                targetRoleSelection,
                 request.scopePermissions(),
                 request.specializations(),
-                request.technicianAvailable(),
-                existingAdminProfile,
-                existingTechnicianProfile
+                request.technicianAvailable()
         );
     }
 
     @Transactional
     public void updateStatus(UUID employeeId, UpdateEmployeeStatusRequest request) {
-        if (request == null || request.isActive() == null) {
-            throw new BusinessRuleException("isActive is required");
+        if (request == null) {
+            throw new BusinessRuleException("Request body is required");
         }
 
-        UserEntity employee = findStaffUser(employeeId);
-        employee.setActive(request.isActive());
-        userJpaRepository.save(employee);
+        UserEntity user = getStaffEmployee(employeeId);
+        EmployeeAccountStatus accountStatus = resolveAccountStatus(request.isActive(), request.status());
+        user.setEmploymentStatus(accountStatus);
+        userJpaRepository.save(user);
     }
 
     @Transactional
     public ResetPasswordResult resetPassword(UUID employeeId, String newPassword) {
-        UserEntity employee = findStaffUser(employeeId);
+        UserEntity user = getStaffEmployee(employeeId);
 
-        String rawPassword = isBlank(newPassword) ? generateTempPassword(10) : newPassword.trim();
-            if (rawPassword == null || rawPassword.length() < 8) {
+        String effectivePassword = normalize(newPassword);
+        if (effectivePassword == null) {
+            effectivePassword = generateTempPassword(10);
+        }
+
+        if (effectivePassword.length() < 8) {
             throw new BusinessRuleException("Password must be at least 8 characters");
         }
 
-        employee.setPasswordHash(passwordEncoder.encode(rawPassword));
-        if (employee.getAuthProvider() != LoginMethod.EMAIL_PASSWORD) {
-            employee.setAuthProvider(LoginMethod.EMAIL_PASSWORD);
-        }
-        userJpaRepository.save(employee);
+        user.setPasswordHash(passwordEncoder.encode(effectivePassword));
+        userJpaRepository.save(user);
 
-        return new ResetPasswordResult(
-                employeeId,
-                "Password reset successfully",
-                rawPassword
-        );
+        return new ResetPasswordResult(user.getId(), "Password reset successfully", effectivePassword);
     }
 
     @Transactional
     public void deactivateEmployee(UUID employeeId) {
-        UserEntity employee = findStaffUser(employeeId);
-        if (employee.isActive()) {
-            employee.setActive(false);
-            userJpaRepository.save(employee);
-        }
+        UserEntity user = getStaffEmployee(employeeId);
+        user.setEmploymentStatus(EmployeeAccountStatus.INACTIVE);
+        userJpaRepository.save(user);
     }
 
     private AdminEmployeesSummary buildSummary() {
-        List<UserEntity> allStaff = userJpaRepository.findAllByRoleIn(STAFF_ROLES);
-        Map<UUID, AdminProfileEntity> adminProfiles = loadAdminProfiles(allStaff);
+        List<UserEntity> allEmployees = userJpaRepository.findAllByRoleIn(STAFF_ROLES);
+        ProfileSnapshot profileSnapshot = loadProfiles(allEmployees);
 
-        long superAdmins = 0;
-        long admins = 0;
-        long technicians = 0;
-        long securityStaff = 0;
-        long activeEmployees = allStaff.stream().filter(UserEntity::isActive).count();
+        long superAdminsCount = 0;
+        long adminsCount = 0;
+        long techniciansCount = 0;
+        long securityStaffCount = 0;
+        long activeEmployeesCount = 0;
 
-        for (UserEntity employee : allStaff) {
-            String roleCode = resolveRoleCode(employee, adminProfiles.get(employee.getId()));
-            if (AdminEmployeeRoleFilter.SUPER_ADMIN.name().equals(roleCode)) {
-                superAdmins++;
-            } else if (AdminEmployeeRoleFilter.ADMIN.name().equals(roleCode)) {
-                admins++;
-            } else if (AdminEmployeeRoleFilter.TECHNICIAN.name().equals(roleCode)) {
-                technicians++;
-            } else if (AdminEmployeeRoleFilter.SECURITY_STAFF.name().equals(roleCode)) {
-                securityStaff++;
+        for (UserEntity user : allEmployees) {
+            AdminProfileEntity adminProfile = profileSnapshot.adminProfileByUserId().get(user.getId());
+            boolean isSuperAdmin = isSuperAdmin(adminProfile);
+
+            if (user.getRole() == Role.ADMIN) {
+                if (isSuperAdmin) {
+                    superAdminsCount++;
+                } else {
+                    adminsCount++;
+                }
+            } else if (user.getRole() == Role.TECHNICIAN) {
+                techniciansCount++;
+            } else if (user.getRole() == Role.SECURITY_GUARD) {
+                securityStaffCount++;
+            }
+
+            if (deriveAccountStatus(user) == EmployeeAccountStatus.ACTIVE) {
+                activeEmployeesCount++;
             }
         }
 
-        long totalEmployees = allStaff.size();
-
+        long totalEmployeesCount = allEmployees.size();
         return new AdminEmployeesSummary(
-                superAdmins,
-                admins,
-                technicians,
-                securityStaff,
-                activeEmployees,
-                totalEmployees,
-                activeEmployees + "/" + totalEmployees
+                superAdminsCount,
+                adminsCount,
+                techniciansCount,
+                securityStaffCount,
+                activeEmployeesCount,
+                totalEmployeesCount,
+                activeEmployeesCount + "/" + totalEmployeesCount
         );
     }
 
-    private UserEntity findStaffUser(UUID employeeId) {
-        UserEntity employee = userJpaRepository.findById(employeeId)
-                .orElseThrow(() -> new NotFoundException("Employee", employeeId));
+    private AdminEmployeeItem mapItem(UserEntity user, ProfileSnapshot profileSnapshot) {
+        AdminProfileEntity adminProfile = profileSnapshot.adminProfileByUserId().get(user.getId());
+        TechnicianProfileEntity technicianProfile = profileSnapshot.technicianProfileByUserId().get(user.getId());
 
-        if (!STAFF_ROLES.contains(employee.getRole())) {
-            throw new NotFoundException("Employee", employeeId);
-        }
-
-        return employee;
-    }
-
-    private Map<UUID, AdminProfileEntity> loadAdminProfiles(List<UserEntity> users) {
-        List<UUID> adminUserIds = users.stream()
-                .filter(user -> user.getRole() == Role.ADMIN)
-                .map(UserEntity::getId)
-                .toList();
-
-        if (adminUserIds.isEmpty()) {
-            return Map.of();
-        }
-
-        return adminProfileJpaRepository.findByUserIds(adminUserIds).stream()
-                .collect(Collectors.toMap(
-                        profile -> profile.getUser().getId(),
-                        profile -> profile,
-                        (first, second) -> first,
-                        LinkedHashMap::new
-                ));
-    }
-
-    private Map<UUID, TechnicianProfileEntity> loadTechnicianProfiles(List<UserEntity> users) {
-        List<UUID> technicianUserIds = users.stream()
-                .filter(user -> user.getRole() == Role.TECHNICIAN)
-                .map(UserEntity::getId)
-                .toList();
-
-        if (technicianUserIds.isEmpty()) {
-            return Map.of();
-        }
-
-        return technicianProfileJpaRepository.findByUserIds(technicianUserIds).stream()
-                .collect(Collectors.toMap(
-                        profile -> profile.getUser().getId(),
-                        profile -> profile,
-                        (first, second) -> first,
-                        LinkedHashMap::new
-                ));
-    }
-
-    private AdminProfileEntity findFirstAdminProfile(UUID userId) {
-        return adminProfileJpaRepository.findByUserId(userId).stream().findFirst().orElse(null);
-    }
-
-    private TechnicianProfileEntity findFirstTechnicianProfile(UUID userId) {
-        return technicianProfileJpaRepository.findByUserId(userId).stream().findFirst().orElse(null);
-    }
-
-    private ProfileSnapshot synchronizeProfiles(
-            UserEntity employee,
-            RoleSelection roleSelection,
-            List<String> requestedPermissions,
-            List<String> requestedSpecializations,
-            Boolean requestedTechnicianAvailable,
-            AdminProfileEntity existingAdminProfile,
-            TechnicianProfileEntity existingTechnicianProfile
-    ) {
-        adminProfileJpaRepository.deleteByUserId(employee.getId());
-        technicianProfileJpaRepository.deleteByUserId(employee.getId());
-
-        AdminProfileEntity savedAdminProfile = null;
-        TechnicianProfileEntity savedTechnicianProfile = null;
-
-        if (roleSelection.databaseRole() == Role.ADMIN) {
-            List<String> scopePermissions = resolveScopePermissions(
-                    roleSelection.superAdmin(),
-                    requestedPermissions,
-                    existingAdminProfile
-            );
-
-            savedAdminProfile = new AdminProfileEntity(employee, scopePermissions);
-            savedAdminProfile.setId(UUID.randomUUID());
-            savedAdminProfile = adminProfileJpaRepository.save(savedAdminProfile);
-        }
-
-        if (roleSelection.databaseRole() == Role.TECHNICIAN) {
-            List<String> specializations = resolveSpecializations(requestedSpecializations, existingTechnicianProfile);
-            boolean isAvailable = requestedTechnicianAvailable != null
-                    ? requestedTechnicianAvailable
-                    : existingTechnicianProfile == null || existingTechnicianProfile.isAvailable();
-            Double rating = existingTechnicianProfile != null ? existingTechnicianProfile.getRating() : null;
-
-            savedTechnicianProfile = new TechnicianProfileEntity(employee, specializations, isAvailable, rating);
-            savedTechnicianProfile.setId(UUID.randomUUID());
-            savedTechnicianProfile = technicianProfileJpaRepository.save(savedTechnicianProfile);
-        }
-
-        return new ProfileSnapshot(savedAdminProfile, savedTechnicianProfile);
-    }
-
-    private List<String> resolveScopePermissions(
-            boolean superAdmin,
-            List<String> requestedPermissions,
-            AdminProfileEntity existingAdminProfile
-    ) {
-        List<String> basePermissions;
-        if (requestedPermissions != null) {
-            basePermissions = normalizeStringList(requestedPermissions);
-        } else if (existingAdminProfile != null && existingAdminProfile.getScopePermissions() != null) {
-            basePermissions = normalizeStringList(existingAdminProfile.getScopePermissions());
-        } else {
-            basePermissions = List.of();
-        }
-
-        LinkedHashSet<String> permissions = new LinkedHashSet<>();
-        for (String permission : basePermissions) {
-            if (!"SUPER_ADMIN".equalsIgnoreCase(permission)) {
-                permissions.add(permission);
-            }
-        }
-
-        if (superAdmin) {
-            permissions.add("SUPER_ADMIN");
-        }
-
-        return List.copyOf(permissions);
-    }
-
-    private List<String> resolveSpecializations(
-            List<String> requestedSpecializations,
-            TechnicianProfileEntity existingTechnicianProfile
-    ) {
-        if (requestedSpecializations != null) {
-            return normalizeStringList(requestedSpecializations);
-        }
-
-        if (existingTechnicianProfile != null && existingTechnicianProfile.getSpecializations() != null) {
-            return normalizeStringList(existingTechnicianProfile.getSpecializations());
-        }
-
-        return List.of();
-    }
-
-    private List<String> normalizeStringList(List<String> values) {
-        LinkedHashSet<String> normalized = new LinkedHashSet<>();
-        for (String value : values) {
-            if (value == null) {
-                continue;
-            }
-            String trimmed = value.trim();
-            if (!trimmed.isBlank()) {
-                normalized.add(trimmed);
-            }
-        }
-        return List.copyOf(normalized);
-    }
-
-    private AdminEmployeeItem mapEmployee(
-            UserEntity employee,
-            AdminProfileEntity adminProfile,
-            TechnicianProfileEntity technicianProfile
-    ) {
-        String roleCode = resolveRoleCode(employee, adminProfile);
-        String roleLabel = resolveRoleLabel(roleCode);
-        String department = resolveDepartment(roleCode);
-        Instant lastActiveAt = employee.getUpdatedAt() != null ? employee.getUpdatedAt() : employee.getCreatedAt();
-        String baseUrl = "/v1/admin/employees/" + employee.getId();
+        boolean isSuperAdmin = isSuperAdmin(adminProfile);
+        AdminEmployeeRoleFilter role = toRoleFilter(user.getRole(), isSuperAdmin);
+        EmployeeAccountStatus accountStatus = deriveAccountStatus(user);
 
         return new AdminEmployeeItem(
-                employee.getId(),
-                buildFullName(employee.getFirstName(), employee.getLastName()),
-                buildInitials(employee.getFirstName(), employee.getLastName()),
-                employee.getFirstName(),
-                employee.getLastName(),
-                employee.getEmail(),
-                employee.getPhone(),
-                roleCode,
-                roleLabel,
-                department,
-                employee.isActive() ? AdminEmployeeStatusFilter.ACTIVE.name() : AdminEmployeeStatusFilter.INACTIVE.name(),
-                employee.isActive(),
-                employee.isPhoneVerified(),
-                employee.getAuthProvider(),
-                employee.getHireDate(),
-                employee.getDepartment(),
-                lastActiveAt,
-                adminProfile != null && adminProfile.getScopePermissions() != null
-                        ? List.copyOf(adminProfile.getScopePermissions())
-                        : List.of(),
-                technicianProfile != null && technicianProfile.getSpecializations() != null
-                        ? List.copyOf(technicianProfile.getSpecializations())
-                        : List.of(),
-                technicianProfile != null ? technicianProfile.isAvailable() : null,
-                baseUrl,
-                baseUrl,
-                baseUrl + "/permissions",
-                baseUrl + "/status",
-                baseUrl + "/reset-password",
-                baseUrl
+                user.getId(),
+                formatFullName(user.getFirstName(), user.getLastName()),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getPhone(),
+                role.name(),
+                toRoleLabel(role),
+                user.getDepartment(),
+                accountStatus.name(),
+                toStatusLabel(accountStatus),
+                user.getUpdatedAt(),
+                user.getHireDate(),
+                isSuperAdmin,
+                accountStatus == EmployeeAccountStatus.ACTIVE,
+                user.isPhoneVerified(),
+                user.getAuthProvider() == null ? null : user.getAuthProvider().name(),
+                technicianProfile == null || technicianProfile.getSpecializations() == null
+                        ? List.of()
+                        : List.copyOf(technicianProfile.getSpecializations()),
+                technicianProfile == null ? null : technicianProfile.isAvailable(),
+                buildActions(user.getId())
         );
     }
 
-    private List<Role> resolveDbRoles(AdminEmployeeRoleFilter roleFilter) {
-        if (roleFilter == null || roleFilter == AdminEmployeeRoleFilter.ALL) {
-            return STAFF_ROLES;
+    private AdminEmployeeActions buildActions(UUID employeeId) {
+        String base = "/v1/admin/employees/" + employeeId;
+        return new AdminEmployeeActions(
+                base,
+                base,
+                base + "/status",
+                base + "/reset-password",
+                base
+        );
+    }
+
+    private ProfileSnapshot loadProfiles(Collection<UserEntity> users) {
+        if (users == null || users.isEmpty()) {
+            return new ProfileSnapshot(Map.of(), Map.of());
         }
 
-        return switch (roleFilter) {
-            case SUPER_ADMIN, ADMIN -> List.of(Role.ADMIN);
-            case TECHNICIAN -> List.of(Role.TECHNICIAN);
-            case SECURITY_STAFF -> List.of(Role.SECURITY_GUARD);
-            case ALL -> STAFF_ROLES;
-        };
+        List<UUID> userIds = users.stream().map(UserEntity::getId).toList();
+
+        Map<UUID, AdminProfileEntity> adminByUserId = adminProfileJpaRepository.findByUserIds(userIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        profile -> profile.getUser().getId(),
+                        Function.identity(),
+                        (left, right) -> left
+                ));
+
+        Map<UUID, TechnicianProfileEntity> technicianByUserId = technicianProfileJpaRepository.findByUserIds(userIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        profile -> profile.getUser().getId(),
+                        Function.identity(),
+                        (left, right) -> left
+                ));
+
+        return new ProfileSnapshot(adminByUserId, technicianByUserId);
     }
 
-    private String resolveStatusFilter(AdminEmployeeStatusFilter status) {
-        if (status == null || status == AdminEmployeeStatusFilter.ALL) {
-            return null;
+    private UserEntity getStaffEmployee(UUID employeeId) {
+        UserEntity user = userJpaRepository.findById(employeeId)
+                .orElseThrow(() -> new NotFoundException("Employee", employeeId));
+
+        if (!STAFF_ROLES.contains(user.getRole())) {
+            throw new BusinessRuleException("Provided user is not an employee");
         }
-        return status.name();
+
+        return user;
     }
 
-    private boolean matchesRoleFilter(String roleCode, AdminEmployeeRoleFilter roleFilter) {
-        if (roleFilter == null || roleFilter == AdminEmployeeRoleFilter.ALL) {
-            return true;
-        }
-        return roleFilter.name().equals(roleCode);
-    }
-
-    private String resolveRoleCode(UserEntity employee, AdminProfileEntity adminProfile) {
-        if (employee.getRole() == Role.ADMIN) {
-            return isSuperAdmin(adminProfile)
-                    ? AdminEmployeeRoleFilter.SUPER_ADMIN.name()
-                    : AdminEmployeeRoleFilter.ADMIN.name();
-        }
-        if (employee.getRole() == Role.TECHNICIAN) {
-            return AdminEmployeeRoleFilter.TECHNICIAN.name();
-        }
-        if (employee.getRole() == Role.SECURITY_GUARD) {
-            return AdminEmployeeRoleFilter.SECURITY_STAFF.name();
-        }
-        return employee.getRole().name();
-    }
-
-    private String resolveRoleLabel(String roleCode) {
-        return switch (roleCode) {
-            case "SUPER_ADMIN" -> "Super Admin";
-            case "ADMIN" -> "Admin";
-            case "TECHNICIAN" -> "Technician";
-            case "SECURITY_STAFF" -> "Security Staff";
-            default -> roleCode;
-        };
-    }
-
-    private String resolveDepartment(String roleCode) {
-        return switch (roleCode) {
-            case "SUPER_ADMIN" -> "-";
-            case "ADMIN" -> "Management";
-            case "TECHNICIAN" -> "Maintenance";
-            case "SECURITY_STAFF" -> "Security";
-            default -> "-";
-        };
-    }
-
-    private boolean isSuperAdmin(AdminProfileEntity adminProfile) {
-        if (adminProfile == null || adminProfile.getScopePermissions() == null) {
-            return false;
-        }
-        return adminProfile.getScopePermissions().stream()
-                .filter(permission -> permission != null && !permission.isBlank())
-                .anyMatch(permission -> "SUPER_ADMIN".equalsIgnoreCase(permission.trim()));
-    }
-
-    private String normalizeSearch(String search) {
-        if (search == null) {
-            return null;
-        }
-        String trimmed = search.trim();
-        return trimmed.isBlank() ? null : trimmed;
-    }
-
-    private String normalizePhone(String phoneNumber) {
-        if (phoneNumber == null || phoneNumber.isBlank()) {
-            throw new BusinessRuleException("phoneNumber is required");
-        }
-        return phoneNumber.trim();
-    }
-
-    private String normalizeEmail(String email) {
-        if (email == null) {
-            return null;
-        }
-        String trimmed = email.trim().toLowerCase(Locale.ROOT);
-        return trimmed.isBlank() ? null : trimmed;
-    }
-
-    private String buildFullName(String firstName, String lastName) {
-        String f = firstName == null ? "" : firstName.trim();
-        String l = lastName == null ? "" : lastName.trim();
-        String fullName = (f + " " + l).trim();
-        return fullName.isBlank() ? "Unknown Employee" : fullName;
-    }
-
-    private String buildInitials(String firstName, String lastName) {
-        String f = firstName == null ? "" : firstName.trim();
-        String l = lastName == null ? "" : lastName.trim();
-
-        String firstInitial = f.isBlank() ? "" : f.substring(0, 1).toUpperCase(Locale.ROOT);
-        String lastInitial = l.isBlank() ? "" : l.substring(0, 1).toUpperCase(Locale.ROOT);
-        String initials = (firstInitial + lastInitial).trim();
-
-        return initials.isBlank() ? "--" : initials;
-    }
-
-    private void ensureUniquePhone(String phoneNumber, UUID employeeIdToExclude) {
-        userJpaRepository.findByPhone(phoneNumber).ifPresent(existing -> {
-            if (employeeIdToExclude == null || !existing.getId().equals(employeeIdToExclude)) {
-                throw new BusinessRuleException("Phone number already registered");
-            }
-        });
-    }
-
-    private void ensureUniqueEmail(String email, UUID employeeIdToExclude) {
-        if (email == null) {
+    private void syncProfiles(
+            UserEntity user,
+            RoleSelection roleSelection,
+            List<String> requestedScopePermissions,
+            List<String> requestedSpecializations,
+            Boolean technicianAvailable
+    ) {
+        if (roleSelection.role() == Role.ADMIN) {
+            technicianProfileJpaRepository.deleteByUserId(user.getId());
+            upsertAdminProfile(user, roleSelection.isSuperAdmin(), requestedScopePermissions);
             return;
         }
 
-        userJpaRepository.findByEmail(email).ifPresent(existing -> {
-            if (employeeIdToExclude == null || !existing.getId().equals(employeeIdToExclude)) {
-                throw new BusinessRuleException("Email already registered");
-            }
-        });
+        adminProfileJpaRepository.deleteByUserId(user.getId());
+
+        if (roleSelection.role() == Role.TECHNICIAN) {
+            upsertTechnicianProfile(user, requestedSpecializations, technicianAvailable);
+            return;
+        }
+
+        technicianProfileJpaRepository.deleteByUserId(user.getId());
     }
 
-    private void validateCreateRequest(CreateEmployeeRequest request) {
-        if (request == null) {
-            throw new BusinessRuleException("Request body is required");
+    private void upsertAdminProfile(UserEntity user, boolean isSuperAdmin, List<String> requestedScopePermissions) {
+        Optional<AdminProfileEntity> existing = adminProfileJpaRepository.findFirstByUserId(user.getId());
+
+        List<String> basePermissions = requestedScopePermissions != null
+                ? normalizeList(requestedScopePermissions)
+                : existing.map(AdminProfileEntity::getScopePermissions).map(this::normalizeList).orElseGet(ArrayList::new);
+
+        LinkedHashSet<String> permissionSet = new LinkedHashSet<>(basePermissions);
+        if (isSuperAdmin) {
+            permissionSet.add(SUPER_ADMIN_PERMISSION);
+        } else {
+            permissionSet.removeIf(value -> SUPER_ADMIN_PERMISSION.equalsIgnoreCase(value));
         }
-        resolveNameParts(request.fullName(), request.firstName(), request.lastName());
-        if (request.role() == null || request.role().isBlank()) {
+
+        AdminProfileEntity adminProfile = existing.orElseGet(AdminProfileEntity::new);
+        adminProfile.setUser(user);
+        adminProfile.setScopePermissions(new ArrayList<>(permissionSet));
+        adminProfileJpaRepository.save(adminProfile);
+    }
+
+    private void upsertTechnicianProfile(UserEntity user, List<String> requestedSpecializations, Boolean technicianAvailable) {
+        Optional<TechnicianProfileEntity> existing = technicianProfileJpaRepository.findByUserId(user.getId())
+                .stream()
+                .findFirst();
+
+        List<String> specializations = requestedSpecializations != null
+                ? normalizeList(requestedSpecializations)
+                : existing.map(TechnicianProfileEntity::getSpecializations).map(this::normalizeList).orElseGet(ArrayList::new);
+
+        TechnicianProfileEntity technicianProfile = existing.orElseGet(TechnicianProfileEntity::new);
+        technicianProfile.setUser(user);
+        technicianProfile.setSpecializations(specializations);
+        technicianProfile.setAvailable(technicianAvailable != null
+                ? technicianAvailable
+                : existing.map(TechnicianProfileEntity::isAvailable).orElse(true));
+
+        technicianProfileJpaRepository.save(technicianProfile);
+    }
+
+    private RoleSelection resolveCurrentRoleSelection(UserEntity user) {
+        if (user.getRole() != Role.ADMIN) {
+            return new RoleSelection(toRoleFilter(user.getRole(), false), user.getRole(), false);
+        }
+
+        boolean isSuperAdmin = adminProfileJpaRepository.findFirstByUserId(user.getId())
+                .map(this::isSuperAdmin)
+                .orElse(false);
+
+        return new RoleSelection(
+                isSuperAdmin ? AdminEmployeeRoleFilter.SUPER_ADMIN : AdminEmployeeRoleFilter.ADMIN,
+                Role.ADMIN,
+                isSuperAdmin
+        );
+    }
+
+    private RoleSelection resolveRoleSelection(String rawRole, Boolean isSuperAdminFlag, boolean defaultToAdmin) {
+        AdminEmployeeRoleFilter roleFilter;
+        if (rawRole == null || rawRole.isBlank()) {
+            roleFilter = defaultToAdmin ? AdminEmployeeRoleFilter.ADMIN : AdminEmployeeRoleFilter.ALL;
+        } else {
+            roleFilter = AdminEmployeeRoleFilter.from(rawRole);
+        }
+
+        if (roleFilter == AdminEmployeeRoleFilter.ALL) {
             throw new BusinessRuleException("role is required");
         }
-        if (request.phoneNumber() == null || request.phoneNumber().isBlank()) {
-            throw new BusinessRuleException("phoneNumber is required");
+
+        return switch (roleFilter) {
+            case SUPER_ADMIN -> new RoleSelection(roleFilter, Role.ADMIN, true);
+            case ADMIN -> new RoleSelection(roleFilter, Role.ADMIN, Boolean.TRUE.equals(isSuperAdminFlag));
+            case TECHNICIAN -> new RoleSelection(roleFilter, Role.TECHNICIAN, false);
+            case SECURITY_STAFF -> new RoleSelection(roleFilter, Role.SECURITY_GUARD, false);
+            default -> throw new BusinessRuleException("Unsupported role");
+        };
+    }
+
+    private boolean matchesRoleFilter(
+            UserEntity user,
+            AdminEmployeeRoleFilter roleFilter,
+            Map<UUID, AdminProfileEntity> adminProfileByUserId
+    ) {
+        if (roleFilter == null || roleFilter == AdminEmployeeRoleFilter.ALL) {
+            return true;
         }
-        if (request.loginMethod() == LoginMethod.EMAIL_PASSWORD && isBlank(request.email())) {
-            throw new BusinessRuleException("email is required when loginMethod is EMAIL_PASSWORD");
+
+        AdminProfileEntity adminProfile = adminProfileByUserId.get(user.getId());
+        boolean isSuperAdmin = isSuperAdmin(adminProfile);
+
+        return switch (roleFilter) {
+            case SUPER_ADMIN -> user.getRole() == Role.ADMIN && isSuperAdmin;
+            case ADMIN -> user.getRole() == Role.ADMIN && !isSuperAdmin;
+            case TECHNICIAN -> user.getRole() == Role.TECHNICIAN;
+            case SECURITY_STAFF -> user.getRole() == Role.SECURITY_GUARD;
+            case ALL -> true;
+        };
+    }
+
+    private AdminEmployeeRoleFilter toRoleFilter(Role role, boolean isSuperAdmin) {
+        if (role == Role.ADMIN) {
+            return isSuperAdmin ? AdminEmployeeRoleFilter.SUPER_ADMIN : AdminEmployeeRoleFilter.ADMIN;
         }
-        if (request.hireDate() == null) {
-            throw new BusinessRuleException("hireDate is required");
+        if (role == Role.TECHNICIAN) {
+            return AdminEmployeeRoleFilter.TECHNICIAN;
         }
-        if (request.hireDate().isAfter(LocalDate.now().plusDays(1))) {
-            throw new BusinessRuleException("hireDate cannot be in the future");
+        if (role == Role.SECURITY_GUARD) {
+            return AdminEmployeeRoleFilter.SECURITY_STAFF;
         }
-        if (request.password() != null && request.confirmPassword() != null && !request.password().equals(request.confirmPassword())) {
+
+        throw new BusinessRuleException("Unsupported employee role: " + role);
+    }
+
+    private EmployeeAccountStatus resolveAccountStatus(Boolean isActive, String statusRawValue) {
+        if (statusRawValue != null && !statusRawValue.isBlank()) {
+            AdminEmployeeStatusFilter statusFilter = AdminEmployeeStatusFilter.from(statusRawValue);
+            if (statusFilter == AdminEmployeeStatusFilter.ALL) {
+                throw new BusinessRuleException("status must be ACTIVE, INACTIVE, or SUSPENDED");
+            }
+            return EmployeeAccountStatus.valueOf(statusFilter.name());
+        }
+
+        if (isActive == null) {
+            return EmployeeAccountStatus.ACTIVE;
+        }
+
+        return isActive ? EmployeeAccountStatus.ACTIVE : EmployeeAccountStatus.INACTIVE;
+    }
+
+    private EmployeeAccountStatus deriveAccountStatus(UserEntity user) {
+        EmployeeAccountStatus status = user.getEmploymentStatus();
+        if (status == null) {
+            return user.isActive() ? EmployeeAccountStatus.ACTIVE : EmployeeAccountStatus.INACTIVE;
+        }
+        return status;
+    }
+
+    private boolean isSuperAdmin(AdminProfileEntity adminProfileEntity) {
+        if (adminProfileEntity == null || adminProfileEntity.getScopePermissions() == null) {
+            return false;
+        }
+
+        return adminProfileEntity.getScopePermissions().stream()
+                .filter(Objects::nonNull)
+                .map(value -> value.trim().toUpperCase(Locale.ROOT))
+                .anyMatch(SUPER_ADMIN_PERMISSION::equals);
+    }
+
+    private String formatFullName(String firstName, String lastName) {
+        return (safe(firstName) + " " + safe(lastName)).trim();
+    }
+
+    private String toRoleLabel(AdminEmployeeRoleFilter roleFilter) {
+        return switch (roleFilter) {
+            case ALL -> "All";
+            case SUPER_ADMIN -> "Super Admin";
+            case ADMIN -> "Admin";
+            case TECHNICIAN -> "Technician";
+            case SECURITY_STAFF -> "Security Staff";
+        };
+    }
+
+    private String toStatusLabel(EmployeeAccountStatus status) {
+        return switch (status) {
+            case ACTIVE -> "Active";
+            case INACTIVE -> "Inactive";
+            case SUSPENDED -> "Suspended";
+        };
+    }
+
+    private NameParts resolveNameParts(String fullName, String firstName, String lastName) {
+        if (fullName != null && !fullName.isBlank()) {
+            return splitFullName(fullName);
+        }
+
+        String safeFirst = normalize(firstName);
+        String safeLast = normalize(lastName);
+
+        if (safeFirst == null || safeLast == null) {
+            throw new BusinessRuleException("firstName and lastName are required");
+        }
+
+        return new NameParts(safeFirst, safeLast);
+    }
+
+    private NameParts splitFullName(String fullName) {
+        String safeFullName = normalize(fullName);
+        if (safeFullName == null) {
+            throw new BusinessRuleException("fullName cannot be blank");
+        }
+
+        String[] parts = safeFullName.split("\\s+");
+        if (parts.length < 2) {
+            throw new BusinessRuleException("fullName must include first and last name");
+        }
+
+        String firstName = parts[0];
+        String lastName = String.join(" ", List.of(parts).subList(1, parts.length));
+        return new NameParts(firstName, lastName);
+    }
+
+    private void validateUserUniqueness(UUID userId, String email, String phoneNumber) {
+        if (email != null) {
+            userJpaRepository.findByEmail(email).ifPresent(existing -> {
+                if (!existing.getId().equals(userId)) {
+                    throw new BusinessRuleException("Email already registered");
+                }
+            });
+        }
+
+        if (phoneNumber != null) {
+            userJpaRepository.findByPhone(phoneNumber).ifPresent(existing -> {
+                if (!existing.getId().equals(userId)) {
+                    throw new BusinessRuleException("Phone number already registered");
+                }
+            });
+        }
+    }
+
+    private void validatePassword(
+            String password,
+            String confirmPassword,
+            LoginMethod loginMethod,
+            boolean requiredWhenEmailPassword,
+            boolean requireConfirmWhenPasswordProvided
+    ) {
+        if (loginMethod == LoginMethod.EMAIL_PASSWORD && requiredWhenEmailPassword && (password == null || password.isBlank())) {
+            throw new BusinessRuleException("password is required when loginMethod is EMAIL_PASSWORD");
+        }
+
+        if (password == null || password.isBlank()) {
+            return;
+        }
+
+        if (requireConfirmWhenPasswordProvided && (confirmPassword == null || confirmPassword.isBlank())) {
+            throw new BusinessRuleException("confirmPassword is required");
+        }
+
+        if (password.length() < 8) {
+            throw new BusinessRuleException("Password must be at least 8 characters");
+        }
+
+        if (confirmPassword != null && !password.equals(confirmPassword)) {
             throw new BusinessRuleException("password and confirmPassword do not match");
         }
     }
 
-    private NameParts resolveNameParts(String fullName, String firstName, String lastName) {
-        if (!isBlank(fullName)) {
-            String normalized = fullName.trim().replaceAll("\\s+", " ");
-            int firstSpace = normalized.indexOf(' ');
-            if (firstSpace <= 0 || firstSpace == normalized.length() - 1) {
-                throw new BusinessRuleException("fullName must include first and last name");
-            }
-            String resolvedFirstName = normalized.substring(0, firstSpace).trim();
-            String resolvedLastName = normalized.substring(firstSpace + 1).trim();
-            return new NameParts(resolvedFirstName, resolvedLastName);
+    private String normalizeEmail(String email) {
+        String normalizedEmail = normalize(email);
+        if (normalizedEmail == null) {
+            return null;
         }
 
-        if (isBlank(firstName) || isBlank(lastName)) {
-            throw new BusinessRuleException("fullName is required, or both firstName and lastName");
+        String lowered = normalizedEmail.toLowerCase(Locale.ROOT);
+        if (!lowered.contains("@")) {
+            throw new BusinessRuleException("Invalid email format");
         }
 
-        return new NameParts(firstName.trim(), lastName.trim());
-    }
-
-    private String resolveDepartmentValue(String explicitDepartment) {
-        if (explicitDepartment != null && !explicitDepartment.isBlank()) {
-            return explicitDepartment.trim();
-        }
-        return null;
-    }
-
-    private RoleSelection resolveRoleForCreate(String role, Boolean isSuperAdmin) {
-        return parseRequestedRole(role, isSuperAdmin, true);
-    }
-
-    private RoleSelection resolveRoleForUpdate(
-            Role currentRole,
-            AdminProfileEntity currentAdminProfile,
-            String requestedRole,
-            Boolean isSuperAdmin
-    ) {
-        if (isBlank(requestedRole)) {
-            if (currentRole != Role.ADMIN) {
-                return new RoleSelection(currentRole, false);
-            }
-
-            boolean currentIsSuperAdmin = isSuperAdmin(currentAdminProfile);
-            boolean resolvedSuperAdmin = isSuperAdmin == null ? currentIsSuperAdmin : isSuperAdmin;
-            return new RoleSelection(Role.ADMIN, resolvedSuperAdmin);
-        }
-
-        return parseRequestedRole(requestedRole, isSuperAdmin, false);
-    }
-
-    private RoleSelection parseRequestedRole(String role, Boolean isSuperAdmin, boolean required) {
-        if (isBlank(role)) {
-            if (required) {
-                throw new BusinessRuleException("role is required");
-            }
-            return new RoleSelection(Role.ADMIN, false);
-        }
-
-        String normalizedRole = role.trim()
-                .toUpperCase(Locale.ROOT)
-                .replace('-', '_')
-                .replace(' ', '_');
-
-        return switch (normalizedRole) {
-            case "SUPER_ADMIN" -> new RoleSelection(Role.ADMIN, true);
-            case "ADMIN" -> new RoleSelection(Role.ADMIN, Boolean.TRUE.equals(isSuperAdmin));
-            case "TECHNICIAN" -> new RoleSelection(Role.TECHNICIAN, false);
-            case "SECURITY_STAFF", "SECURITY_GUARD" -> new RoleSelection(Role.SECURITY_GUARD, false);
-            default -> throw new BusinessRuleException("Unsupported role: " + role);
-        };
+        return lowered;
     }
 
     private String generateTempPassword(int length) {
@@ -790,26 +728,45 @@ public class AdminEmployeeDirectoryService {
         return builder.toString();
     }
 
-    private boolean isBlank(String value) {
-        return value == null || value.isBlank();
+    private List<String> normalizeList(List<String> values) {
+        if (values == null) {
+            return new ArrayList<>();
+        }
+
+        LinkedHashSet<String> normalized = new LinkedHashSet<>();
+        for (String value : values) {
+            String safeValue = normalize(value);
+            if (safeValue != null) {
+                normalized.add(safeValue);
+            }
+        }
+
+        return new ArrayList<>(normalized);
     }
 
-    private record RoleSelection(
-            Role databaseRole,
-            boolean superAdmin
-    ) {
+    private String requireNonBlank(String value, String errorMessage) {
+        String normalized = normalize(value);
+        if (normalized == null) {
+            throw new BusinessRuleException(errorMessage);
+        }
+        return normalized;
     }
 
-    private record ProfileSnapshot(
-            AdminProfileEntity adminProfile,
-            TechnicianProfileEntity technicianProfile
-    ) {
+    private String normalize(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 
-    private record NameParts(
-            String firstName,
-            String lastName
-    ) {
+    private String safe(String value) {
+        return value == null ? "" : value;
+    }
+
+    private List<String> ArraysAsList(String... values) {
+        return List.of(values);
     }
 
     public record AdminEmployeesDashboardResponse(
@@ -820,9 +777,40 @@ public class AdminEmployeeDirectoryService {
             int totalPages,
             boolean hasNext,
             boolean hasPrevious,
-            AdminEmployeesSummary summary,
-            List<String> roleOptions,
-            List<String> statusOptions
+            AdminEmployeesSummary summary
+    ) {
+    }
+
+    public record AdminEmployeeItem(
+            UUID employeeId,
+            String fullName,
+            String firstName,
+            String lastName,
+            String email,
+            String phoneNumber,
+            String role,
+            String roleLabel,
+            String department,
+            String status,
+            String statusLabel,
+            Instant lastActiveAt,
+            LocalDate hireDate,
+            boolean superAdmin,
+            boolean active,
+            boolean phoneVerified,
+            String loginMethod,
+            List<String> specializations,
+            Boolean technicianAvailable,
+            AdminEmployeeActions actions
+    ) {
+    }
+
+    public record AdminEmployeeActions(
+            String viewUrl,
+            String editUrl,
+            String updateStatusUrl,
+            String resetPasswordUrl,
+            String deactivateUrl
     ) {
     }
 
@@ -834,36 +822,6 @@ public class AdminEmployeeDirectoryService {
             long activeEmployeesCount,
             long totalEmployeesCount,
             String activeEmployeesLabel
-    ) {
-    }
-
-    public record AdminEmployeeItem(
-            UUID employeeId,
-            String fullName,
-            String initials,
-            String firstName,
-            String lastName,
-            String email,
-            String phoneNumber,
-            String roleCode,
-            String roleLabel,
-            String department,
-            String status,
-            boolean isActive,
-            boolean isPhoneVerified,
-            LoginMethod loginMethod,
-            LocalDate hireDate,
-            String customDepartment,
-            Instant lastActiveAt,
-            List<String> scopePermissions,
-            List<String> specializations,
-            Boolean technicianAvailable,
-            String viewUrl,
-            String editUrl,
-            String permissionsUrl,
-            String statusUrl,
-            String resetPasswordUrl,
-            String deactivateUrl
     ) {
     }
 
@@ -909,14 +867,15 @@ public class AdminEmployeeDirectoryService {
     ) {
     }
 
-    public record UpdateEmployeeStatusRequest(Boolean isActive) {
+    public record UpdateEmployeeStatusRequest(
+            Boolean isActive,
+            String status
+    ) {
     }
 
     public record CreateEmployeeResult(
             UUID employeeId,
-            String message,
-            String temporaryPassword,
-            AdminEmployeeItem employee
+            String message
     ) {
     }
 
@@ -924,6 +883,25 @@ public class AdminEmployeeDirectoryService {
             UUID employeeId,
             String message,
             String temporaryPassword
+    ) {
+    }
+
+    private record RoleSelection(
+            AdminEmployeeRoleFilter filter,
+            Role role,
+            boolean isSuperAdmin
+    ) {
+    }
+
+    private record ProfileSnapshot(
+            Map<UUID, AdminProfileEntity> adminProfileByUserId,
+            Map<UUID, TechnicianProfileEntity> technicianProfileByUserId
+    ) {
+    }
+
+    private record NameParts(
+            String firstName,
+            String lastName
     ) {
     }
 }

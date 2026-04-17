@@ -5,6 +5,7 @@ import com.theMs.sakany.accounts.internal.application.queries.AdminEmployeeDirec
 import com.theMs.sakany.accounts.internal.application.queries.AdminEmployeeRoleFilter;
 import com.theMs.sakany.accounts.internal.application.queries.AdminEmployeeStatusFilter;
 import com.theMs.sakany.accounts.internal.domain.LoginMethod;
+import com.theMs.sakany.shared.exception.BusinessRuleException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,12 +35,18 @@ public class AdminEmployeesController {
     @GetMapping
     public ResponseEntity<AdminEmployeeDirectoryService.AdminEmployeesDashboardResponse> listEmployees(
             @RequestParam(required = false) String search,
-            @RequestParam(required = false, defaultValue = "ALL") AdminEmployeeRoleFilter role,
-            @RequestParam(required = false, defaultValue = "ALL") AdminEmployeeStatusFilter status,
+            @RequestParam(defaultValue = "ALL") String role,
+            @RequestParam(defaultValue = "ALL") String status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "25") int size
     ) {
-        return ResponseEntity.ok(adminEmployeeDirectoryService.getEmployees(search, role, status, page, size));
+        return ResponseEntity.ok(adminEmployeeDirectoryService.getEmployees(
+                search,
+                parseRole(role),
+                parseStatus(status),
+                page,
+                size
+        ));
     }
 
     @GetMapping("/{employeeId}")
@@ -113,27 +120,32 @@ public class AdminEmployeesController {
                         request.technicianAvailable()
                 )
         );
+
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{employeeId}/status")
-    public ResponseEntity<Void> updateEmployeeStatus(
+    public ResponseEntity<Void> updateStatus(
             @PathVariable UUID employeeId,
             @RequestBody AdminUpdateEmployeeStatusRequest request
     ) {
         adminEmployeeDirectoryService.updateStatus(
                 employeeId,
-                new AdminEmployeeDirectoryService.UpdateEmployeeStatusRequest(request.isActive())
+                new AdminEmployeeDirectoryService.UpdateEmployeeStatusRequest(
+                        request.isActive(),
+                        request.status()
+                )
         );
+
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{employeeId}/reset-password")
-    public ResponseEntity<AdminEmployeeDirectoryService.ResetPasswordResult> resetEmployeePassword(
+    public ResponseEntity<AdminEmployeeDirectoryService.ResetPasswordResult> resetPassword(
             @PathVariable UUID employeeId,
             @RequestBody(required = false) AdminResetPasswordRequest request
     ) {
-        String newPassword = request != null ? request.newPassword() : null;
+        String newPassword = request == null ? null : request.newPassword();
         return ResponseEntity.ok(adminEmployeeDirectoryService.resetPassword(employeeId, newPassword));
     }
 
@@ -143,51 +155,91 @@ public class AdminEmployeesController {
         return ResponseEntity.noContent().build();
     }
 
+    private AdminEmployeeRoleFilter parseRole(String rawRole) {
+        try {
+            return AdminEmployeeRoleFilter.from(rawRole);
+        } catch (IllegalArgumentException ex) {
+            throw new BusinessRuleException(ex.getMessage());
+        }
+    }
+
+    private AdminEmployeeStatusFilter parseStatus(String rawStatus) {
+        try {
+            return AdminEmployeeStatusFilter.from(rawStatus);
+        } catch (IllegalArgumentException ex) {
+            throw new BusinessRuleException(ex.getMessage());
+        }
+    }
+
     public record AdminCreateEmployeeRequest(
-            @JsonAlias({"employeeName", "name"}) String fullName,
+            String fullName,
             String firstName,
             String lastName,
-            @JsonAlias({"phone", "mobileNumber"}) String phoneNumber,
-            @JsonAlias({"emailAddress", "userEmail"}) String email,
+            @JsonAlias({"phone", "mobile", "phone_number"})
+            String phoneNumber,
+            @JsonAlias({"emailAddress"})
+            String email,
             String password,
-            @JsonAlias({"confirm_password"}) String confirmPassword,
-            @JsonAlias({"employeeRole", "roleCode"}) String role,
-            @JsonAlias({"joiningDate", "startDate"}) LocalDate hireDate,
-            @JsonAlias({"departmentName"}) String department,
-            @JsonAlias({"superAdmin"}) Boolean isSuperAdmin,
-            @JsonAlias({"active"}) Boolean isActive,
-            @JsonAlias({"phoneVerified"}) Boolean isPhoneVerified,
-            @JsonAlias({"authProvider"}) LoginMethod loginMethod,
+            String confirmPassword,
+            @JsonAlias({"employeeRole", "userRole"})
+            String role,
+            @JsonAlias({"joiningDate", "startDate"})
+            LocalDate hireDate,
+            String department,
+            @JsonAlias({"superAdmin", "super_admin"})
+            Boolean isSuperAdmin,
+            @JsonAlias({"active"})
+            Boolean isActive,
+            @JsonAlias({"phoneVerified", "isPhoneNumberVerified"})
+            Boolean isPhoneVerified,
+            LoginMethod loginMethod,
             List<String> scopePermissions,
             List<String> specializations,
-            @JsonAlias({"isAvailable"}) Boolean technicianAvailable
+            @JsonAlias({"available", "isAvailable"})
+            Boolean technicianAvailable
     ) {
     }
 
     public record AdminUpdateEmployeeRequest(
-            @JsonAlias({"employeeName", "name"}) String fullName,
+            String fullName,
             String firstName,
             String lastName,
-            @JsonAlias({"phone", "mobileNumber"}) String phoneNumber,
-            @JsonAlias({"emailAddress", "userEmail"}) String email,
+            @JsonAlias({"phone", "mobile", "phone_number"})
+            String phoneNumber,
+            @JsonAlias({"emailAddress"})
+            String email,
             String password,
-            @JsonAlias({"confirm_password"}) String confirmPassword,
-            @JsonAlias({"employeeRole", "roleCode"}) String role,
-            @JsonAlias({"joiningDate", "startDate"}) LocalDate hireDate,
-            @JsonAlias({"departmentName"}) String department,
-            @JsonAlias({"superAdmin"}) Boolean isSuperAdmin,
-            @JsonAlias({"active"}) Boolean isActive,
-            @JsonAlias({"phoneVerified"}) Boolean isPhoneVerified,
-            @JsonAlias({"authProvider"}) LoginMethod loginMethod,
+            String confirmPassword,
+            @JsonAlias({"employeeRole", "userRole"})
+            String role,
+            @JsonAlias({"joiningDate", "startDate"})
+            LocalDate hireDate,
+            String department,
+            @JsonAlias({"superAdmin", "super_admin"})
+            Boolean isSuperAdmin,
+            @JsonAlias({"active"})
+            Boolean isActive,
+            @JsonAlias({"phoneVerified", "isPhoneNumberVerified"})
+            Boolean isPhoneVerified,
+            LoginMethod loginMethod,
             List<String> scopePermissions,
             List<String> specializations,
-            @JsonAlias({"isAvailable"}) Boolean technicianAvailable
+            @JsonAlias({"available", "isAvailable"})
+            Boolean technicianAvailable
     ) {
     }
 
-    public record AdminUpdateEmployeeStatusRequest(Boolean isActive) {
+    public record AdminUpdateEmployeeStatusRequest(
+            @JsonAlias({"active"})
+            Boolean isActive,
+            @JsonAlias({"employeeStatus"})
+            String status
+    ) {
     }
 
-    public record AdminResetPasswordRequest(String newPassword) {
+    public record AdminResetPasswordRequest(
+            @JsonAlias({"password"})
+            String newPassword
+    ) {
     }
 }

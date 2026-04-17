@@ -28,7 +28,8 @@ public class ReportAlertCommandHandler implements CommandHandler<ReportAlertComm
             command.description(),
             command.location(),
             command.eventTime(),
-            command.photoUrls()
+            command.photoUrls(),
+            command.contactNumber()
         );
         Alert savedAlert = alertRepository.save(alert);
         return savedAlert.getId();

@@ -31,10 +31,6 @@ public class AlertEntity extends BaseEntity {
     @Column(nullable = false)
     private AlertCategory category;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private AlertReportStatus status = AlertReportStatus.OPEN;
-
     @Column(nullable = false)
     private String title;
 
@@ -51,10 +47,21 @@ public class AlertEntity extends BaseEntity {
     @Column(name = "photo_urls", columnDefinition = "text[]")
     private List<String> photoUrls;
 
-    @Column(nullable = false)
+    @Column(name = "is_resolved", nullable = false)
     private boolean isResolved = false;
 
+    @Column(name = "resolved_at")
     private Instant resolvedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    private AlertReportStatus status = AlertReportStatus.OPEN;
+
+    @Column(name = "contact_number", length = 30)
+    private String contactNumber;
+
+    public AlertEntity() {
+    }
 
     public UUID getReporterId() {
         return reporterId;
@@ -78,14 +85,6 @@ public class AlertEntity extends BaseEntity {
 
     public void setCategory(AlertCategory category) {
         this.category = category;
-    }
-
-    public AlertReportStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(AlertReportStatus status) {
-        this.status = status;
     }
 
     public String getTitle() {
@@ -142,5 +141,21 @@ public class AlertEntity extends BaseEntity {
 
     public void setResolvedAt(Instant resolvedAt) {
         this.resolvedAt = resolvedAt;
+    }
+
+    public AlertReportStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(AlertReportStatus status) {
+        this.status = status;
+    }
+
+    public String getContactNumber() {
+        return contactNumber;
+    }
+
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
     }
 }

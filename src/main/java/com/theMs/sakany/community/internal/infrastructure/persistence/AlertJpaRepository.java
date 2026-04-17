@@ -14,177 +14,155 @@ import java.util.UUID;
 @Repository
 public interface AlertJpaRepository extends JpaRepository<AlertEntity, UUID> {
 
-        @Query(value = """
-            SELECT *
+    List<AlertEntity> findByIsResolvedFalseOrderByCreatedAtDesc();
+
+    @Query(value = """
+            SELECT
+                a.id AS reportId,
+                a.reporter_id AS reporterId,
+                a.type AS reportType,
+                a.category AS category,
+                a.title AS title,
+                a.description AS description,
+                a.location AS location,
+                a.event_time AS eventTime,
+                COALESCE(a.status, CASE WHEN a.is_resolved THEN 'RESOLVED' ELSE 'OPEN' END) AS status,
+                a.resolved_at AS resolvedAt,
+                a.contact_number AS contactNumber,
+                a.created_at AS createdAt,
+                COALESCE(NULLIF(TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))), ''), 'Unknown Reporter') AS reporterName,
+                CASE
+                    WHEN b.name IS NULL AND un.unit_number IS NULL THEN 'N/A'
+                    WHEN b.name IS NULL THEN un.unit_number
+                    WHEN un.unit_number IS NULL THEN b.name
+                    ELSE CONCAT(b.name, '-', un.unit_number)
+                END AS reporterUnitLabel
             FROM alerts a
-            WHERE COALESCE(a.status, CASE WHEN a.is_resolved THEN 'RESOLVED' ELSE 'OPEN' END) <> 'RESOLVED'
-            ORDER BY a.created_at DESC
+            LEFT JOIN users u ON u.id = a.reporter_id
+            LEFT JOIN resident_profiles rp ON rp.user_id = a.reporter_id
+            LEFT JOIN units un ON un.id = rp.unit_id
+            LEFT JOIN buildings b ON b.id = un.building_id
+            WHERE (
+                    :searchTerm IS NULL
+                    OR LOWER(COALESCE(a.title, '')) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
+                    OR LOWER(COALESCE(a.description, '')) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
+                    OR LOWER(COALESCE(TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))), '')) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
+                  )
+              AND (
+                    ((:typeFilter IS NULL OR :typeFilter = 'ALL') AND a.type IN ('MISSING', 'FOUND'))
+                    OR a.type = :typeFilter
+                  )
+              AND (
+                    :statusFilter IS NULL
+                    OR :statusFilter = 'ALL'
+                    OR COALESCE(a.status, CASE WHEN a.is_resolved THEN 'RESOLVED' ELSE 'OPEN' END) = :statusFilter
+                  )
+              AND (:categoryFilter IS NULL OR a.category = :categoryFilter)
+            ORDER BY COALESCE(a.event_time, a.created_at) DESC, a.created_at DESC
+            """,
+            countQuery = """
+            SELECT COUNT(*)
+            FROM alerts a
+            LEFT JOIN users u ON u.id = a.reporter_id
+            WHERE (
+                    :searchTerm IS NULL
+                    OR LOWER(COALESCE(a.title, '')) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
+                    OR LOWER(COALESCE(a.description, '')) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
+                    OR LOWER(COALESCE(TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))), '')) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
+                  )
+              AND (
+                    ((:typeFilter IS NULL OR :typeFilter = 'ALL') AND a.type IN ('MISSING', 'FOUND'))
+                    OR a.type = :typeFilter
+                  )
+              AND (
+                    :statusFilter IS NULL
+                    OR :statusFilter = 'ALL'
+                    OR COALESCE(a.status, CASE WHEN a.is_resolved THEN 'RESOLVED' ELSE 'OPEN' END) = :statusFilter
+                  )
+              AND (:categoryFilter IS NULL OR a.category = :categoryFilter)
             """,
             nativeQuery = true)
-        List<AlertEntity> findByIsResolvedFalseOrderByCreatedAtDesc();
+    Page<AdminMissingFoundReportRow> findMissingFoundReportsForAdmin(
+            @Param("searchTerm") String searchTerm,
+            @Param("typeFilter") String typeFilter,
+            @Param("statusFilter") String statusFilter,
+            @Param("categoryFilter") String categoryFilter,
+            Pageable pageable
+    );
 
-        @Query(value = """
-                        SELECT
-                                a.id AS reportId,
-                                a.reporter_id AS reporterId,
-                                a.type AS type,
-                                a.category AS category,
-                                COALESCE(a.status, CASE WHEN a.is_resolved THEN 'RESOLVED' ELSE 'OPEN' END) AS status,
-                                a.title AS title,
-                                a.description AS description,
-                                a.location AS location,
-                                a.event_time AS eventTime,
-                                a.is_resolved AS resolved,
-                                a.resolved_at AS resolvedAt,
-                                a.created_at AS createdAt,
-                                a.updated_at AS updatedAt,
-                                u.first_name AS reporterFirstName,
-                                u.last_name AS reporterLastName,
-                                un.unit_number AS reporterUnitNumber,
-                                b.name AS reporterBuildingName
-                        FROM alerts a
-                        LEFT JOIN users u ON u.id = a.reporter_id
-                        LEFT JOIN resident_profiles rp ON rp.user_id = a.reporter_id
-                        LEFT JOIN units un ON un.id = rp.unit_id
-                        LEFT JOIN buildings b ON b.id = un.building_id
-                        WHERE a.type IN ('MISSING', 'FOUND')
-                            AND (
-                                        :searchTerm IS NULL
-                                        OR LOWER(a.title) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
-                                        OR LOWER(a.description) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
-                                        OR LOWER(COALESCE(a.location, '')) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
-                                        OR LOWER(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
-                                        OR LOWER(COALESCE(un.unit_number, '')) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
-                                        OR LOWER(COALESCE(b.name, '')) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
-                                    )
-                            AND (
-                                        :typeFilter IS NULL
-                                        OR :typeFilter = 'ALL'
-                                        OR a.type = :typeFilter
-                                    )
-                            AND (
-                                        :statusFilter IS NULL
-                                        OR :statusFilter = 'ALL'
-                                        OR COALESCE(a.status, CASE WHEN a.is_resolved THEN 'RESOLVED' ELSE 'OPEN' END) = :statusFilter
-                                    )
-                            AND (
-                                        :category IS NULL
-                                        OR a.category = :category
-                                    )
-                        ORDER BY COALESCE(a.event_time, a.created_at) DESC, a.created_at DESC
-                        """,
-                        countQuery = """
-                        SELECT COUNT(*)
-                        FROM alerts a
-                        LEFT JOIN users u ON u.id = a.reporter_id
-                        LEFT JOIN resident_profiles rp ON rp.user_id = a.reporter_id
-                        LEFT JOIN units un ON un.id = rp.unit_id
-                        LEFT JOIN buildings b ON b.id = un.building_id
-                        WHERE a.type IN ('MISSING', 'FOUND')
-                            AND (
-                                        :searchTerm IS NULL
-                                        OR LOWER(a.title) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
-                                        OR LOWER(a.description) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
-                                        OR LOWER(COALESCE(a.location, '')) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
-                                        OR LOWER(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
-                                        OR LOWER(COALESCE(un.unit_number, '')) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
-                                        OR LOWER(COALESCE(b.name, '')) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
-                                    )
-                            AND (
-                                        :typeFilter IS NULL
-                                        OR :typeFilter = 'ALL'
-                                        OR a.type = :typeFilter
-                                    )
-                            AND (
-                                        :statusFilter IS NULL
-                                        OR :statusFilter = 'ALL'
-                                        OR COALESCE(a.status, CASE WHEN a.is_resolved THEN 'RESOLVED' ELSE 'OPEN' END) = :statusFilter
-                                    )
-                            AND (
-                                        :category IS NULL
-                                        OR a.category = :category
-                                    )
-                        """,
-                        nativeQuery = true)
-        Page<AdminMissingFoundRow> findMissingFoundReports(
-                        @Param("searchTerm") String searchTerm,
-                        @Param("typeFilter") String typeFilter,
-                        @Param("statusFilter") String statusFilter,
-                        @Param("category") String category,
-                        Pageable pageable
-        );
+    @Query(value = """
+            SELECT
+                COUNT(*) AS totalCount,
+                COALESCE(SUM(CASE WHEN a.type = 'MISSING' THEN 1 ELSE 0 END), 0) AS missingCount,
+                COALESCE(SUM(CASE WHEN a.type = 'FOUND' THEN 1 ELSE 0 END), 0) AS foundCount,
+                COALESCE(SUM(CASE WHEN COALESCE(a.status, CASE WHEN a.is_resolved THEN 'RESOLVED' ELSE 'OPEN' END) = 'OPEN' THEN 1 ELSE 0 END), 0) AS openCount,
+                COALESCE(SUM(CASE WHEN COALESCE(a.status, CASE WHEN a.is_resolved THEN 'RESOLVED' ELSE 'OPEN' END) = 'MATCHED' THEN 1 ELSE 0 END), 0) AS matchedCount,
+                COALESCE(SUM(CASE WHEN COALESCE(a.status, CASE WHEN a.is_resolved THEN 'RESOLVED' ELSE 'OPEN' END) = 'RESOLVED' THEN 1 ELSE 0 END), 0) AS resolvedCount
+            FROM alerts a
+            LEFT JOIN users u ON u.id = a.reporter_id
+            WHERE (
+                    :searchTerm IS NULL
+                    OR LOWER(COALESCE(a.title, '')) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
+                    OR LOWER(COALESCE(a.description, '')) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
+                    OR LOWER(COALESCE(TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))), '')) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
+                  )
+              AND (
+                    ((:typeFilter IS NULL OR :typeFilter = 'ALL') AND a.type IN ('MISSING', 'FOUND'))
+                    OR a.type = :typeFilter
+                  )
+              AND (
+                    :statusFilter IS NULL
+                    OR :statusFilter = 'ALL'
+                    OR COALESCE(a.status, CASE WHEN a.is_resolved THEN 'RESOLVED' ELSE 'OPEN' END) = :statusFilter
+                  )
+              AND (:categoryFilter IS NULL OR a.category = :categoryFilter)
+            """,
+            nativeQuery = true)
+    AdminMissingFoundSummaryRow getMissingFoundSummaryForAdmin(
+            @Param("searchTerm") String searchTerm,
+            @Param("typeFilter") String typeFilter,
+            @Param("statusFilter") String statusFilter,
+            @Param("categoryFilter") String categoryFilter
+    );
 
-        @Query(value = """
-                        SELECT
-                                a.id AS reportId,
-                                a.reporter_id AS reporterId,
-                                a.type AS type,
-                                a.category AS category,
-                                COALESCE(a.status, CASE WHEN a.is_resolved THEN 'RESOLVED' ELSE 'OPEN' END) AS status,
-                                a.title AS title,
-                                a.description AS description,
-                                a.location AS location,
-                                a.event_time AS eventTime,
-                                a.is_resolved AS resolved,
-                                a.resolved_at AS resolvedAt,
-                                a.created_at AS createdAt,
-                                a.updated_at AS updatedAt,
-                                u.first_name AS reporterFirstName,
-                                u.last_name AS reporterLastName,
-                                un.unit_number AS reporterUnitNumber,
-                                b.name AS reporterBuildingName
-                        FROM alerts a
-                        LEFT JOIN users u ON u.id = a.reporter_id
-                        LEFT JOIN resident_profiles rp ON rp.user_id = a.reporter_id
-                        LEFT JOIN units un ON un.id = rp.unit_id
-                        LEFT JOIN buildings b ON b.id = un.building_id
-                        WHERE a.id = :reportId
-                            AND a.type IN ('MISSING', 'FOUND')
-                        """,
-                        nativeQuery = true)
-        Optional<AdminMissingFoundRow> findMissingFoundReportById(@Param("reportId") UUID reportId);
+    @Query(value = """
+            SELECT
+                a.id AS reportId,
+                a.reporter_id AS reporterId,
+                a.type AS reportType,
+                a.category AS category,
+                a.title AS title,
+                a.description AS description,
+                a.location AS location,
+                a.event_time AS eventTime,
+                COALESCE(a.status, CASE WHEN a.is_resolved THEN 'RESOLVED' ELSE 'OPEN' END) AS status,
+                a.resolved_at AS resolvedAt,
+                a.contact_number AS contactNumber,
+                a.created_at AS createdAt,
+                COALESCE(NULLIF(TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))), ''), 'Unknown Reporter') AS reporterName,
+                CASE
+                    WHEN b.name IS NULL AND un.unit_number IS NULL THEN 'N/A'
+                    WHEN b.name IS NULL THEN un.unit_number
+                    WHEN un.unit_number IS NULL THEN b.name
+                    ELSE CONCAT(b.name, '-', un.unit_number)
+                END AS reporterUnitLabel
+            FROM alerts a
+            LEFT JOIN users u ON u.id = a.reporter_id
+            LEFT JOIN resident_profiles rp ON rp.user_id = a.reporter_id
+            LEFT JOIN units un ON un.id = rp.unit_id
+            LEFT JOIN buildings b ON b.id = un.building_id
+            WHERE a.id = :reportId
+              AND a.type IN ('MISSING', 'FOUND')
+            """,
+            nativeQuery = true)
+    Optional<AdminMissingFoundReportRow> findMissingFoundReportForAdmin(@Param("reportId") UUID reportId);
 
-        @Query(value = """
-                        SELECT
-                                COUNT(*) AS totalCount,
-                                COALESCE(SUM(CASE WHEN a.type = 'MISSING' THEN 1 ELSE 0 END), 0) AS missingCount,
-                                COALESCE(SUM(CASE WHEN a.type = 'FOUND' THEN 1 ELSE 0 END), 0) AS foundCount,
-                                COALESCE(SUM(CASE WHEN COALESCE(a.status, CASE WHEN a.is_resolved THEN 'RESOLVED' ELSE 'OPEN' END) = 'OPEN' THEN 1 ELSE 0 END), 0) AS openCount,
-                                COALESCE(SUM(CASE WHEN COALESCE(a.status, CASE WHEN a.is_resolved THEN 'RESOLVED' ELSE 'OPEN' END) = 'MATCHED' THEN 1 ELSE 0 END), 0) AS matchedCount,
-                                COALESCE(SUM(CASE WHEN COALESCE(a.status, CASE WHEN a.is_resolved THEN 'RESOLVED' ELSE 'OPEN' END) = 'RESOLVED' THEN 1 ELSE 0 END), 0) AS resolvedCount
-                        FROM alerts a
-                        LEFT JOIN users u ON u.id = a.reporter_id
-                        LEFT JOIN resident_profiles rp ON rp.user_id = a.reporter_id
-                        LEFT JOIN units un ON un.id = rp.unit_id
-                        LEFT JOIN buildings b ON b.id = un.building_id
-                        WHERE a.type IN ('MISSING', 'FOUND')
-                            AND (
-                                        :searchTerm IS NULL
-                                        OR LOWER(a.title) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
-                                        OR LOWER(a.description) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
-                                        OR LOWER(COALESCE(a.location, '')) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
-                                        OR LOWER(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
-                                        OR LOWER(COALESCE(un.unit_number, '')) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
-                                        OR LOWER(COALESCE(b.name, '')) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
-                                    )
-                            AND (
-                                        :category IS NULL
-                                        OR a.category = :category
-                                    )
-                        """,
-                        nativeQuery = true)
-        AdminMissingFoundSummaryRow getMissingFoundSummary(
-                        @Param("searchTerm") String searchTerm,
-                        @Param("category") String category
-        );
-
-        @Query(value = """
-                        SELECT DISTINCT
-                                a.category AS category
-                        FROM alerts a
-                        WHERE a.type IN ('MISSING', 'FOUND')
-                        ORDER BY a.category ASC
-                        """,
-                        nativeQuery = true)
-        List<AdminMissingFoundCategoryOptionRow> findMissingFoundCategoryOptions();
+    @Query(value = """
+            SELECT DISTINCT a.category
+            FROM alerts a
+            WHERE a.type IN ('MISSING', 'FOUND')
+            ORDER BY a.category ASC
+            """,
+            nativeQuery = true)
+    List<String> findMissingFoundCategoriesForAdmin();
 }

@@ -16,5 +16,6 @@ public record ReportAlertCommand(
     String description,
     String location,
     Instant eventTime,
-    List<String> photoUrls
+    List<String> photoUrls,
+    String contactNumber
 ) implements Command<UUID> {}

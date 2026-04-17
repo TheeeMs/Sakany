@@ -1,6 +1,7 @@
 package com.theMs.sakany.accounts.internal.infrastructure.persistence;
 
 import com.theMs.sakany.accounts.internal.domain.LoginMethod;
+import com.theMs.sakany.accounts.internal.domain.EmployeeAccountStatus;
 import com.theMs.sakany.accounts.internal.domain.Role;
 import com.theMs.sakany.shared.jpa.BaseEntity;
 import jakarta.persistence.Column;
@@ -37,6 +38,10 @@ public class UserEntity extends BaseEntity {
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "employment_status", nullable = false, length = 20)
+    private EmployeeAccountStatus employmentStatus = EmployeeAccountStatus.ACTIVE;
+
     @Column(name = "is_phone_verified", nullable = false)
     private boolean isPhoneVerified = false;
 
@@ -60,6 +65,7 @@ public class UserEntity extends BaseEntity {
         this.passwordHash = passwordHash;
         this.role = role;
         this.isActive = isActive;
+        this.employmentStatus = isActive ? EmployeeAccountStatus.ACTIVE : EmployeeAccountStatus.INACTIVE;
         this.isPhoneVerified = isPhoneVerified;
         this.authProvider = authProvider;
     }
@@ -118,6 +124,26 @@ public class UserEntity extends BaseEntity {
 
     public void setActive(boolean active) {
         isActive = active;
+        if (active) {
+            employmentStatus = EmployeeAccountStatus.ACTIVE;
+            return;
+        }
+
+        if (employmentStatus == null || employmentStatus == EmployeeAccountStatus.ACTIVE) {
+            employmentStatus = EmployeeAccountStatus.INACTIVE;
+        }
+    }
+
+    public EmployeeAccountStatus getEmploymentStatus() {
+        if (employmentStatus == null) {
+            return isActive ? EmployeeAccountStatus.ACTIVE : EmployeeAccountStatus.INACTIVE;
+        }
+        return employmentStatus;
+    }
+
+    public void setEmploymentStatus(EmployeeAccountStatus employmentStatus) {
+        this.employmentStatus = employmentStatus == null ? EmployeeAccountStatus.ACTIVE : employmentStatus;
+        this.isActive = this.employmentStatus == EmployeeAccountStatus.ACTIVE;
     }
 
     public boolean isPhoneVerified() {
