@@ -7,6 +7,7 @@ import com.theMs.sakany.property.internal.application.commands.CreateCompoundCom
 import com.theMs.sakany.property.internal.application.queries.GetCompoundByIdQuery;
 import com.theMs.sakany.property.internal.application.queries.GetCompoundByIdQueryHandler;
 import com.theMs.sakany.property.internal.domain.Compound;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class CompoundController {
     }
 
     @PostMapping
-    public ResponseEntity<UUID> createCompound(@RequestBody CreateCompoundRequest request) {
+    public ResponseEntity<UUID> createCompound(@Valid @RequestBody CreateCompoundRequest request) {
         CreateCompoundCommand command = new CreateCompoundCommand(request.name(), request.address());
         UUID id = createCompoundCommandHandler.handle(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(id);

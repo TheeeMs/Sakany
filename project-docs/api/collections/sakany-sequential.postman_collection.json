@@ -1,0 +1,2716 @@
+{
+  "info": {
+    "name": "Sakany Sequential API Collection (Generated)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "host",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "auth_token",
+      "value": ""
+    },
+    {
+      "key": "admin_token",
+      "value": ""
+    },
+    {
+      "key": "refresh_token",
+      "value": ""
+    },
+    {
+      "key": "user_id",
+      "value": ""
+    },
+    {
+      "key": "compound_id",
+      "value": ""
+    },
+    {
+      "key": "building_id",
+      "value": ""
+    },
+    {
+      "key": "unit_id",
+      "value": ""
+    },
+    {
+      "key": "access_code_id",
+      "value": ""
+    },
+    {
+      "key": "access_code",
+      "value": ""
+    },
+    {
+      "key": "visit_log_id",
+      "value": ""
+    },
+    {
+      "key": "invoice_id",
+      "value": ""
+    },
+    {
+      "key": "maintenance_id",
+      "value": ""
+    },
+    {
+      "key": "feedback_id",
+      "value": ""
+    },
+    {
+      "key": "announcement_id",
+      "value": ""
+    },
+    {
+      "key": "alert_id",
+      "value": ""
+    },
+    {
+      "key": "event_id",
+      "value": ""
+    },
+    {
+      "key": "notification_id",
+      "value": ""
+    },
+    {
+      "key": "admin_report_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication and Users",
+      "item": [
+        {
+          "name": "POST /v1/auth/register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/v1/auth/register"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"firstName\": \"Sample name\",\r\n  \"lastName\": \"Sample name\",\r\n  \"phoneNumber\": \"+201000000000\",\r\n  \"email\": \"user@example.com\",\r\n  \"password\": \"Password123!\",\r\n  \"type\": \"PROPERTY_OWNER\",\r\n  \"unitId\": \"{{unit_id}}\",\r\n  \"loginMethod\": \"PHONE_OTP\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "POST /v1/auth/send-otp",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/v1/auth/send-otp"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"phoneNumber\": \"+201000000000\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "POST /v1/auth/login/phone",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/v1/auth/login/phone"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"phoneNumber\": \"+201000000000\",\r\n  \"otpCode\": \"sample\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "POST /v1/auth/login/email",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/v1/auth/login/email"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"user@example.com\",\r\n  \"password\": \"Password123!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "POST /v1/auth/refresh",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/v1/auth/refresh"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"refreshToken\": \"sample\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/auth/me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/auth/me"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Properties (Compound, Building, Unit)",
+      "item": [
+        {
+          "name": "POST /v1/compounds",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/compounds"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Sample name\",\r\n  \"address\": \"sample\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/compounds/{id}",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/compounds/{{compound_id}}"
+            }
+          }
+        },
+        {
+          "name": "POST /v1/buildings",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/buildings"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"compoundId\": \"{{compound_id}}\",\r\n  \"name\": \"Sample name\",\r\n  \"numberOfFloors\": 1\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/buildings/compound/{compoundId}",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/buildings/compound/{{compound_id}}"
+            }
+          }
+        },
+        {
+          "name": "POST /v1/units",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/units"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"buildingId\": \"{{building_id}}\",\r\n  \"unitNumber\": \"sample\",\r\n  \"type\": \"APARTMENT\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/units/building/{buildingId}",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/units/building/{{building_id}}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Access Codes and QR Access",
+      "item": [
+        {
+          "name": "POST /v1/access/codes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/access/codes"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"visitorName\": \"Sample name\",\r\n  \"visitorPhone\": \"+201000000000\",\r\n  \"purpose\": \"GUEST\",\r\n  \"validFrom\": \"2027-01-01T10:00:00Z\",\r\n  \"validUntil\": \"2027-01-01T10:00:00Z\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/access/codes/my",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/access/codes/my"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/access/codes/{id}",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/access/codes/{{access_code_id}}"
+            }
+          }
+        },
+        {
+          "name": "POST /v1/access/codes/{code}/scan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/access/codes/{{code}}/scan"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"code\": \"sample\",\r\n  \"gateNumber\": \"sample\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/access/visit-logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/access/visit-logs"
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/access/visit-logs/{id}/exit",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/access/visit-logs/{{visit_log_id}}/exit"
+            }
+          }
+        },
+        {
+          "name": "POST /v1/access/codes/{codeId}/reactivate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/access/codes/{{access_code_id}}/reactivate"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"validFrom\": \"2027-01-01T10:00:00Z\",\r\n  \"validUntil\": \"2027-01-01T10:00:00Z\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "DELETE /v1/access/codes/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/access/codes/{{access_code_id}}"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/access/codes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/access/codes?tab=ALL&search=&status=&page=0&size=25"
+            }
+          }
+        },
+        {
+          "name": "DELETE /v1/admin/access/codes/{accessCodeId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/access/codes/{{access_code_id}}"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/access/codes/{accessCodeId}/details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/access/codes/{{access_code_id}}/details"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/access/codes/{accessCodeId}/download",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/access/codes/{{access_code_id}}/download"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/access/residents/{residentId}/codes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/access/residents/{{resident_id}}/codes?tab=ALL&status=&page=0&size=25"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/access/statuses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/access/statuses"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/access/types",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/access/types"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Billing (Invoices and Payments)",
+      "item": [
+        {
+          "name": "POST /v1/invoices",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/invoices"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"residentId\": \"{{user_id}}\",\r\n  \"unitId\": \"{{unit_id}}\",\r\n  \"type\": \"MONTHLY_FEE\",\r\n  \"amount\": 150.0,\r\n  \"description\": \"Sample text\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/invoices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/invoices?residentId=&status="
+            }
+          }
+        },
+        {
+          "name": "GET /v1/invoices/{id}",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/invoices/{{invoice_id}}"
+            }
+          }
+        },
+        {
+          "name": "POST /v1/invoices/{id}/pay",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/invoices/{{invoice_id}}/pay"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"residentId\": \"{{user_id}}\",\r\n  \"paymentMethod\": \"CASH\",\r\n  \"transactionReference\": \"tx-123456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/payments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/payments?residentId=&status="
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/invoices/{id}/cancel",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/invoices/{{invoice_id}}/cancel"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Maintenance Requests and Admin Command Center",
+      "item": [
+        {
+          "name": "POST /v1/maintenance-requests",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/maintenance-requests"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"residentId\": \"{{user_id}}\",\r\n  \"unitId\": \"{{unit_id}}\",\r\n  \"title\": \"Sample title\",\r\n  \"description\": \"Sample text\",\r\n  \"category\": \"PLUMBING\",\r\n  \"priority\": \"LOW\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/maintenance-requests/{id}",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/maintenance-requests/{{maintenance_id}}"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/maintenance-requests/resident/{residentId}",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/maintenance-requests/resident/{{residentId}}"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/maintenance-requests/status/{status}",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/maintenance-requests/status/{{status}}"
+            }
+          }
+        },
+        {
+          "name": "POST /v1/maintenance-requests/{id}/assign",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/maintenance-requests/{{maintenance_id}}/assign"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"technicianId\": \"00000000-0000-0000-0000-000000000000\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "POST /v1/maintenance-requests/{id}/start",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/maintenance-requests/{{maintenance_id}}/start"
+            }
+          }
+        },
+        {
+          "name": "POST /v1/maintenance-requests/{id}/resolve",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/maintenance-requests/{{maintenance_id}}/resolve"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"resolution\": \"sample\",\r\n  \"totalCost\": 150.0\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "POST /v1/maintenance-requests/{id}/reject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/maintenance-requests/{{maintenance_id}}/reject"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"reason\": \"Sample text\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "POST /v1/maintenance-requests/{id}/cancel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/maintenance-requests/{{maintenance_id}}/cancel"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/maintenance/areas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/maintenance/areas"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/maintenance/categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/maintenance/categories"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/maintenance/requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/maintenance/requests?tab=ALL&area=&type=&category=&sortBy=NEWEST&page=0&size=25"
+            }
+          }
+        },
+        {
+          "name": "POST /v1/admin/maintenance/requests/{requestId}/assign",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/maintenance/requests/{{maintenance_id}}/assign"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"sample\": \"value\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/maintenance/requests/{requestId}/card",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/maintenance/requests/{{maintenance_id}}/card"
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/admin/maintenance/requests/{requestId}/priority",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/maintenance/requests/{{maintenance_id}}/priority"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"sample\": \"value\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/maintenance/requests/{requestId}/receipt",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/maintenance/requests/{{maintenance_id}}/receipt"
+            }
+          }
+        },
+        {
+          "name": "POST /v1/admin/maintenance/requests/{requestId}/viewed",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/maintenance/requests/{{maintenance_id}}/viewed"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"actorId\": \"00000000-0000-0000-0000-000000000000\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/maintenance/technicians",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/maintenance/technicians?availableOnly=true"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/maintenance/types",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/maintenance/types"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Feedback (Resident and Admin)",
+      "item": [
+        {
+          "name": "POST /v1/feedback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/feedback"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Sample title\",\r\n  \"content\": \"Sample text\",\r\n  \"type\": \"COMPLAINT\",\r\n  \"category\": \"OTHER\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/feedback",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/feedback"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/feedback/me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/feedback/me"
+            }
+          }
+        },
+        {
+          "name": "POST /v1/feedback/{id}/vote",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/feedback/{{feedback_id}}/vote"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"voteType\": \"UP\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/feedback/{id}/status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/feedback/{{feedback_id}}/status"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"newStatus\": \"OPEN\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/feedback",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/feedback?tab=PUBLIC_SUGGESTIONS&search=&status=ALL&category=&page=0&size=25"
+            }
+          }
+        },
+        {
+          "name": "POST /v1/admin/feedback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/feedback"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"authorId\": \"00000000-0000-0000-0000-000000000000\",\r\n  \"title\": \"Sample title\",\r\n  \"content\": \"Sample text\",\r\n  \"type\": \"COMPLAINT\",\r\n  \"category\": \"OTHER\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "DELETE /v1/admin/feedback/{feedbackId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/feedback/{{feedback_id}}"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/feedback/{feedbackId}/details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/feedback/{{feedback_id}}/details"
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/admin/feedback/{feedbackId}/respond",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/feedback/{{feedback_id}}/respond"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"response\": \"sample\",\r\n  \"newStatus\": \"ALL\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/admin/feedback/{feedbackId}/status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/feedback/{{feedback_id}}/status"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"newStatus\": \"ALL\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/feedback/categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/feedback/categories"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/feedback/statuses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/feedback/statuses"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Announcements and Alerts",
+      "item": [
+        {
+          "name": "POST /v1/announcements",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/announcements"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"authorId\": \"00000000-0000-0000-0000-000000000000\",\r\n  \"title\": \"Sample title\",\r\n  \"content\": \"Sample text\",\r\n  \"priority\": \"LOW\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/announcements",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/announcements"
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/announcements/{id}/deactivate",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/announcements/{{announcement_id}}/deactivate"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"requestingUserId\": \"{{user_id}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "POST /v1/alerts",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/alerts"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"reporterId\": \"00000000-0000-0000-0000-000000000000\",\r\n  \"type\": \"MISSING\",\r\n  \"category\": \"PET\",\r\n  \"title\": \"Sample title\",\r\n  \"description\": \"Sample text\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/alerts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/alerts"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/alerts/{id}",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/alerts/{{alert_id}}"
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/alerts/{id}/resolve",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/alerts/{{alert_id}}/resolve"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"requestingUserId\": \"{{user_id}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Events (Resident and Admin)",
+      "item": [
+        {
+          "name": "POST /v1/events",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/events"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"organizerId\": \"00000000-0000-0000-0000-000000000000\",\r\n  \"title\": \"Sample title\",\r\n  \"description\": \"Sample text\",\r\n  \"hostName\": \"Sample name\",\r\n  \"category\": \"OTHER\",\r\n  \"contactPhone\": \"+201000000000\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/events",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/events?status="
+            }
+          }
+        },
+        {
+          "name": "GET /v1/events/{id}",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/events/{{event_id}}"
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/events/{id}/approve",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/events/{{event_id}}/approve?adminId="
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/events/{id}/reject",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/events/{{event_id}}/reject?adminId="
+            }
+          }
+        },
+        {
+          "name": "POST /v1/events/{id}/register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/events/{{event_id}}/register?residentId="
+            }
+          }
+        },
+        {
+          "name": "DELETE /v1/events/{id}/register",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/events/{{event_id}}/register?residentId="
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/events",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/events?search=&status=ALL&category=&page=0&size=9"
+            }
+          }
+        },
+        {
+          "name": "POST /v1/admin/events",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/events"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"organizerId\": \"00000000-0000-0000-0000-000000000000\",\r\n  \"title\": \"Sample title\",\r\n  \"description\": \"Sample text\",\r\n  \"hostName\": \"Sample name\",\r\n  \"category\": \"OTHER\",\r\n  \"contactPhone\": \"+201000000000\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "DELETE /v1/admin/events/{eventId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/events/{{event_id}}?adminId="
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/admin/events/{eventId}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/events/{{event_id}}"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"sample\": \"value\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/admin/events/{eventId}/approve",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/events/{{event_id}}/approve"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"adminId\": \"00000000-0000-0000-0000-000000000000\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/events/{eventId}/attendees/export",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/events/{{event_id}}/attendees/export"
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/admin/events/{eventId}/complete",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/events/{{event_id}}/complete"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"adminId\": \"00000000-0000-0000-0000-000000000000\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/events/{eventId}/details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/events/{{event_id}}/details"
+            }
+          }
+        },
+        {
+          "name": "POST /v1/admin/events/{eventId}/notify-residents",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/events/{{event_id}}/notify-residents"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Sample title\",\r\n  \"message\": \"Sample text\",\r\n  \"channel\": \"PUSH\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/admin/events/{eventId}/reject",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/events/{{event_id}}/reject"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"adminId\": \"00000000-0000-0000-0000-000000000000\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/events/categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/events/categories"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/events/statuses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/events/statuses"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications and Communications Center",
+      "item": [
+        {
+          "name": "POST /v1/device-tokens",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/device-tokens"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"userId\": \"{{user_id}}\",\r\n  \"token\": \"sample\",\r\n  \"platform\": \"ANDROID\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/notifications?recipientId=&status="
+            }
+          }
+        },
+        {
+          "name": "POST /v1/notifications/send",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/notifications/send"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"recipientId\": \"00000000-0000-0000-0000-000000000000\",\r\n  \"title\": \"Sample title\",\r\n  \"type\": \"MAINTENANCE_UPDATE\",\r\n  \"referenceId\": \"00000000-0000-0000-0000-000000000000\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/notifications/{id}/read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/notifications/{{notification_id}}/read?recipientId="
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/notifications/read-all",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/notifications/read-all?recipientId="
+            }
+          }
+        },
+        {
+          "name": "DELETE /v1/device-tokens/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/device-tokens/{{id}}"
+            }
+          }
+        },
+        {
+          "name": "POST /v1/admin/communications/announcements",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/communications/announcements"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"authorId\": \"00000000-0000-0000-0000-000000000000\",\r\n  \"title\": \"Sample title\",\r\n  \"content\": \"Sample text\",\r\n  \"priority\": \"NORMAL\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "DELETE /v1/admin/communications/announcements/{announcementId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/communications/announcements/{{announcement_id}}"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/communications/announcements/{announcementId}",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/communications/announcements/{{announcement_id}}"
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/admin/communications/announcements/{announcementId}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/communications/announcements/{{announcement_id}}"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Sample title\",\r\n  \"content\": \"Sample text\",\r\n  \"priority\": \"NORMAL\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/communications/center",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/communications/center?tab=PUSH_NOTIFICATIONS&status=ALL&search="
+            }
+          }
+        },
+        {
+          "name": "POST /v1/admin/communications/notifications",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/communications/notifications"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"adminId\": \"00000000-0000-0000-0000-000000000000\",\r\n  \"recipientIds\": \"00000000-0000-0000-0000-000000000000\",\r\n  \"title\": \"Sample title\",\r\n  \"priority\": \"NORMAL\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "DELETE /v1/admin/communications/notifications/{itemId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/communications/notifications/{{notification_id}}?tab=PUSH_NOTIFICATIONS"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/communications/notifications/{itemId}",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/communications/notifications/{{notification_id}}?tab=PUSH_NOTIFICATIONS"
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/admin/communications/notifications/{itemId}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/communications/notifications/{{notification_id}}?tab=PUSH_NOTIFICATIONS"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Sample title\",\r\n  \"priority\": \"NORMAL\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Missing and Found",
+      "item": [
+        {
+          "name": "GET /v1/admin/missing-found/categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/missing-found/categories"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/missing-found/reports",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/missing-found/reports?search=&type=ALL&status=ALL&category=&page=0&size=25"
+            }
+          }
+        },
+        {
+          "name": "POST /v1/admin/missing-found/reports",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/missing-found/reports"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"reporterId\": \"00000000-0000-0000-0000-000000000000\",\r\n  \"residentId\": \"{{user_id}}\",\r\n  \"type\": \"sample\",\r\n  \"category\": \"OTHER\",\r\n  \"description\": \"Sample text\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "DELETE /v1/admin/missing-found/reports/{reportId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/missing-found/reports/{{admin_report_id}}"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/missing-found/reports/{reportId}",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/missing-found/reports/{{admin_report_id}}"
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/admin/missing-found/reports/{reportId}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/missing-found/reports/{{admin_report_id}}"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"type\": \"sample\",\r\n  \"category\": \"OTHER\",\r\n  \"description\": \"Sample text\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/missing-found/reports/{reportId}/details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/missing-found/reports/{{admin_report_id}}/details"
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/admin/missing-found/reports/{reportId}/mark-matched",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/missing-found/reports/{{admin_report_id}}/mark-matched"
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/admin/missing-found/reports/{reportId}/mark-resolved",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/missing-found/reports/{{admin_report_id}}/mark-resolved"
+            }
+          }
+        },
+        {
+          "name": "POST /v1/admin/missing-found/reports/{reportId}/notify-user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/missing-found/reports/{{admin_report_id}}/notify-user"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Sample title\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/admin/missing-found/reports/{reportId}/status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/missing-found/reports/{{admin_report_id}}/status"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"status\": \"OPEN\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/missing-found/residents/options",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/missing-found/residents/options?search=&page=0&size=25"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/missing-found/statuses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/missing-found/statuses"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/missing-found/summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/missing-found/summary?search=&type=ALL&status=ALL&category="
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/missing-found/types",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/missing-found/types"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Residents Directory",
+      "item": [
+        {
+          "name": "GET /v1/admin/residents",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/residents?search=&buildingId=&status=&approvalStatus=&page=0&size=25"
+            }
+          }
+        },
+        {
+          "name": "POST /v1/admin/residents",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/residents"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"firstName\": \"Sample name\",\r\n  \"lastName\": \"Sample name\",\r\n  \"phoneNumber\": \"+201000000000\",\r\n  \"email\": \"user@example.com\",\r\n  \"password\": \"Password123!\",\r\n  \"type\": \"PROPERTY_OWNER\",\r\n  \"unitId\": \"{{unit_id}}\",\r\n  \"loginMethod\": \"PHONE_OTP\",\r\n  \"approvalStatus\": \"PENDING\",\r\n  \"nationalId\": \"sample\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "DELETE /v1/admin/residents/{residentId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/residents/{{resident_id}}"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/residents/{residentId}",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/residents/{{resident_id}}"
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/admin/residents/{residentId}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/residents/{{resident_id}}"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"firstName\": \"Sample name\",\r\n  \"lastName\": \"Sample name\",\r\n  \"phoneNumber\": \"+201000000000\",\r\n  \"email\": \"user@example.com\",\r\n  \"unitId\": \"{{unit_id}}\",\r\n  \"type\": \"PROPERTY_OWNER\",\r\n  \"nationalId\": \"sample\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/admin/residents/{residentId}/approval",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/residents/{{resident_id}}/approval"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"approvalStatus\": \"PENDING\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/residents/{residentId}/card",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/residents/{{resident_id}}/card"
+            }
+          }
+        },
+        {
+          "name": "POST /v1/admin/residents/{residentId}/reset-password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/residents/{{resident_id}}/reset-password"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"newPassword\": \"Password123!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/residents/buildings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/residents/buildings"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/residents/units",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/residents/units?buildingId="
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Employee Management",
+      "item": [
+        {
+          "name": "GET /v1/admin/employees",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/employees?search=&role=ALL&status=ALL&page=0&size=25"
+            }
+          }
+        },
+        {
+          "name": "POST /v1/admin/employees",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/employees"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"fullName\": \"Sample name\",\r\n  \"firstName\": \"Sample name\",\r\n  \"lastName\": \"Sample name\",\r\n  \"phoneNumber\": \"+201000000000\",\r\n  \"email\": \"user@example.com\",\r\n  \"password\": \"Password123!\",\r\n  \"confirmPassword\": \"Password123!\",\r\n  \"loginMethod\": \"PHONE_OTP\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "DELETE /v1/admin/employees/{employeeId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/employees/{{employee_id}}"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/employees/{employeeId}",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/employees/{{employee_id}}"
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/admin/employees/{employeeId}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/employees/{{employee_id}}"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"fullName\": \"Sample name\",\r\n  \"firstName\": \"Sample name\",\r\n  \"lastName\": \"Sample name\",\r\n  \"phoneNumber\": \"+201000000000\",\r\n  \"email\": \"user@example.com\",\r\n  \"password\": \"Password123!\",\r\n  \"confirmPassword\": \"Password123!\",\r\n  \"loginMethod\": \"PHONE_OTP\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "POST /v1/admin/employees/{employeeId}/reset-password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/employees/{{employee_id}}/reset-password"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"newPassword\": \"Password123!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "PATCH /v1/admin/employees/{employeeId}/status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/employees/{{employee_id}}/status"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"isActive\": false,\r\n  \"status\": \"OPEN\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/employees/roles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/employees/roles"
+            }
+          }
+        },
+        {
+          "name": "GET /v1/admin/employees/statuses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{host}}/v1/admin/employees/statuses"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

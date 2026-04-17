@@ -99,6 +99,70 @@ runtimeOnly 'org.postgresql:postgresql'
 
 ---
 
+### Property API Hardening (Compound/Building/Unit)
+
+The Property module now enforces stricter invariants at both API and database levels:
+
+- Request validation is mandatory for create endpoints (`@Valid` + bean validation annotations)
+- `floor` is required when creating a unit (missing field returns `400 Bad Request`)
+- Unit numbers must be unique inside the same building (case-insensitive, trimmed comparison)
+- Uniqueness is enforced twice:
+    - Application layer guard (`BusinessRuleException` -> `409 Conflict`)
+    - Database layer unique index migration (`V29__add_unique_unit_number_per_building.sql`)
+
+---
+
+### Events API Hardening (Resident and Admin)
+
+The Events module now enforces identity integrity and role-correct actions:
+
+- Resident-facing endpoints bind actor IDs to the authenticated JWT principal (no cross-user impersonation)
+- `POST /v1/events` no longer accepts organizer spoofing (body `organizerId` must match authenticated user if provided)
+- `POST /v1/events/{id}/register` and `DELETE /v1/events/{id}/register` no longer allow registering/cancelling on behalf of another resident
+- Public approve/reject routes are restricted to admins only, and any optional `adminId` must match the authenticated admin
+- Admin command routes (`approve`, `reject`, `complete`, `delete`) validate that provided `adminId` matches the authenticated admin to preserve audit correctness
+
+---
+
+### Admin Residents Directory Hardening
+
+Live API logic validation (April 2026) surfaced a critical role-safety defect and an integrity error-mapping gap in the residents admin endpoints.
+
+- `DELETE /v1/admin/residents/{residentId}` now enforces that the target user role is `RESIDENT` before deactivation.
+    - Prevents accidental deactivation of `ADMIN` users through a resident-only route.
+- Resident `nationalId` is now normalized (`trim`, blank -> `null`) and validated for uniqueness in both create and update flows.
+    - Prevents database-level unique-constraint failures from leaking as generic 500s.
+- Global exception mapping now translates `DataIntegrityViolationException` to `409 Conflict` with domain-friendly messages (e.g., duplicate `nationalId`, duplicate email, duplicate phone).
+
+Result: Admin Residents Directory now rejects cross-role destructive actions and returns consistent business-level conflict responses for duplicate identity fields.
+
+---
+
+### Notifications and Communications API Hardening
+
+The Notifications + Communications Center module now enforces actor/recipient integrity and safe token ownership:
+
+- Resident notification endpoints bind `recipientId` to the authenticated JWT principal (`GET /v1/notifications`, `PATCH /v1/notifications/{id}/read`, `PATCH /v1/notifications/read-all`, `POST /v1/notifications/send`)
+- Device token registration now rejects body `userId` spoofing and only allows the authenticated user identity
+- Device token deactivation now validates token ownership (`token.userId == authenticatedUserId`) before deactivation
+- Existing device token values cannot be re-registered under a different user (prevents cross-user token hijacking)
+- Admin communications create endpoints enforce audit actor integrity:
+    - `POST /v1/admin/communications/notifications`: body `adminId` must match authenticated admin if provided
+    - `POST /v1/admin/communications/announcements`: body `authorId` must match authenticated admin if provided
+- Device token persistence update path was fixed to perform update-safe saves (no duplicate-insert behavior), eliminating runtime `500` failures during deactivation
+
+---
+
+### Admin Missing & Found Hardening
+
+The Admin Missing & Found module now enforces strict resource scoping for mutation endpoints:
+
+- `PATCH /v1/admin/missing-found/reports/{reportId}/status`, `mark-matched`, `mark-resolved`, `PATCH /reports/{reportId}`, `POST /reports/{reportId}/notify-user`, and `DELETE /reports/{reportId}` are limited to reports whose alert type is `MISSING` or `FOUND`
+- Passing an alert ID of another domain type (for example `OTHER` or `SUSPICIOUS_ACTIVITY`) now returns not found for Missing & Found context instead of mutating unrelated alerts
+- Added targeted unit coverage to prevent regression of cross-type mutations in admin report operations
+
+---
+
 ## 📂 Folder Structure (Adapted for Sakany)
 
 ```

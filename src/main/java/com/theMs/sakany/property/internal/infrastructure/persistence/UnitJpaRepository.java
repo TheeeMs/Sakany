@@ -6,4 +6,5 @@ import java.util.UUID;
 
 public interface UnitJpaRepository extends JpaRepository<UnitEntity, UUID> {
     List<UnitEntity> findByBuildingId(UUID buildingId);
+    boolean existsByBuildingIdAndUnitNumberIgnoreCase(UUID buildingId, String unitNumber);
 }

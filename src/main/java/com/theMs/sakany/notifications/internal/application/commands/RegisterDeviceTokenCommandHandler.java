@@ -3,6 +3,7 @@ package com.theMs.sakany.notifications.internal.application.commands;
 import com.theMs.sakany.notifications.internal.domain.DeviceToken;
 import com.theMs.sakany.notifications.internal.domain.DeviceTokenRepository;
 import com.theMs.sakany.shared.cqrs.CommandHandler;
+import com.theMs.sakany.shared.exception.BusinessRuleException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,9 @@ public class RegisterDeviceTokenCommandHandler implements CommandHandler<Registe
     public UUID handle(RegisterDeviceTokenCommand command) {
         DeviceToken deviceToken = deviceTokenRepository.findByToken(command.token())
                 .map(existing -> {
+                    if (!existing.getUserId().equals(command.userId())) {
+                        throw new BusinessRuleException("Device token already belongs to another user");
+                    }
                     existing.refresh(command.token());
                     return existing;
                 })

@@ -127,21 +127,24 @@ public class AdminEventsController {
 
     @PatchMapping("/{eventId}/approve")
     public ResponseEntity<Void> approveEvent(@PathVariable UUID eventId, @RequestBody(required = false) AdminActorRequest request) {
-        UUID adminId = request != null && request.adminId() != null ? request.adminId() : getAuthenticatedUserId();
+        UUID requestedAdminId = request != null ? request.adminId() : null;
+        UUID adminId = resolveAdminActorId(requestedAdminId);
         approveEventCommandHandler.handle(new ApproveEventCommand(eventId, adminId));
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{eventId}/reject")
     public ResponseEntity<Void> rejectEvent(@PathVariable UUID eventId, @RequestBody(required = false) AdminActorRequest request) {
-        UUID adminId = request != null && request.adminId() != null ? request.adminId() : getAuthenticatedUserId();
+        UUID requestedAdminId = request != null ? request.adminId() : null;
+        UUID adminId = resolveAdminActorId(requestedAdminId);
         rejectEventCommandHandler.handle(new RejectEventCommand(eventId, adminId));
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{eventId}/complete")
     public ResponseEntity<Void> completeEvent(@PathVariable UUID eventId, @RequestBody(required = false) AdminActorRequest request) {
-        UUID adminId = request != null && request.adminId() != null ? request.adminId() : getAuthenticatedUserId();
+        UUID requestedAdminId = request != null ? request.adminId() : null;
+        UUID adminId = resolveAdminActorId(requestedAdminId);
         completeEventCommandHandler.handle(new CompleteEventCommand(eventId, adminId));
         return ResponseEntity.noContent().build();
     }
@@ -187,9 +190,17 @@ public class AdminEventsController {
             @PathVariable UUID eventId,
             @RequestParam(required = false) UUID adminId
     ) {
-        UUID effectiveAdminId = adminId != null ? adminId : getAuthenticatedUserId();
+        UUID effectiveAdminId = resolveAdminActorId(adminId);
         adminEventCardMenuService.deleteEvent(eventId, effectiveAdminId);
         return ResponseEntity.noContent().build();
+    }
+
+    private UUID resolveAdminActorId(UUID requestedAdminId) {
+        UUID authenticatedUserId = getAuthenticatedUserId();
+        if (requestedAdminId != null && !requestedAdminId.equals(authenticatedUserId)) {
+            throw new BusinessRuleException("adminId must match authenticated user");
+        }
+        return authenticatedUserId;
     }
 
     private UUID getAuthenticatedUserId() {

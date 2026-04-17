@@ -44,7 +44,7 @@ public class AdminCommunicationsController {
     public ResponseEntity<AdminCommunicationsCenterService.CreatePushNotificationResult> createPushNotification(
             @RequestBody AdminCreatePushNotificationRequest request
     ) {
-        UUID adminId = request.adminId() != null ? request.adminId() : getAuthenticatedUserId();
+        UUID adminId = resolveAuthenticatedAdminActor(request.adminId(), "adminId");
 
         AdminCommunicationsCenterService.CreatePushNotificationResult result = adminCommunicationsCenterService.createPushNotification(
                 adminId,
@@ -95,7 +95,7 @@ public class AdminCommunicationsController {
 
     @PostMapping("/announcements")
     public ResponseEntity<UUID> createAnnouncement(@RequestBody AdminCreateAnnouncementRequest request) {
-        UUID authorId = request.authorId() != null ? request.authorId() : getAuthenticatedUserId();
+        UUID authorId = resolveAuthenticatedAdminActor(request.authorId(), "authorId");
         UUID announcementId = adminCommunicationsCenterService.createAnnouncement(
                 authorId,
                 request.title(),
@@ -149,6 +149,15 @@ public class AdminCommunicationsController {
         } catch (IllegalArgumentException e) {
             throw new BusinessRuleException("Invalid authenticated principal");
         }
+    }
+
+    private UUID resolveAuthenticatedAdminActor(UUID requestedActorId, String actorField) {
+        UUID authenticatedUserId = getAuthenticatedUserId();
+        if (requestedActorId != null && !requestedActorId.equals(authenticatedUserId)) {
+            throw new BusinessRuleException(actorField + " must match authenticated admin");
+        }
+
+        return authenticatedUserId;
     }
 
     public record AdminCreatePushNotificationRequest(

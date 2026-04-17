@@ -11,6 +11,7 @@ import com.theMs.sakany.community.internal.application.queries.AdminMissingFound
 import com.theMs.sakany.community.internal.domain.AlertCategory;
 import com.theMs.sakany.community.internal.domain.AlertReportStatus;
 import com.theMs.sakany.community.internal.domain.AlertType;
+import com.theMs.sakany.notifications.internal.domain.NotificationChannel;
 import com.theMs.sakany.shared.cqrs.CommandHandler;
 import com.theMs.sakany.shared.exception.BusinessRuleException;
 import org.springframework.http.HttpStatus;
@@ -92,6 +93,11 @@ public class AdminMissingFoundController {
         return ResponseEntity.ok(missingFoundService.getReport(reportId));
     }
 
+    @GetMapping("/reports/{reportId}/details")
+    public ResponseEntity<AdminMissingFoundService.MissingFoundReportDetails> getReportDetails(@PathVariable UUID reportId) {
+        return ResponseEntity.ok(missingFoundService.getReport(reportId));
+    }
+
     @PostMapping("/reports")
     public ResponseEntity<UUID> createReport(@RequestBody AdminMissingFoundCreateRequest request) {
         UUID reportId = reportAlertHandler.handle(new ReportAlertCommand(
@@ -125,6 +131,30 @@ public class AdminMissingFoundController {
     ) {
         missingFoundService.updateStatus(reportId, request.resolveStatus());
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/reports/{reportId}/mark-matched")
+    public ResponseEntity<Void> markMatched(@PathVariable UUID reportId) {
+        missingFoundService.updateStatus(reportId, AlertReportStatus.MATCHED);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/reports/{reportId}/mark-resolved")
+    public ResponseEntity<Void> markResolved(@PathVariable UUID reportId) {
+        missingFoundService.updateStatus(reportId, AlertReportStatus.RESOLVED);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/reports/{reportId}/notify-user")
+    public ResponseEntity<AdminMissingFoundService.NotifyUserResult> notifyUser(
+            @PathVariable UUID reportId,
+            @RequestBody(required = false) AdminMissingFoundNotifyUserRequest request
+    ) {
+        AdminMissingFoundService.NotifyUserRequest payload = request == null
+                ? new AdminMissingFoundService.NotifyUserRequest(null, null, NotificationChannel.IN_APP)
+                : request.toPayload();
+
+        return ResponseEntity.ok(missingFoundService.notifyReporter(reportId, payload));
     }
 
     @DeleteMapping("/reports/{reportId}")
@@ -281,6 +311,19 @@ public class AdminMissingFoundController {
             return AlertReportStatus.valueOf(normalized);
         } catch (IllegalArgumentException e) {
             throw new BusinessRuleException("Invalid status value: " + rawStatus);
+        }
+    }
+
+    private static NotificationChannel parseNotificationChannel(String rawChannel, NotificationChannel defaultChannel) {
+        if (rawChannel == null || rawChannel.isBlank()) {
+            return defaultChannel;
+        }
+
+        String normalized = normalizeEnumValue(rawChannel);
+        try {
+            return NotificationChannel.valueOf(normalized);
+        } catch (IllegalArgumentException e) {
+            throw new BusinessRuleException("Invalid notify channel value: " + rawChannel);
         }
     }
 
@@ -475,6 +518,20 @@ public class AdminMissingFoundController {
     ) {
         AlertReportStatus resolveStatus() {
             return parseStatus(firstNonBlank(status, newStatus), true);
+        }
+    }
+
+    public record AdminMissingFoundNotifyUserRequest(
+            String title,
+            @JsonAlias({"body", "notificationMessage"}) String message,
+            @JsonAlias({"notifyChannel", "notificationChannel"}) String channel
+    ) {
+        AdminMissingFoundService.NotifyUserRequest toPayload() {
+            return new AdminMissingFoundService.NotifyUserRequest(
+                    normalizeOptional(title),
+                    normalizeOptional(message),
+                    parseNotificationChannel(channel, NotificationChannel.IN_APP)
+            );
         }
     }
 

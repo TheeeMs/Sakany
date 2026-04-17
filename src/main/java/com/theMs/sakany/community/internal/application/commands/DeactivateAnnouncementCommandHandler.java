@@ -3,6 +3,7 @@ package com.theMs.sakany.community.internal.application.commands;
 import com.theMs.sakany.community.internal.domain.Announcement;
 import com.theMs.sakany.community.internal.domain.AnnouncementRepository;
 import com.theMs.sakany.shared.cqrs.CommandHandler;
+import com.theMs.sakany.shared.exception.BusinessRuleException;
 import com.theMs.sakany.shared.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,10 @@ public class DeactivateAnnouncementCommandHandler implements CommandHandler<Deac
     public Void handle(DeactivateAnnouncementCommand command) {
         Announcement announcement = announcementRepository.findById(command.announcementId())
             .orElseThrow(() -> new NotFoundException("Announcement", command.announcementId()));
+
+        if (!announcement.getAuthorId().equals(command.requestingUserId())) {
+            throw new BusinessRuleException("Only the author can deactivate this announcement");
+        }
 
         announcement.deactivate();
         announcementRepository.save(announcement);

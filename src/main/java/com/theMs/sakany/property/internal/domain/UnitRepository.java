@@ -8,4 +8,5 @@ public interface UnitRepository {
     Unit save(Unit unit);
     Optional<Unit> findById(UUID id);
     List<Unit> findByBuildingId(UUID buildingId);
+    boolean existsByBuildingIdAndUnitNumber(UUID buildingId, String unitNumber);
 }

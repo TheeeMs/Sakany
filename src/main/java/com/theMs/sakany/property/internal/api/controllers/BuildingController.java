@@ -6,6 +6,7 @@ import com.theMs.sakany.property.internal.application.commands.CreateBuildingCom
 import com.theMs.sakany.property.internal.application.commands.CreateBuildingCommandHandler;
 import com.theMs.sakany.property.internal.application.queries.GetBuildingsByCompoundQuery;
 import com.theMs.sakany.property.internal.application.queries.GetBuildingsByCompoundQueryHandler;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class BuildingController {
     }
 
     @PostMapping
-    public ResponseEntity<UUID> createBuilding(@RequestBody CreateBuildingRequest request) {
+    public ResponseEntity<UUID> createBuilding(@Valid @RequestBody CreateBuildingRequest request) {
         CreateBuildingCommand command = new CreateBuildingCommand(request.compoundId(), request.name(), request.numberOfFloors());
         UUID id = createBuildingCommandHandler.handle(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(id);

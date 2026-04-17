@@ -6,6 +6,7 @@ import com.theMs.sakany.property.internal.application.commands.CreateUnitCommand
 import com.theMs.sakany.property.internal.application.commands.CreateUnitCommandHandler;
 import com.theMs.sakany.property.internal.application.queries.GetUnitsByBuildingQuery;
 import com.theMs.sakany.property.internal.application.queries.GetUnitsByBuildingQueryHandler;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class UnitController {
     }
 
     @PostMapping
-    public ResponseEntity<UUID> createUnit(@RequestBody CreateUnitRequest request) {
+    public ResponseEntity<UUID> createUnit(@Valid @RequestBody CreateUnitRequest request) {
         CreateUnitCommand command = new CreateUnitCommand(request.buildingId(), request.unitNumber(), request.floor(), request.type());
         UUID id = createUnitCommandHandler.handle(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(id);

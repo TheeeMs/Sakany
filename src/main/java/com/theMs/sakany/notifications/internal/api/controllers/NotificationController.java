@@ -12,8 +12,11 @@ import com.theMs.sakany.notifications.internal.application.queries.ListNotificat
 import com.theMs.sakany.notifications.internal.application.queries.ListNotificationsQueryHandler;
 import com.theMs.sakany.notifications.internal.domain.NotificationLog;
 import com.theMs.sakany.notifications.internal.domain.NotificationStatus;
+import com.theMs.sakany.shared.exception.BusinessRuleException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,10 +52,12 @@ public class NotificationController {
 
     @GetMapping
     public ResponseEntity<List<NotificationResponse>> listNotifications(
-            @RequestParam UUID recipientId,
+            @RequestParam(required = false) UUID recipientId,
             @RequestParam(required = false) NotificationStatus status
     ) {
-        List<NotificationResponse> response = listNotificationsQueryHandler.handle(new ListNotificationsQuery(recipientId, status))
+        UUID actorId = resolveRecipientFromAuthenticatedUser(recipientId);
+
+        List<NotificationResponse> response = listNotificationsQueryHandler.handle(new ListNotificationsQuery(actorId, status))
                 .stream()
                 .map(this::toResponse)
                 .toList();
@@ -60,21 +65,25 @@ public class NotificationController {
     }
 
     @PatchMapping("/{id}/read")
-    public ResponseEntity<Void> markAsRead(@PathVariable UUID id, @RequestParam UUID recipientId) {
-        markNotificationReadCommandHandler.handle(new MarkNotificationReadCommand(id, recipientId));
+    public ResponseEntity<Void> markAsRead(@PathVariable UUID id, @RequestParam(required = false) UUID recipientId) {
+        UUID actorId = resolveRecipientFromAuthenticatedUser(recipientId);
+        markNotificationReadCommandHandler.handle(new MarkNotificationReadCommand(id, actorId));
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/read-all")
-    public ResponseEntity<Void> markAllAsRead(@RequestParam UUID recipientId) {
-        markAllNotificationsReadCommandHandler.handle(new MarkAllNotificationsReadCommand(recipientId));
+    public ResponseEntity<Void> markAllAsRead(@RequestParam(required = false) UUID recipientId) {
+        UUID actorId = resolveRecipientFromAuthenticatedUser(recipientId);
+        markAllNotificationsReadCommandHandler.handle(new MarkAllNotificationsReadCommand(actorId));
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/send")
     public ResponseEntity<UUID> sendNotification(@RequestBody SendNotificationRequest request) {
+        UUID actorId = resolveRecipientFromAuthenticatedUser(request.recipientId());
+
         UUID id = sendNotificationCommandHandler.handle(new SendNotificationCommand(
-                request.recipientId(),
+                actorId,
                 request.title(),
                 request.body(),
                 request.type(),
@@ -104,5 +113,32 @@ public class NotificationController {
                 notificationLog.getFailureReason(),
                 isUrgent
         );
+    }
+
+    private UUID resolveRecipientFromAuthenticatedUser(UUID requestedRecipientId) {
+        UUID authenticatedUserId = getAuthenticatedUserId();
+        if (requestedRecipientId != null && !requestedRecipientId.equals(authenticatedUserId)) {
+            throw new BusinessRuleException("recipientId must match authenticated user");
+        }
+
+        return authenticatedUserId;
+    }
+
+    private UUID getAuthenticatedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new BusinessRuleException("No authenticated user");
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UUID uuid) {
+            return uuid;
+        }
+
+        try {
+            return UUID.fromString(principal.toString());
+        } catch (IllegalArgumentException e) {
+            throw new BusinessRuleException("Invalid authenticated principal");
+        }
     }
 }

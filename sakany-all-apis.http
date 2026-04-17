@@ -1,4 +1,4 @@
-### Sakany API Complete Sequential Test Flow (54 Endpoints)
+### Sakany API Complete Sequential Test Flow (94 Endpoints)
 # This file is compatible with IntelliJ IDEA HTTP Client and VS Code REST Client.
 # It uses variables to chain requests sequentially.
 
@@ -6,7 +6,11 @@
 @email = testuser+{{$timestamp}}@example.com
 @password = Password123!
 @phone = +12345{{$timestamp}}
+@admin_token = {{auth_token}}
+@resident_email = resident+{{$timestamp}}@example.com
+@resident_phone = +2012{{$timestamp}}
 @otp_code = 123456
+@resident_id = 
 @visit_log_id = 
 @event_id_reject = 
 @notification_id = 
@@ -167,7 +171,105 @@ Authorization: Bearer {{auth_token}}
 
 
 # ==========================================
-# 4. MAINTENANCE REQUESTS
+# 4. ADMIN RESIDENT DIRECTORY (ADMIN)
+# ==========================================
+
+### List Resident Buildings (Filter Dropdown)
+GET {{host}}/v1/admin/residents/buildings
+Authorization: Bearer {{admin_token}}
+
+### List Resident Units (Assign Unit Dropdown)
+GET {{host}}/v1/admin/residents/units?buildingId={{building_id}}
+Authorization: Bearer {{admin_token}}
+
+### Create Resident (Admin)
+# @name createAdminResident
+POST {{host}}/v1/admin/residents
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "firstName": "Resident",
+  "lastName": "One",
+  "phoneNumber": "{{resident_phone}}",
+  "email": "{{resident_email}}",
+  "password": "{{password}}",
+  "type": "TENANT",
+  "unitId": "{{unit_id}}",
+  "loginMethod": "EMAIL_PASSWORD",
+  "approvalStatus": "PENDING",
+  "moveInDate": "2026-04-16",
+  "monthlyFee": 2500,
+  "nationalId": "29012345678901"
+}
+
+> {%
+    client.global.set("resident_id", response.body);
+%}
+
+### List Residents Directory (Admin)
+# @name listAdminResidents
+GET {{host}}/v1/admin/residents?search=Resident&buildingId={{building_id}}&status=PENDING&approvalStatus=PENDING&page=0&size=25
+Authorization: Bearer {{admin_token}}
+
+> {%
+    if ((!client.global.get("resident_id") || client.global.get("resident_id") === "")
+        && response.body
+        && response.body.residents
+        && response.body.residents.length > 0) {
+      client.global.set("resident_id", response.body.residents[0].residentId);
+    }
+%}
+
+### Get Resident Details (Admin)
+GET {{host}}/v1/admin/residents/{{resident_id}}
+Authorization: Bearer {{admin_token}}
+
+### Get Resident Card (Admin)
+GET {{host}}/v1/admin/residents/{{resident_id}}/card
+Authorization: Bearer {{admin_token}}
+
+### Update Resident Details (Admin)
+PATCH {{host}}/v1/admin/residents/{{resident_id}}
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "firstName": "Resident Updated",
+  "lastName": "One",
+  "phoneNumber": "{{resident_phone}}",
+  "email": "{{resident_email}}",
+  "isActive": true,
+  "unitId": "{{unit_id}}",
+  "type": "TENANT",
+  "moveInDate": "2026-04-16",
+  "monthlyFee": 2500,
+  "nationalId": "29012345678901"
+}
+
+### Reset Resident Password (Admin)
+POST {{host}}/v1/admin/residents/{{resident_id}}/reset-password
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{}
+
+### Approve/Reject Resident (Admin)
+PATCH {{host}}/v1/admin/residents/{{resident_id}}/approval
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "approvalStatus": "APPROVED"
+}
+
+### Deactivate Resident (Admin)
+DELETE {{host}}/v1/admin/residents/{{resident_id}}
+Authorization: Bearer {{admin_token}}
+
+
+# ==========================================
+# 5. MAINTENANCE REQUESTS
 # ==========================================
 
 ### Create Maintenance Request
@@ -181,6 +283,7 @@ Content-Type: application/json
   "unitId": "{{unit_id}}",
   "title": "Leaking Pipe in Kitchen",
   "description": "Water is leaking from under the sink.",
+  "locationLabel": "Unit 101A",
   "category": "PLUMBING",
   "priority": "URGENT",
   "isPublic": false,
@@ -200,6 +303,68 @@ Authorization: Bearer {{auth_token}}
 ### Get by Status
 GET {{host}}/v1/maintenance-requests/status/SUBMITTED
 Authorization: Bearer {{auth_token}}
+
+### Admin Maintenance Command Center (All)
+GET {{host}}/v1/admin/maintenance/requests?tab=ALL&sortBy=NEWEST&page=0&size=25
+Authorization: Bearer {{admin_token}}
+
+### Admin Maintenance Command Center (Pending + Area/Type Filters)
+GET {{host}}/v1/admin/maintenance/requests?tab=PENDING&area=Unit&type=PRIVATE&sortBy=NEWEST&page=0&size=25
+Authorization: Bearer {{admin_token}}
+
+### Admin Maintenance Card Details
+GET {{host}}/v1/admin/maintenance/requests/{{maintenance_id}}/card
+Authorization: Bearer {{admin_token}}
+
+### Admin Maintenance Download Receipt
+GET {{host}}/v1/admin/maintenance/requests/{{maintenance_id}}/receipt
+Authorization: Bearer {{admin_token}}
+
+### Admin Maintenance Card Mark Viewed
+POST {{host}}/v1/admin/maintenance/requests/{{maintenance_id}}/viewed
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "actorId": "{{user_id}}"
+}
+
+### Admin Maintenance Technician Options
+GET {{host}}/v1/admin/maintenance/technicians?availableOnly=true
+Authorization: Bearer {{admin_token}}
+
+### Admin Maintenance Set Priority
+PATCH {{host}}/v1/admin/maintenance/requests/{{maintenance_id}}/priority
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "priority": "HIGH",
+  "actorId": "{{user_id}}"
+}
+
+### Admin Maintenance Assign Technician
+POST {{host}}/v1/admin/maintenance/requests/{{maintenance_id}}/assign
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "technicianId": "5d26e9d2-0c9f-48b2-b77f-20fe7cb3ac54",
+  "actorId": "{{user_id}}",
+  "assignmentNote": "Assigned from command center"
+}
+
+### Admin Maintenance Area Filter Options
+GET {{host}}/v1/admin/maintenance/areas
+Authorization: Bearer {{admin_token}}
+
+### Admin Maintenance Type/Category Options
+GET {{host}}/v1/admin/maintenance/types
+Authorization: Bearer {{admin_token}}
+
+### Admin Maintenance Category Options
+GET {{host}}/v1/admin/maintenance/categories
+Authorization: Bearer {{admin_token}}
 
 ### Assign Technician
 POST {{host}}/v1/maintenance-requests/{{maintenance_id}}/assign
@@ -222,7 +387,10 @@ POST {{host}}/v1/maintenance-requests/{{maintenance_id}}/resolve
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
-{}
+{
+  "resolution": "Replaced faulty outlet and checked all electrical connections.",
+  "totalCost": 320
+}
 
 ### Reject Work
 POST {{host}}/v1/maintenance-requests/{{maintenance_id}}/reject
@@ -242,7 +410,7 @@ Content-Type: application/json
 
 
 # ==========================================
-# 5. INVOICES & PAYMENTS
+# 6. INVOICES & PAYMENTS
 # ==========================================
 
 ### Create Invoice
@@ -296,7 +464,7 @@ Content-Type: application/json
 
 
 # ==========================================
-# 6. FEEDBACK
+# 7. FEEDBACK
 # ==========================================
 
 ### Submit Feedback
@@ -344,64 +512,9 @@ Content-Type: application/json
   "newStatus": "UNDER_REVIEW"
 }
 
-### Admin Feedback Dashboard
-GET {{host}}/v1/admin/feedback?tab=PUBLIC_SUGGESTIONS&status=ALL&page=0&size=25
-Authorization: Bearer {{auth_token}}
-
-### Admin Feedback Status Options
-GET {{host}}/v1/admin/feedback/statuses
-Authorization: Bearer {{auth_token}}
-
-### Admin Feedback Category Options
-GET {{host}}/v1/admin/feedback/categories
-Authorization: Bearer {{auth_token}}
-
-### Admin Feedback Details
-GET {{host}}/v1/admin/feedback/{{feedback_id}}/details
-Authorization: Bearer {{auth_token}}
-
-### Admin Create Feedback
-POST {{host}}/v1/admin/feedback
-Authorization: Bearer {{auth_token}}
-Content-Type: application/json
-
-{
-  "selectedResidentId": "{{user_id}}",
-  "visibility": "PUBLIC",
-  "title": "Add More Benches in the Garden Area",
-  "detailedDescription": "Residents need more shaded seating near the playground.",
-  "selectedCategory": "Facilities",
-  "location": "Garden Area",
-  "postAnonymously": false,
-  "photoUrls": []
-}
-
-### Admin Respond to Feedback
-PATCH {{host}}/v1/admin/feedback/{{feedback_id}}/respond
-Authorization: Bearer {{auth_token}}
-Content-Type: application/json
-
-{
-  "response": "Thanks for the suggestion. The maintenance team will add this to next week plan.",
-  "newStatus": "UNDER_REVIEW"
-}
-
-### Admin Update Feedback Status (UI-Mapped)
-PATCH {{host}}/v1/admin/feedback/{{feedback_id}}/status
-Authorization: Bearer {{auth_token}}
-Content-Type: application/json
-
-{
-  "newStatus": "RESOLVED"
-}
-
-### Admin Delete Feedback
-DELETE {{host}}/v1/admin/feedback/{{feedback_id}}
-Authorization: Bearer {{auth_token}}
-
 
 # ==========================================
-# 7. ANNOUNCEMENTS
+# 8. ANNOUNCEMENTS
 # ==========================================
 
 ### Create Announcement
@@ -435,7 +548,7 @@ Content-Type: application/json
 
 
 # ==========================================
-# 8. ALERTS
+# 9. ALERTS
 # ==========================================
 
 ### Report Alert
@@ -452,11 +565,10 @@ Content-Type: application/json
   "description": "Someone is wandering around without access card.",
   "location": "Building A Lobby",
   "eventTime": "2026-04-16T10:00:00Z",
-  "photoUrls": [],
-  "contactNumber": "+201000000000"
+  "photoUrls": []
 }
 
-> {% client.global.set("alert_id", response.body.id || response.body); %}
+> {% client.global.set("alert_id", response.body.id); %}
 
 ### Get Active Alerts
 GET {{host}}/v1/alerts
@@ -474,84 +586,6 @@ Content-Type: application/json
 {
   "requestingUserId": "{{user_id}}"
 }
-
-
-# ==========================================
-# 9. ADMIN MISSING & FOUND
-# ==========================================
-
-### Admin List Missing & Found Reports
-GET {{host}}/v1/admin/missing-found/reports?search=&type=ALL&status=ALL&category=&page=0&size=10
-Authorization: Bearer {{auth_token}}
-
-### Admin Missing & Found Summary
-GET {{host}}/v1/admin/missing-found/summary?search=&type=ALL&status=ALL&category=
-Authorization: Bearer {{auth_token}}
-
-### Admin Get Report by ID
-GET {{host}}/v1/admin/missing-found/reports/{{alert_id}}
-Authorization: Bearer {{auth_token}}
-
-### Admin Resident Options for "Report On Behalf Of" Dropdown
-GET {{host}}/v1/admin/missing-found/residents/options?search=&page=0&size=25
-Authorization: Bearer {{auth_token}}
-
-### Admin Create Missing & Found Report (UI Alias Contract)
-# @name adminCreateMissingFoundReport
-POST {{host}}/v1/admin/missing-found/reports
-Authorization: Bearer {{auth_token}}
-Content-Type: application/json
-
-{
-  "reportOnBehalfOf": "{{user_id}}",
-  "reportType": "Missing",
-  "itemCategory": "Personal Item",
-  "briefDescription": "Car Keys with Blue Keychain",
-  "detailedDescription": "Lost my car keys with a blue leather keychain.",
-  "lastSeenLocation": "Near swimming pool area",
-  "lastSeenAt": "2026-02-11T10:00:00Z",
-  "photos": [],
-  "contactNumber": "+201000000000"
-}
-
-> {% client.global.set("admin_report_id", response.body.id || response.body); %}
-
-### Admin Update Missing & Found Report
-PATCH {{host}}/v1/admin/missing-found/reports/{{admin_report_id}}
-Authorization: Bearer {{auth_token}}
-Content-Type: application/json
-
-{
-  "title": "Car Keys with Blue Keychain (Updated)",
-  "detailedDescription": "Updated details from admin dashboard edit action.",
-  "lastSeenLocation": "Near clubhouse entrance",
-  "photos": []
-}
-
-### Admin Update Missing & Found Status
-PATCH {{host}}/v1/admin/missing-found/reports/{{admin_report_id}}/status
-Authorization: Bearer {{auth_token}}
-Content-Type: application/json
-
-{
-  "newStatus": "MATCHED"
-}
-
-### Admin Get Missing & Found Type Options
-GET {{host}}/v1/admin/missing-found/types
-Authorization: Bearer {{auth_token}}
-
-### Admin Get Missing & Found Status Options
-GET {{host}}/v1/admin/missing-found/statuses
-Authorization: Bearer {{auth_token}}
-
-### Admin Get Missing & Found Category Options
-GET {{host}}/v1/admin/missing-found/categories
-Authorization: Bearer {{auth_token}}
-
-### Admin Delete Missing & Found Report
-DELETE {{host}}/v1/admin/missing-found/reports/{{admin_report_id}}
-Authorization: Bearer {{auth_token}}
 
 
 # ==========================================
@@ -585,6 +619,34 @@ Authorization: Bearer {{auth_token}}
 ### List My Access Codes
 GET {{host}}/v1/access/codes/my
 Authorization: Bearer {{auth_token}}
+
+### Admin QR Access Codes Dashboard
+GET {{host}}/v1/admin/access/codes?tab=ALL&search=John&status=ACTIVE&page=0&size=25
+Authorization: Bearer {{admin_token}}
+
+### Admin QR Access Status Options
+GET {{host}}/v1/admin/access/statuses
+Authorization: Bearer {{admin_token}}
+
+### Admin QR Access Type Options
+GET {{host}}/v1/admin/access/types
+Authorization: Bearer {{admin_token}}
+
+### Admin Resident QR Codes Modal
+GET {{host}}/v1/admin/access/residents/{{resident_id}}/codes?tab=ALL&status=ACTIVE&page=0&size=25
+Authorization: Bearer {{admin_token}}
+
+### Admin QR Code Details (Expanded Row)
+GET {{host}}/v1/admin/access/codes/{{access_code_id}}/details
+Authorization: Bearer {{admin_token}}
+
+### Admin QR Code Download
+GET {{host}}/v1/admin/access/codes/{{access_code_id}}/download
+Authorization: Bearer {{admin_token}}
+
+### Admin QR Code Delete
+DELETE {{host}}/v1/admin/access/codes/{{access_code_id}}
+Authorization: Bearer {{admin_token}}
 
 ### Scan Access Code
 # @name scanAccessCode
@@ -627,7 +689,7 @@ Authorization: Bearer {{auth_token}}
 
 
 # ==========================================
-# 10. EVENTS
+# 11. EVENTS
 # ==========================================
 
 ### Propose Event
@@ -660,6 +722,52 @@ Content-Type: application/json
     }
 %}
 
+### Admin Events Dashboard
+GET {{host}}/v1/admin/events?search=Kids&status=ALL&page=0&size=9
+Authorization: Bearer {{admin_token}}
+
+### Admin Event Categories
+GET {{host}}/v1/admin/events/categories
+Authorization: Bearer {{admin_token}}
+
+### Admin Event Statuses
+GET {{host}}/v1/admin/events/statuses
+Authorization: Bearer {{admin_token}}
+
+### Admin Event Card Details (Menu -> View Details)
+GET {{host}}/v1/admin/events/{{event_id}}/details
+Authorization: Bearer {{admin_token}}
+
+### Admin Create Event
+# @name adminCreateEvent
+POST {{host}}/v1/admin/events
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "eventTitle": "Admin Wellness Session",
+  "eventDescription": "Yoga and breathing techniques for residents.",
+  "location": "Clubhouse Hall",
+  "date": "2027-08-01",
+  "time": "08:00",
+  "duration": 2,
+  "durationUnit": "HOUR",
+  "eventCategory": "HEALTH & WELLNESS",
+  "hostName": "Sakany Admin Team",
+  "hostRole": "ADMIN",
+  "contactNumber": "+1234567890",
+  "maximumCapacity": 40,
+  "price": 0,
+  "tags": "Family Friendly, Wellness",
+  "isRecurring": false
+}
+
+> {%
+    if (response.body) {
+      client.global.set("event_id_admin", response.body);
+    }
+%}
+
 ### List Events
 GET {{host}}/v1/events?status=PROPOSED
 Authorization: Bearer {{auth_token}}
@@ -671,6 +779,13 @@ Authorization: Bearer {{auth_token}}
 ### Approve Event
 PATCH {{host}}/v1/events/{{event_id}}/approve?adminId={{user_id}}
 Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{}
+
+### Admin Approve Event
+PATCH {{host}}/v1/admin/events/{{event_id}}/approve
+Authorization: Bearer {{admin_token}}
 Content-Type: application/json
 
 {}
@@ -712,6 +827,87 @@ Content-Type: application/json
 
 {}
 
+### Admin Reject Event
+PATCH {{host}}/v1/admin/events/{{event_id_reject}}/reject
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{}
+
+### Admin Pending Event Card Details (for Approve/Reject buttons)
+GET {{host}}/v1/admin/events/{{event_id_reject}}/details
+Authorization: Bearer {{admin_token}}
+
+### Admin Pending Event Approve (explicit actor)
+PATCH {{host}}/v1/admin/events/{{event_id_reject}}/approve
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "adminId": "{{user_id}}"
+}
+
+### Admin Pending Event Reject (explicit actor)
+PATCH {{host}}/v1/admin/events/{{event_id_reject}}/reject
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "adminId": "{{user_id}}"
+}
+
+### Admin Edit Event (Menu -> Edit Event)
+PATCH {{host}}/v1/admin/events/{{event_id}}
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "title": "Kids Swimming Competition - Updated",
+  "description": "Updated details from event card menu edit action.",
+  "location": "Swimming Pool",
+  "startDate": "2027-06-01T15:00:00Z",
+  "endDate": "2027-06-01T18:30:00Z",
+  "category": "Sports",
+  "maxAttendees": 60,
+  "tags": "Family, Outdoor",
+  "recurringEvent": false
+}
+
+### Admin Edit Event (UI Form Payload Compatibility)
+PATCH {{host}}/v1/admin/events/{{event_id}}
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "eventTitle": "Community BBQ Gathering",
+  "eventCategory": "Social",
+  "date": "02/20/2026",
+  "time": "06:00 PM",
+  "duration": 4,
+  "durationUnit": "HOURS",
+  "location": "Compound Garden Area",
+  "contactNumber": "+20 100 123 4567",
+  "eventDescription": "Join us for a fun community BBQ in the compound garden.",
+  "maximumCapacity": 80,
+  "tags": "Family Friendly, Food, Outdoor",
+  "isRecurring": true
+}
+
+### Admin Notify Residents (Menu -> Notify Residents)
+POST {{host}}/v1/admin/events/{{event_id}}/notify-residents
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "title": "Event Reminder",
+  "message": "Don’t forget to attend tomorrow’s event.",
+  "channel": "IN_APP"
+}
+
+### Admin Export Attendees (Menu -> Export Attendees)
+GET {{host}}/v1/admin/events/{{event_id}}/attendees/export
+Authorization: Bearer {{admin_token}}
+
 ### Register for Event
 POST {{host}}/v1/events/{{event_id}}/register?residentId={{user_id}}
 Authorization: Bearer {{auth_token}}
@@ -723,9 +919,20 @@ Content-Type: application/json
 DELETE {{host}}/v1/events/{{event_id}}/register?residentId={{user_id}}
 Authorization: Bearer {{auth_token}}
 
+### Admin Complete Event
+PATCH {{host}}/v1/admin/events/{{event_id}}/complete
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{}
+
+### Admin Delete Event (Menu -> Delete Event)
+DELETE {{host}}/v1/admin/events/{{event_id}}?adminId={{user_id}}
+Authorization: Bearer {{admin_token}}
+
 
 # ==========================================
-# 11. NOTIFICATIONS
+# 12. NOTIFICATIONS
 # ==========================================
 
 ### Send Notification

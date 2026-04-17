@@ -26,7 +26,8 @@ public class Unit extends AggregateRoot {
         if (buildingId == null) {
             throw new BusinessRuleException("Unit buildingId cannot be null");
         }
-        if (unitNumber == null || unitNumber.trim().isEmpty()) {
+        String normalizedUnitNumber = unitNumber == null ? null : unitNumber.trim();
+        if (normalizedUnitNumber == null || normalizedUnitNumber.isEmpty()) {
             throw new BusinessRuleException("Unit number cannot be null or empty");
         }
         if (floor < 0) {
@@ -37,8 +38,8 @@ public class Unit extends AggregateRoot {
         }
 
         UUID id = UUID.randomUUID();
-        Unit unit = new Unit(id, buildingId, unitNumber, floor, type);
-        unit.registerEvent(new UnitCreated(id, buildingId, unitNumber, Instant.now()));
+        Unit unit = new Unit(id, buildingId, normalizedUnitNumber, floor, type);
+        unit.registerEvent(new UnitCreated(id, buildingId, normalizedUnitNumber, Instant.now()));
         return unit;
     }
 

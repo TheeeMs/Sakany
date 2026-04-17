@@ -24,6 +24,10 @@ public class VoteFeedbackCommandHandler implements CommandHandler<VoteFeedbackCo
         Feedback feedback = feedbackRepository.findById(command.feedbackId())
             .orElseThrow(() -> new NotFoundException("Feedback", command.feedbackId()));
 
+        if (command.voteType() == null) {
+            throw new BusinessRuleException("voteType is required");
+        }
+
         if (feedbackRepository.hasVoted(command.feedbackId(), command.voterId())) {
             throw new BusinessRuleException("User has already voted on this feedback");
         }

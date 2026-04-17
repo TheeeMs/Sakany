@@ -28,6 +28,17 @@ docker compose up -d
 ./gradlew bootRun
 ```
 
+### Windows One-Command Start
+If you are on Windows, you can run the full local stack with one command:
+
+```powershell
+.\run-local.ps1
+```
+
+Useful options:
+- `-SkipDocker` when Postgres/pgAdmin are already running.
+- `-DisableFlywayValidation` only for temporary migration-drift debugging in local dev.
+
 ---
 
 ## 🏗️ Architecture

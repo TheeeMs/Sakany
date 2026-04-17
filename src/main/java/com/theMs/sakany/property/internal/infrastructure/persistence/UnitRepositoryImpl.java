@@ -44,4 +44,9 @@ public class UnitRepositoryImpl implements UnitRepository {
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public boolean existsByBuildingIdAndUnitNumber(UUID buildingId, String unitNumber) {
+        return jpaRepository.existsByBuildingIdAndUnitNumberIgnoreCase(buildingId, unitNumber);
+    }
 }

@@ -109,6 +109,7 @@ public class AdminFeedbackDashboardService {
         return List.copyOf(categories);
     }
 
+    @Transactional
     public AdminFeedbackDetailsResponse getFeedbackDetails(UUID feedbackId) {
         feedbackJpaRepository.incrementViewCount(feedbackId);
         AdminFeedbackDashboardRow row = feedbackJpaRepository.findAdminFeedbackRowById(feedbackId)

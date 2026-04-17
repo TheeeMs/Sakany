@@ -29,9 +29,20 @@ public class DeviceTokenRepositoryImpl implements DeviceTokenRepository {
 
     @Override
     public DeviceToken save(DeviceToken deviceToken) {
-        DeviceTokenEntity savedEntity = jpaRepository.save(
-            Objects.requireNonNull(mapper.toEntity(deviceToken), "DeviceToken entity cannot be null")
-        );
+        Objects.requireNonNull(deviceToken, "DeviceToken cannot be null");
+
+        DeviceTokenEntity entity = deviceToken.getId() == null
+                ? new DeviceTokenEntity()
+                : jpaRepository.findById(deviceToken.getId()).orElseGet(DeviceTokenEntity::new);
+
+        entity.setId(deviceToken.getId());
+        entity.setUserId(deviceToken.getUserId());
+        entity.setToken(deviceToken.getToken());
+        entity.setPlatform(deviceToken.getPlatform());
+        entity.setActive(deviceToken.isActive());
+        entity.setLastUsedAt(deviceToken.getLastUsedAt());
+
+        DeviceTokenEntity savedEntity = jpaRepository.save(entity);
 
         deviceToken.getDomainEvents().forEach(eventPublisher::publishEvent);
         deviceToken.clearDomainEvents();

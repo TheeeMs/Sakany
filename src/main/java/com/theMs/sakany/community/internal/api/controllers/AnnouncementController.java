@@ -5,8 +5,11 @@ import com.theMs.sakany.community.internal.application.commands.DeactivateAnnoun
 import com.theMs.sakany.community.internal.application.queries.GetActiveAnnouncementsQuery;
 import com.theMs.sakany.community.internal.domain.Announcement;
 import com.theMs.sakany.community.internal.domain.AnnouncementPriority;
+import com.theMs.sakany.shared.exception.BusinessRuleException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -64,10 +67,23 @@ public class AnnouncementController {
 
     public record DeactivateAnnouncementRequest(UUID requestingUserId) {}
 
+    private UUID getAuthenticatedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new BusinessRuleException("No authenticated user");
+        }
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UUID uuid) {
+            return uuid;
+        }
+        return UUID.fromString(principal.toString());
+    }
+
     @PostMapping
     public ResponseEntity<UUID> createAnnouncement(@RequestBody CreateAnnouncementRequest request) {
+        UUID authorId = getAuthenticatedUserId();
         UUID announcementId = createAnnouncementHandler.handle(new CreateAnnouncementCommand(
-            request.authorId(),
+            authorId,
             request.title(),
             request.content(),
             request.priority(),
@@ -84,8 +100,9 @@ public class AnnouncementController {
     }
 
     @PatchMapping("/{id}/deactivate")
-    public ResponseEntity<Void> deactivateAnnouncement(@PathVariable UUID id, @RequestBody DeactivateAnnouncementRequest request) {
-        deactivateAnnouncementHandler.handle(new DeactivateAnnouncementCommand(id, request.requestingUserId()));
+    public ResponseEntity<Void> deactivateAnnouncement(@PathVariable UUID id, @RequestBody(required = false) DeactivateAnnouncementRequest request) {
+        UUID requestingUserId = getAuthenticatedUserId();
+        deactivateAnnouncementHandler.handle(new DeactivateAnnouncementCommand(id, requestingUserId));
         return ResponseEntity.noContent().build();
     }
 }

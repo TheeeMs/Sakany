@@ -10,8 +10,11 @@ import com.theMs.sakany.community.internal.domain.AlertReportStatus;
 import com.theMs.sakany.community.internal.domain.AlertType;
 import com.theMs.sakany.shared.cqrs.CommandHandler;
 import com.theMs.sakany.shared.cqrs.QueryHandler;
+import com.theMs.sakany.shared.exception.BusinessRuleException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,10 +49,23 @@ public class AlertController {
         this.getAlertByIdHandler = getAlertByIdHandler;
     }
 
+    private UUID getAuthenticatedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new BusinessRuleException("No authenticated user");
+        }
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UUID uuid) {
+            return uuid;
+        }
+        return UUID.fromString(principal.toString());
+    }
+
     @PostMapping
     public ResponseEntity<UUID> reportAlert(@RequestBody ReportAlertRequest request) {
+        UUID reporterId = getAuthenticatedUserId();
         UUID alertId = reportAlertHandler.handle(new ReportAlertCommand(
-                request.reporterId(),
+                reporterId,
                 request.type(),
                 request.category(),
                 request.title(),
@@ -80,8 +96,9 @@ public class AlertController {
     }
 
     @PatchMapping("/{id}/resolve")
-    public ResponseEntity<Void> resolveAlert(@PathVariable UUID id, @RequestBody ResolveAlertRequest request) {
-        resolveAlertHandler.handle(new ResolveAlertCommand(id, request.requestingUserId()));
+    public ResponseEntity<Void> resolveAlert(@PathVariable UUID id, @RequestBody(required = false) ResolveAlertRequest request) {
+        UUID requestingUserId = getAuthenticatedUserId();
+        resolveAlertHandler.handle(new ResolveAlertCommand(id, requestingUserId));
         return ResponseEntity.noContent().build();
     }
 

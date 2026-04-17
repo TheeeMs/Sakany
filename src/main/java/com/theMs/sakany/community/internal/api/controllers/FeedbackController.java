@@ -6,6 +6,7 @@ import com.theMs.sakany.community.internal.application.commands.VoteFeedbackComm
 import com.theMs.sakany.community.internal.application.queries.GetMyFeedbackQuery;
 import com.theMs.sakany.community.internal.application.queries.GetPublicFeedbackQuery;
 import com.theMs.sakany.community.internal.domain.Feedback;
+import com.theMs.sakany.community.internal.domain.FeedbackRepository;
 import com.theMs.sakany.community.internal.domain.FeedbackStatus;
 import com.theMs.sakany.community.internal.domain.FeedbackType;
 import com.theMs.sakany.community.internal.domain.VoteType;
@@ -15,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import com.theMs.sakany.shared.exception.BusinessRuleException;
+import com.theMs.sakany.shared.exception.NotFoundException;
 
 import java.time.Instant;
 import java.util.List;
@@ -30,19 +32,22 @@ public class FeedbackController {
     private final com.theMs.sakany.shared.cqrs.CommandHandler<UpdateFeedbackStatusCommand, Void> updateFeedbackStatusHandler;
     private final com.theMs.sakany.shared.cqrs.QueryHandler<GetPublicFeedbackQuery, List<Feedback>> getPublicFeedbackHandler;
     private final com.theMs.sakany.shared.cqrs.QueryHandler<GetMyFeedbackQuery, List<Feedback>> getMyFeedbackHandler;
+    private final FeedbackRepository feedbackRepository;
 
     public FeedbackController(
         com.theMs.sakany.shared.cqrs.CommandHandler<SubmitFeedbackCommand, UUID> submitFeedbackHandler,
         com.theMs.sakany.shared.cqrs.CommandHandler<VoteFeedbackCommand, Void> voteFeedbackHandler,
         com.theMs.sakany.shared.cqrs.CommandHandler<UpdateFeedbackStatusCommand, Void> updateFeedbackStatusHandler,
         com.theMs.sakany.shared.cqrs.QueryHandler<GetPublicFeedbackQuery, List<Feedback>> getPublicFeedbackHandler,
-        com.theMs.sakany.shared.cqrs.QueryHandler<GetMyFeedbackQuery, List<Feedback>> getMyFeedbackHandler
+        com.theMs.sakany.shared.cqrs.QueryHandler<GetMyFeedbackQuery, List<Feedback>> getMyFeedbackHandler,
+        FeedbackRepository feedbackRepository
     ) {
         this.submitFeedbackHandler = submitFeedbackHandler;
         this.voteFeedbackHandler = voteFeedbackHandler;
         this.updateFeedbackStatusHandler = updateFeedbackStatusHandler;
         this.getPublicFeedbackHandler = getPublicFeedbackHandler;
         this.getMyFeedbackHandler = getMyFeedbackHandler;
+        this.feedbackRepository = feedbackRepository;
     }
 
     public record SubmitFeedbackRequest(
@@ -120,6 +125,15 @@ public class FeedbackController {
         }
     }
 
+    private boolean isAdminActor() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return false;
+        }
+        return authentication.getAuthorities().stream()
+            .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
+    }
+
     @PostMapping
     public ResponseEntity<UUID> submitFeedback(@RequestBody SubmitFeedbackRequest request) {
         UUID authorId = getAuthenticatedUserId();
@@ -166,6 +180,14 @@ public class FeedbackController {
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> updateFeedbackStatus(@PathVariable UUID id, @RequestBody UpdateFeedbackStatusRequest request) {
+        UUID actorId = getAuthenticatedUserId();
+        Feedback feedback = feedbackRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Feedback", id));
+
+        if (!isAdminActor() && !actorId.equals(feedback.getAuthorId())) {
+            throw new BusinessRuleException("You are not allowed to modify this feedback");
+        }
+
         updateFeedbackStatusHandler.handle(new UpdateFeedbackStatusCommand(id, request.newStatus()));
         return ResponseEntity.noContent().build();
     }

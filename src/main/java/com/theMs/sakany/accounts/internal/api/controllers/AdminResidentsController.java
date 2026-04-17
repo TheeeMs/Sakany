@@ -166,6 +166,8 @@ public class AdminResidentsController {
     @PostMapping
     public ResponseEntity<UUID> createResident(@RequestBody CreateResidentRequest request) {
         validateResidentCreateRequest(request);
+        String normalizedNationalId = normalizeNationalId(request.nationalId());
+        ensureNationalIdAvailableForCreate(normalizedNationalId);
 
         LoginMethod loginMethod = request.loginMethod() == null ? LoginMethod.PHONE_OTP : request.loginMethod();
 
@@ -188,8 +190,8 @@ public class AdminResidentsController {
         if (effectiveApprovalStatus != ResidentApprovalStatus.PENDING) {
             profile.setApprovalStatus(effectiveApprovalStatus);
         }
-        if (request.nationalId() != null) {
-            profile.setNationalId(request.nationalId());
+        if (normalizedNationalId != null) {
+            profile.setNationalId(normalizedNationalId);
         }
         if (request.monthlyFee() != null) {
             profile.setMonthlyFee(request.monthlyFee());
@@ -219,6 +221,12 @@ public class AdminResidentsController {
     ) {
         if (request.approvalStatus() == null) {
             throw new BusinessRuleException("approvalStatus is required");
+        }
+
+        UserEntity resident = userJpaRepository.findById(residentId)
+            .orElseThrow(() -> new NotFoundException("Resident", residentId));
+        if (resident.getRole() != Role.RESIDENT) {
+            throw new BusinessRuleException("Provided user is not a resident");
         }
 
         ResidentProfileEntity profile = residentProfileJpaRepository.findByUserId(residentId)
@@ -273,7 +281,9 @@ public class AdminResidentsController {
             profile.setMoveInDate(request.moveInDate());
         }
         if (request.nationalId() != null) {
-            profile.setNationalId(request.nationalId());
+            String normalizedNationalId = normalizeNationalId(request.nationalId());
+            ensureNationalIdAvailableForUpdate(residentId, normalizedNationalId);
+            profile.setNationalId(normalizedNationalId);
         }
         if (request.monthlyFee() != null) {
             profile.setMonthlyFee(request.monthlyFee());
@@ -318,6 +328,10 @@ public class AdminResidentsController {
         User user = userRepository.findById(residentId)
                 .orElseThrow(() -> new NotFoundException("Resident", residentId));
 
+        if (user.getRole() != Role.RESIDENT) {
+            throw new BusinessRuleException("Provided user is not a resident");
+        }
+
         if (user.isActive()) {
             user.deactivate();
             userRepository.save(user);
@@ -343,6 +357,32 @@ public class AdminResidentsController {
         if (request.monthlyFee() != null && request.monthlyFee().compareTo(BigDecimal.ZERO) <= 0) {
             throw new BusinessRuleException("monthlyFee must be positive");
         }
+    }
+
+    private void ensureNationalIdAvailableForCreate(String nationalId) {
+        if (nationalId == null) {
+            return;
+        }
+        if (residentProfileJpaRepository.existsByNationalId(nationalId)) {
+            throw new BusinessRuleException("nationalId already registered");
+        }
+    }
+
+    private void ensureNationalIdAvailableForUpdate(UUID residentId, String nationalId) {
+        if (nationalId == null) {
+            return;
+        }
+        if (residentProfileJpaRepository.existsByNationalIdAndUserIdNot(nationalId, residentId)) {
+            throw new BusinessRuleException("nationalId already registered");
+        }
+    }
+
+    private String normalizeNationalId(String nationalId) {
+        if (nationalId == null) {
+            return null;
+        }
+        String trimmed = nationalId.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 
     private String generateTempPassword(int length) {

@@ -1,0 +1,3898 @@
+[
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AuthController.java",
+    "class": "AuthController",
+    "handler": "loginWithEmail",
+    "line": 136,
+    "method": "POST",
+    "path": "/v1/auth/login/email",
+    "module": "01-auth-users",
+    "auth": "Public (no token)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "LoginEmailRequest",
+    "requestBodyOptional": false,
+    "responseType": "AuthResponse",
+    "statusHint": "200 OK",
+    "minimalBody": {
+      "email": "user@example.com",
+      "password": "Password123!"
+    },
+    "fullBody": {
+      "email": "user@example.com",
+      "password": "Password123!"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AuthController.java",
+    "class": "AuthController",
+    "handler": "loginWithPhone",
+    "line": 107,
+    "method": "POST",
+    "path": "/v1/auth/login/phone",
+    "module": "01-auth-users",
+    "auth": "Public (no token)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "LoginPhoneRequest",
+    "requestBodyOptional": false,
+    "responseType": "AuthResponse",
+    "statusHint": "200 OK",
+    "minimalBody": {
+      "phoneNumber": "+201000000000",
+      "otpCode": "sample"
+    },
+    "fullBody": {
+      "phoneNumber": "+201000000000",
+      "otpCode": "sample"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AuthController.java",
+    "class": "AuthController",
+    "handler": "me",
+    "line": 179,
+    "method": "GET",
+    "path": "/v1/auth/me",
+    "module": "01-auth-users",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Map<String, Object>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AuthController.java",
+    "class": "AuthController",
+    "handler": "refresh",
+    "line": 156,
+    "method": "POST",
+    "path": "/v1/auth/refresh",
+    "module": "01-auth-users",
+    "auth": "Public (no token)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "RefreshRequest",
+    "requestBodyOptional": false,
+    "responseType": "AuthResponse",
+    "statusHint": "200 OK",
+    "minimalBody": {
+      "refreshToken": "sample"
+    },
+    "fullBody": {
+      "refreshToken": "sample"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AuthController.java",
+    "class": "AuthController",
+    "handler": "register",
+    "line": 58,
+    "method": "POST",
+    "path": "/v1/auth/register",
+    "module": "01-auth-users",
+    "auth": "Public (no token)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "RegisterRequest",
+    "requestBodyOptional": false,
+    "responseType": "AuthResponse",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "firstName": "Sample name",
+      "lastName": "Sample name",
+      "phoneNumber": "+201000000000",
+      "email": "user@example.com",
+      "password": "Password123!",
+      "type": "PROPERTY_OWNER",
+      "unitId": "{{unit_id}}",
+      "loginMethod": "PHONE_OTP"
+    },
+    "fullBody": {
+      "firstName": "Sample name",
+      "lastName": "Sample name",
+      "phoneNumber": "+201000000000",
+      "email": "user@example.com",
+      "password": "Password123!",
+      "type": "PROPERTY_OWNER",
+      "unitId": "{{unit_id}}",
+      "loginMethod": "PHONE_OTP"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AuthController.java",
+    "class": "AuthController",
+    "handler": "sendOtp",
+    "line": 85,
+    "method": "POST",
+    "path": "/v1/auth/send-otp",
+    "module": "01-auth-users",
+    "auth": "Public (no token)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "Map<String, String>",
+    "requestBodyOptional": false,
+    "responseType": "Map<String, String>",
+    "statusHint": "200 OK",
+    "minimalBody": {
+      "phoneNumber": "+201000000000"
+    },
+    "fullBody": {
+      "phoneNumber": "+201000000000"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\property\\internal\\api\\controllers\\BuildingController.java",
+    "class": "BuildingController",
+    "handler": "createBuilding",
+    "line": 29,
+    "method": "POST",
+    "path": "/v1/buildings",
+    "module": "02-properties",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "CreateBuildingRequest",
+    "requestBodyOptional": false,
+    "responseType": "UUID",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "compoundId": "{{compound_id}}",
+      "name": "Sample name",
+      "numberOfFloors": 1
+    },
+    "fullBody": {
+      "compoundId": "{{compound_id}}",
+      "name": "Sample name",
+      "numberOfFloors": 1
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\property\\internal\\api\\controllers\\BuildingController.java",
+    "class": "BuildingController",
+    "handler": "getBuildingsByCompound",
+    "line": 36,
+    "method": "GET",
+    "path": "/v1/buildings/compound/{compoundId}",
+    "module": "02-properties",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "compoundId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<BuildingResponse>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\property\\internal\\api\\controllers\\CompoundController.java",
+    "class": "CompoundController",
+    "handler": "createCompound",
+    "line": 28,
+    "method": "POST",
+    "path": "/v1/compounds",
+    "module": "02-properties",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "CreateCompoundRequest",
+    "requestBodyOptional": false,
+    "responseType": "UUID",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "name": "Sample name",
+      "address": "sample"
+    },
+    "fullBody": {
+      "name": "Sample name",
+      "address": "sample"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\property\\internal\\api\\controllers\\CompoundController.java",
+    "class": "CompoundController",
+    "handler": "getCompoundById",
+    "line": 35,
+    "method": "GET",
+    "path": "/v1/compounds/{id}",
+    "module": "02-properties",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "CompoundResponse",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\property\\internal\\api\\controllers\\UnitController.java",
+    "class": "UnitController",
+    "handler": "createUnit",
+    "line": 29,
+    "method": "POST",
+    "path": "/v1/units",
+    "module": "02-properties",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "CreateUnitRequest",
+    "requestBodyOptional": false,
+    "responseType": "UUID",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "buildingId": "{{building_id}}",
+      "unitNumber": "sample",
+      "type": "APARTMENT"
+    },
+    "fullBody": {
+      "buildingId": "{{building_id}}",
+      "unitNumber": "sample",
+      "floor": 1,
+      "type": "APARTMENT"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\property\\internal\\api\\controllers\\UnitController.java",
+    "class": "UnitController",
+    "handler": "getUnitsByBuilding",
+    "line": 36,
+    "method": "GET",
+    "path": "/v1/units/building/{buildingId}",
+    "module": "02-properties",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "buildingId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<UnitResponse>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\access\\internal\\api\\controllers\\AccessController.java",
+    "class": "AccessController",
+    "handler": "createAccessCode",
+    "line": 80,
+    "method": "POST",
+    "path": "/v1/access/codes",
+    "module": "03-access-qr",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "CreateAccessCodeRequest",
+    "requestBodyOptional": false,
+    "responseType": "AccessCodeResponse",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "visitorName": "Sample name",
+      "visitorPhone": "+201000000000",
+      "purpose": "GUEST",
+      "validFrom": "2027-01-01T10:00:00Z",
+      "validUntil": "2027-01-01T10:00:00Z"
+    },
+    "fullBody": {
+      "visitorName": "Sample name",
+      "visitorPhone": "+201000000000",
+      "purpose": "GUEST",
+      "isSingleUse": false,
+      "validFrom": "2027-01-01T10:00:00Z",
+      "validUntil": "2027-01-01T10:00:00Z"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\access\\internal\\api\\controllers\\AccessController.java",
+    "class": "AccessController",
+    "handler": "scanAccessCode",
+    "line": 132,
+    "method": "POST",
+    "path": "/v1/access/codes/{code}/scan",
+    "module": "03-access-qr",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "code",
+        "type": "String"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "ScanAccessCodeRequest",
+    "requestBodyOptional": false,
+    "responseType": "ScanAccessCodeResponse",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "code": "sample",
+      "gateNumber": "sample"
+    },
+    "fullBody": {
+      "code": "sample",
+      "gateNumber": "sample"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\access\\internal\\api\\controllers\\AccessController.java",
+    "class": "AccessController",
+    "handler": "reactivateAccessCode",
+    "line": 159,
+    "method": "POST",
+    "path": "/v1/access/codes/{codeId}/reactivate",
+    "module": "03-access-qr",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "codeId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "ReactivateAccessCodeRequest",
+    "requestBodyOptional": false,
+    "responseType": "AccessCodeResponse",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "validFrom": "2027-01-01T10:00:00Z",
+      "validUntil": "2027-01-01T10:00:00Z"
+    },
+    "fullBody": {
+      "validFrom": "2027-01-01T10:00:00Z",
+      "validUntil": "2027-01-01T10:00:00Z"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\access\\internal\\api\\controllers\\AccessController.java",
+    "class": "AccessController",
+    "handler": "revokeAccessCode",
+    "line": 149,
+    "method": "DELETE",
+    "path": "/v1/access/codes/{id}",
+    "module": "03-access-qr",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\access\\internal\\api\\controllers\\AccessController.java",
+    "class": "AccessController",
+    "handler": "getAccessCode",
+    "line": 104,
+    "method": "GET",
+    "path": "/v1/access/codes/{id}",
+    "module": "03-access-qr",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AccessCodeResponse",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\access\\internal\\api\\controllers\\AccessController.java",
+    "class": "AccessController",
+    "handler": "listMyAccessCodes",
+    "line": 115,
+    "method": "GET",
+    "path": "/v1/access/codes/my",
+    "module": "03-access-qr",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<AccessCodeResponse>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\access\\internal\\api\\controllers\\AccessController.java",
+    "class": "AccessController",
+    "handler": "listVisitLogs",
+    "line": 179,
+    "method": "GET",
+    "path": "/v1/access/visit-logs",
+    "module": "03-access-qr",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<VisitLogResponse>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\access\\internal\\api\\controllers\\AccessController.java",
+    "class": "AccessController",
+    "handler": "logVisitorExit",
+    "line": 204,
+    "method": "PATCH",
+    "path": "/v1/access/visit-logs/{id}/exit",
+    "module": "03-access-qr",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\access\\internal\\api\\controllers\\AdminQrAccessController.java",
+    "class": "AdminQrAccessController",
+    "handler": "listAdminQrAccessCodes",
+    "line": 30,
+    "method": "GET",
+    "path": "/v1/admin/access/codes",
+    "module": "03-access-qr",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [
+      {
+        "name": "tab",
+        "type": "AdminQrAccessTab",
+        "required": false,
+        "defaultValue": "ALL"
+      },
+      {
+        "name": "search",
+        "type": "String",
+        "required": false,
+        "defaultValue": null
+      },
+      {
+        "name": "status",
+        "type": "AdminQrAccessStatus",
+        "required": false,
+        "defaultValue": null
+      },
+      {
+        "name": "page",
+        "type": "int",
+        "required": false,
+        "defaultValue": "0"
+      },
+      {
+        "name": "size",
+        "type": "int",
+        "required": false,
+        "defaultValue": "25"
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminQrAccessDirectoryService.AdminQrAccessPage",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\access\\internal\\api\\controllers\\AdminQrAccessController.java",
+    "class": "AdminQrAccessController",
+    "handler": "deleteQrCode",
+    "line": 78,
+    "method": "DELETE",
+    "path": "/v1/admin/access/codes/{accessCodeId}",
+    "module": "03-access-qr",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "accessCodeId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\access\\internal\\api\\controllers\\AdminQrAccessController.java",
+    "class": "AdminQrAccessController",
+    "handler": "getCodeDetails",
+    "line": 62,
+    "method": "GET",
+    "path": "/v1/admin/access/codes/{accessCodeId}/details",
+    "module": "03-access-qr",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "accessCodeId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminQrAccessDirectoryService.AdminQrCodeDetailsResponse",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\access\\internal\\api\\controllers\\AdminQrAccessController.java",
+    "class": "AdminQrAccessController",
+    "handler": "downloadQrCode",
+    "line": 69,
+    "method": "GET",
+    "path": "/v1/admin/access/codes/{accessCodeId}/download",
+    "module": "03-access-qr",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "accessCodeId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "byte[]",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\access\\internal\\api\\controllers\\AdminQrAccessController.java",
+    "class": "AdminQrAccessController",
+    "handler": "listResidentQrCodes",
+    "line": 51,
+    "method": "GET",
+    "path": "/v1/admin/access/residents/{residentId}/codes",
+    "module": "03-access-qr",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "residentId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [
+      {
+        "name": "tab",
+        "type": "AdminQrAccessTab",
+        "required": false,
+        "defaultValue": "ALL"
+      },
+      {
+        "name": "status",
+        "type": "AdminQrAccessStatus",
+        "required": false,
+        "defaultValue": null
+      },
+      {
+        "name": "page",
+        "type": "int",
+        "required": false,
+        "defaultValue": "0"
+      },
+      {
+        "name": "size",
+        "type": "int",
+        "required": false,
+        "defaultValue": "25"
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminQrAccessDirectoryService.ResidentQrCodesResponse",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\access\\internal\\api\\controllers\\AdminQrAccessController.java",
+    "class": "AdminQrAccessController",
+    "handler": "listStatusOptions",
+    "line": 41,
+    "method": "GET",
+    "path": "/v1/admin/access/statuses",
+    "module": "03-access-qr",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<String>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\access\\internal\\api\\controllers\\AdminQrAccessController.java",
+    "class": "AdminQrAccessController",
+    "handler": "listTypeOptions",
+    "line": 46,
+    "method": "GET",
+    "path": "/v1/admin/access/types",
+    "module": "03-access-qr",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<String>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\billing\\internal\\api\\controllers\\InvoiceController.java",
+    "class": "InvoiceController",
+    "handler": "listInvoices",
+    "line": 71,
+    "method": "GET",
+    "path": "/v1/invoices",
+    "module": "04-billing",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [
+      {
+        "name": "residentId",
+        "type": "UUID",
+        "required": false,
+        "defaultValue": null
+      },
+      {
+        "name": "status",
+        "type": "InvoiceStatus",
+        "required": false,
+        "defaultValue": null
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<InvoiceResponse>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\billing\\internal\\api\\controllers\\InvoiceController.java",
+    "class": "InvoiceController",
+    "handler": "issueInvoice",
+    "line": 56,
+    "method": "POST",
+    "path": "/v1/invoices",
+    "module": "04-billing",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "IssueInvoiceRequest",
+    "requestBodyOptional": false,
+    "responseType": "UUID",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "residentId": "{{user_id}}",
+      "unitId": "{{unit_id}}",
+      "type": "MONTHLY_FEE",
+      "amount": 150.0,
+      "description": "Sample text"
+    },
+    "fullBody": {
+      "residentId": "{{user_id}}",
+      "unitId": "{{unit_id}}",
+      "type": "MONTHLY_FEE",
+      "amount": 150.0,
+      "currency": "USD",
+      "description": "Sample text",
+      "dueDate": "2027-01-01"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\billing\\internal\\api\\controllers\\InvoiceController.java",
+    "class": "InvoiceController",
+    "handler": "getInvoiceById",
+    "line": 83,
+    "method": "GET",
+    "path": "/v1/invoices/{id}",
+    "module": "04-billing",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "InvoiceResponse",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\billing\\internal\\api\\controllers\\InvoiceController.java",
+    "class": "InvoiceController",
+    "handler": "cancelInvoice",
+    "line": 101,
+    "method": "PATCH",
+    "path": "/v1/invoices/{id}/cancel",
+    "module": "04-billing",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\billing\\internal\\api\\controllers\\InvoiceController.java",
+    "class": "InvoiceController",
+    "handler": "payInvoice",
+    "line": 89,
+    "method": "POST",
+    "path": "/v1/invoices/{id}/pay",
+    "module": "04-billing",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "PayInvoiceRequest",
+    "requestBodyOptional": false,
+    "responseType": "UUID",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "residentId": "{{user_id}}",
+      "paymentMethod": "CASH",
+      "transactionReference": "tx-123456"
+    },
+    "fullBody": {
+      "residentId": "{{user_id}}",
+      "paymentMethod": "CASH",
+      "transactionReference": "tx-123456"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\billing\\internal\\api\\controllers\\PaymentController.java",
+    "class": "PaymentController",
+    "handler": "listPayments",
+    "line": 27,
+    "method": "GET",
+    "path": "/v1/payments",
+    "module": "04-billing",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [
+      {
+        "name": "residentId",
+        "type": "UUID",
+        "required": false,
+        "defaultValue": null
+      },
+      {
+        "name": "status",
+        "type": "PaymentStatus",
+        "required": false,
+        "defaultValue": null
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<PaymentResponse>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\maintenance\\internal\\api\\controllers\\AdminMaintenanceCommandCenterController.java",
+    "class": "AdminMaintenanceCommandCenterController",
+    "handler": "getAreaOptions",
+    "line": 40,
+    "method": "GET",
+    "path": "/v1/admin/maintenance/areas",
+    "module": "05-maintenance",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<String>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\maintenance\\internal\\api\\controllers\\AdminMaintenanceCommandCenterController.java",
+    "class": "AdminMaintenanceCommandCenterController",
+    "handler": "getCategoryOptions",
+    "line": 50,
+    "method": "GET",
+    "path": "/v1/admin/maintenance/categories",
+    "module": "05-maintenance",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<String>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\maintenance\\internal\\api\\controllers\\AdminMaintenanceCommandCenterController.java",
+    "class": "AdminMaintenanceCommandCenterController",
+    "handler": "getCommandCenter",
+    "line": 27,
+    "method": "GET",
+    "path": "/v1/admin/maintenance/requests",
+    "module": "05-maintenance",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [
+      {
+        "name": "tab",
+        "type": "AdminMaintenanceTab",
+        "required": false,
+        "defaultValue": "ALL"
+      },
+      {
+        "name": "area",
+        "type": "String",
+        "required": false,
+        "defaultValue": null
+      },
+      {
+        "name": "type",
+        "type": "AdminMaintenanceRequestType",
+        "required": false,
+        "defaultValue": null
+      },
+      {
+        "name": "category",
+        "type": "MaintenanceCategory",
+        "required": false,
+        "defaultValue": null
+      },
+      {
+        "name": "sortBy",
+        "type": "AdminMaintenanceSortBy",
+        "required": false,
+        "defaultValue": "NEWEST"
+      },
+      {
+        "name": "page",
+        "type": "int",
+        "required": false,
+        "defaultValue": "0"
+      },
+      {
+        "name": "size",
+        "type": "int",
+        "required": false,
+        "defaultValue": "25"
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminMaintenanceCommandCenterService.MaintenanceCommandCenterPage",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\maintenance\\internal\\api\\controllers\\AdminMaintenanceCardController.java",
+    "class": "AdminMaintenanceCardController",
+    "handler": "assignTechnician",
+    "line": 114,
+    "method": "POST",
+    "path": "/v1/admin/maintenance/requests/{requestId}/assign",
+    "module": "05-maintenance",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "requestId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "AssignMaintenanceTechnicianRequest",
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": {
+      "sample": "value"
+    },
+    "fullBody": {
+      "sample": "value"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\maintenance\\internal\\api\\controllers\\AdminMaintenanceCardController.java",
+    "class": "AdminMaintenanceCardController",
+    "handler": "getMaintenanceCard",
+    "line": 48,
+    "method": "GET",
+    "path": "/v1/admin/maintenance/requests/{requestId}/card",
+    "module": "05-maintenance",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "requestId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminMaintenanceCardService.MaintenanceManagementCardResponse",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\maintenance\\internal\\api\\controllers\\AdminMaintenanceCardController.java",
+    "class": "AdminMaintenanceCardController",
+    "handler": "updatePriority",
+    "line": 96,
+    "method": "PATCH",
+    "path": "/v1/admin/maintenance/requests/{requestId}/priority",
+    "module": "05-maintenance",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "requestId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "UpdatePriorityRequest",
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": {
+      "sample": "value"
+    },
+    "fullBody": {
+      "sample": "value"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\maintenance\\internal\\api\\controllers\\AdminMaintenanceCardController.java",
+    "class": "AdminMaintenanceCardController",
+    "handler": "downloadReceipt",
+    "line": 55,
+    "method": "GET",
+    "path": "/v1/admin/maintenance/requests/{requestId}/receipt",
+    "module": "05-maintenance",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "requestId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "byte[]",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\maintenance\\internal\\api\\controllers\\AdminMaintenanceCardController.java",
+    "class": "AdminMaintenanceCardController",
+    "handler": "markViewed",
+    "line": 135,
+    "method": "POST",
+    "path": "/v1/admin/maintenance/requests/{requestId}/viewed",
+    "module": "05-maintenance",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "requestId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "MarkMaintenanceViewedRequest",
+    "requestBodyOptional": true,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": {
+      "actorId": "00000000-0000-0000-0000-000000000000"
+    },
+    "fullBody": {
+      "actorId": "00000000-0000-0000-0000-000000000000"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\maintenance\\internal\\api\\controllers\\AdminMaintenanceCardController.java",
+    "class": "AdminMaintenanceCardController",
+    "handler": "getTechnicians",
+    "line": 89,
+    "method": "GET",
+    "path": "/v1/admin/maintenance/technicians",
+    "module": "05-maintenance",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [
+      {
+        "name": "availableOnly",
+        "type": "boolean",
+        "required": false,
+        "defaultValue": "true"
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<AdminMaintenanceCardService.TechnicianOption>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\maintenance\\internal\\api\\controllers\\AdminMaintenanceCommandCenterController.java",
+    "class": "AdminMaintenanceCommandCenterController",
+    "handler": "getTypeOptions",
+    "line": 45,
+    "method": "GET",
+    "path": "/v1/admin/maintenance/types",
+    "module": "05-maintenance",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<String>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\maintenance\\internal\\api\\controllers\\MaintenanceRequestController.java",
+    "class": "MaintenanceRequestController",
+    "handler": "createRequest",
+    "line": 59,
+    "method": "POST",
+    "path": "/v1/maintenance-requests",
+    "module": "05-maintenance",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "CreateMaintenanceRequestDto",
+    "requestBodyOptional": false,
+    "responseType": "UUID",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "residentId": "{{user_id}}",
+      "unitId": "{{unit_id}}",
+      "title": "Sample title",
+      "description": "Sample text",
+      "category": "PLUMBING",
+      "priority": "LOW"
+    },
+    "fullBody": {
+      "residentId": "{{user_id}}",
+      "unitId": "{{unit_id}}",
+      "title": "Sample title",
+      "description": "Sample text",
+      "locationLabel": "sample",
+      "category": "PLUMBING",
+      "priority": "LOW",
+      "isPublic": false,
+      "photoUrls": "sample"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\maintenance\\internal\\api\\controllers\\MaintenanceRequestController.java",
+    "class": "MaintenanceRequestController",
+    "handler": "getById",
+    "line": 84,
+    "method": "GET",
+    "path": "/v1/maintenance-requests/{id}",
+    "module": "05-maintenance",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "MaintenanceRequestResponseDto",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\maintenance\\internal\\api\\controllers\\MaintenanceRequestController.java",
+    "class": "MaintenanceRequestController",
+    "handler": "assignTechnician",
+    "line": 106,
+    "method": "POST",
+    "path": "/v1/maintenance-requests/{id}/assign",
+    "module": "05-maintenance",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "AssignTechnicianDto",
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "200 OK",
+    "minimalBody": {
+      "technicianId": "00000000-0000-0000-0000-000000000000"
+    },
+    "fullBody": {
+      "technicianId": "00000000-0000-0000-0000-000000000000"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\maintenance\\internal\\api\\controllers\\MaintenanceRequestController.java",
+    "class": "MaintenanceRequestController",
+    "handler": "cancel",
+    "line": 154,
+    "method": "POST",
+    "path": "/v1/maintenance-requests/{id}/cancel",
+    "module": "05-maintenance",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\maintenance\\internal\\api\\controllers\\MaintenanceRequestController.java",
+    "class": "MaintenanceRequestController",
+    "handler": "reject",
+    "line": 168,
+    "method": "POST",
+    "path": "/v1/maintenance-requests/{id}/reject",
+    "module": "05-maintenance",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "RejectRequestDto",
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "200 OK",
+    "minimalBody": {
+      "reason": "Sample text"
+    },
+    "fullBody": {
+      "reason": "Sample text"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\maintenance\\internal\\api\\controllers\\MaintenanceRequestController.java",
+    "class": "MaintenanceRequestController",
+    "handler": "resolve",
+    "line": 134,
+    "method": "POST",
+    "path": "/v1/maintenance-requests/{id}/resolve",
+    "module": "05-maintenance",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "ResolveMaintenanceRequestDto",
+    "requestBodyOptional": true,
+    "responseType": "Void",
+    "statusHint": "200 OK",
+    "minimalBody": {
+      "resolution": "sample",
+      "totalCost": 150.0
+    },
+    "fullBody": {
+      "resolution": "sample",
+      "totalCost": 150.0
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\maintenance\\internal\\api\\controllers\\MaintenanceRequestController.java",
+    "class": "MaintenanceRequestController",
+    "handler": "startWork",
+    "line": 120,
+    "method": "POST",
+    "path": "/v1/maintenance-requests/{id}/start",
+    "module": "05-maintenance",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\maintenance\\internal\\api\\controllers\\MaintenanceRequestController.java",
+    "class": "MaintenanceRequestController",
+    "handler": "getByResident",
+    "line": 90,
+    "method": "GET",
+    "path": "/v1/maintenance-requests/resident/{residentId}",
+    "module": "05-maintenance",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "residentId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<MaintenanceRequestResponseDto>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\maintenance\\internal\\api\\controllers\\MaintenanceRequestController.java",
+    "class": "MaintenanceRequestController",
+    "handler": "getByStatus",
+    "line": 98,
+    "method": "GET",
+    "path": "/v1/maintenance-requests/status/{status}",
+    "module": "05-maintenance",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "status",
+        "type": "MaintenanceStatus"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<MaintenanceRequestResponseDto>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminFeedbackController.java",
+    "class": "AdminFeedbackController",
+    "handler": "getDashboard",
+    "line": 37,
+    "method": "GET",
+    "path": "/v1/admin/feedback",
+    "module": "06-feedback",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [
+      {
+        "name": "tab",
+        "type": "AdminFeedbackTab",
+        "required": false,
+        "defaultValue": "PUBLIC_SUGGESTIONS"
+      },
+      {
+        "name": "search",
+        "type": "String",
+        "required": false,
+        "defaultValue": null
+      },
+      {
+        "name": "status",
+        "type": "AdminFeedbackStatusFilter",
+        "required": false,
+        "defaultValue": "ALL"
+      },
+      {
+        "name": "category",
+        "type": "String",
+        "required": false,
+        "defaultValue": null
+      },
+      {
+        "name": "page",
+        "type": "int",
+        "required": false,
+        "defaultValue": "0"
+      },
+      {
+        "name": "size",
+        "type": "int",
+        "required": false,
+        "defaultValue": "25"
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminFeedbackDashboardService.AdminFeedbackDashboardResponse",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminFeedbackController.java",
+    "class": "AdminFeedbackController",
+    "handler": "createFeedback",
+    "line": 64,
+    "method": "POST",
+    "path": "/v1/admin/feedback",
+    "module": "06-feedback",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "AdminCreateFeedbackRequest",
+    "requestBodyOptional": false,
+    "responseType": "UUID",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "authorId": "00000000-0000-0000-0000-000000000000",
+      "title": "Sample title",
+      "content": "Sample text",
+      "type": "COMPLAINT",
+      "category": "OTHER"
+    },
+    "fullBody": {
+      "authorId": "00000000-0000-0000-0000-000000000000",
+      "title": "Sample title",
+      "content": "Sample text",
+      "type": "COMPLAINT",
+      "isPublic": false,
+      "isPrivate": false,
+      "visibility": "sample",
+      "category": "OTHER",
+      "location": "sample",
+      "isAnonymous": false,
+      "imageUrl": "sample",
+      "imageUrls": "sample"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminFeedbackController.java",
+    "class": "AdminFeedbackController",
+    "handler": "deleteFeedback",
+    "line": 114,
+    "method": "DELETE",
+    "path": "/v1/admin/feedback/{feedbackId}",
+    "module": "06-feedback",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "feedbackId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminFeedbackController.java",
+    "class": "AdminFeedbackController",
+    "handler": "getFeedbackDetails",
+    "line": 59,
+    "method": "GET",
+    "path": "/v1/admin/feedback/{feedbackId}/details",
+    "module": "06-feedback",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "feedbackId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminFeedbackDashboardService.AdminFeedbackDetailsResponse",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminFeedbackController.java",
+    "class": "AdminFeedbackController",
+    "handler": "respondToFeedback",
+    "line": 88,
+    "method": "PATCH",
+    "path": "/v1/admin/feedback/{feedbackId}/respond",
+    "module": "06-feedback",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "feedbackId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "AdminRespondFeedbackRequest",
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": {
+      "response": "sample",
+      "newStatus": "ALL"
+    },
+    "fullBody": {
+      "response": "sample",
+      "newStatus": "ALL"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminFeedbackController.java",
+    "class": "AdminFeedbackController",
+    "handler": "updateFeedbackStatus",
+    "line": 101,
+    "method": "PATCH",
+    "path": "/v1/admin/feedback/{feedbackId}/status",
+    "module": "06-feedback",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "feedbackId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "AdminUpdateFeedbackStatusRequest",
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": {
+      "newStatus": "ALL"
+    },
+    "fullBody": {
+      "newStatus": "ALL"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminFeedbackController.java",
+    "class": "AdminFeedbackController",
+    "handler": "getCategoryOptions",
+    "line": 49,
+    "method": "GET",
+    "path": "/v1/admin/feedback/categories",
+    "module": "06-feedback",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<String>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminFeedbackController.java",
+    "class": "AdminFeedbackController",
+    "handler": "getStatusOptions",
+    "line": 54,
+    "method": "GET",
+    "path": "/v1/admin/feedback/statuses",
+    "module": "06-feedback",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<String>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\FeedbackController.java",
+    "class": "FeedbackController",
+    "handler": "getPublicFeedback",
+    "line": 140,
+    "method": "GET",
+    "path": "/v1/feedback",
+    "module": "06-feedback",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<FeedbackResponse>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\FeedbackController.java",
+    "class": "FeedbackController",
+    "handler": "submitFeedback",
+    "line": 123,
+    "method": "POST",
+    "path": "/v1/feedback",
+    "module": "06-feedback",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "SubmitFeedbackRequest",
+    "requestBodyOptional": false,
+    "responseType": "UUID",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "title": "Sample title",
+      "content": "Sample text",
+      "type": "COMPLAINT",
+      "category": "OTHER"
+    },
+    "fullBody": {
+      "title": "Sample title",
+      "content": "Sample text",
+      "type": "COMPLAINT",
+      "isPublic": false,
+      "category": "OTHER",
+      "location": "sample",
+      "isAnonymous": false,
+      "imageUrl": "sample"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\FeedbackController.java",
+    "class": "FeedbackController",
+    "handler": "updateFeedbackStatus",
+    "line": 167,
+    "method": "PATCH",
+    "path": "/v1/feedback/{id}/status",
+    "module": "06-feedback",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "UpdateFeedbackStatusRequest",
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": {
+      "newStatus": "OPEN"
+    },
+    "fullBody": {
+      "newStatus": "OPEN"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\FeedbackController.java",
+    "class": "FeedbackController",
+    "handler": "voteFeedback",
+    "line": 160,
+    "method": "POST",
+    "path": "/v1/feedback/{id}/vote",
+    "module": "06-feedback",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "VoteFeedbackRequest",
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": {
+      "voteType": "UP"
+    },
+    "fullBody": {
+      "voteType": "UP"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\FeedbackController.java",
+    "class": "FeedbackController",
+    "handler": "getMyFeedback",
+    "line": 147,
+    "method": "GET",
+    "path": "/v1/feedback/me",
+    "module": "06-feedback",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "MyFeedbackSummaryResponse",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AlertController.java",
+    "class": "AlertController",
+    "handler": "getActiveAlerts",
+    "line": 66,
+    "method": "GET",
+    "path": "/v1/alerts",
+    "module": "07-announcements-alerts",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<AlertResponse>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AlertController.java",
+    "class": "AlertController",
+    "handler": "reportAlert",
+    "line": 49,
+    "method": "POST",
+    "path": "/v1/alerts",
+    "module": "07-announcements-alerts",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "ReportAlertRequest",
+    "requestBodyOptional": false,
+    "responseType": "UUID",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "reporterId": "00000000-0000-0000-0000-000000000000",
+      "type": "MISSING",
+      "category": "PET",
+      "title": "Sample title",
+      "description": "Sample text"
+    },
+    "fullBody": {
+      "reporterId": "00000000-0000-0000-0000-000000000000",
+      "type": "MISSING",
+      "category": "PET",
+      "title": "Sample title",
+      "description": "Sample text",
+      "location": "sample",
+      "eventTime": "2027-01-01T10:00:00Z",
+      "photoUrls": "sample",
+      "contactNumber": "+201000000000"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AlertController.java",
+    "class": "AlertController",
+    "handler": "getAlertById",
+    "line": 73,
+    "method": "GET",
+    "path": "/v1/alerts/{id}",
+    "module": "07-announcements-alerts",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AlertResponse",
+    "statusHint": "200/201 depending on handler logic",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AlertController.java",
+    "class": "AlertController",
+    "handler": "resolveAlert",
+    "line": 82,
+    "method": "PATCH",
+    "path": "/v1/alerts/{id}/resolve",
+    "module": "07-announcements-alerts",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "ResolveAlertRequest",
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": {
+      "requestingUserId": "{{user_id}}"
+    },
+    "fullBody": {
+      "requestingUserId": "{{user_id}}"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AnnouncementController.java",
+    "class": "AnnouncementController",
+    "handler": "getActiveAnnouncements",
+    "line": 79,
+    "method": "GET",
+    "path": "/v1/announcements",
+    "module": "07-announcements-alerts",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<AnnouncementResponse>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AnnouncementController.java",
+    "class": "AnnouncementController",
+    "handler": "createAnnouncement",
+    "line": 67,
+    "method": "POST",
+    "path": "/v1/announcements",
+    "module": "07-announcements-alerts",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "CreateAnnouncementRequest",
+    "requestBodyOptional": false,
+    "responseType": "UUID",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "authorId": "00000000-0000-0000-0000-000000000000",
+      "title": "Sample title",
+      "content": "Sample text",
+      "priority": "LOW"
+    },
+    "fullBody": {
+      "authorId": "00000000-0000-0000-0000-000000000000",
+      "title": "Sample title",
+      "content": "Sample text",
+      "priority": "LOW",
+      "expiresAt": "2027-01-01T10:00:00Z"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AnnouncementController.java",
+    "class": "AnnouncementController",
+    "handler": "deactivateAnnouncement",
+    "line": 86,
+    "method": "PATCH",
+    "path": "/v1/announcements/{id}/deactivate",
+    "module": "07-announcements-alerts",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "DeactivateAnnouncementRequest",
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": {
+      "requestingUserId": "{{user_id}}"
+    },
+    "fullBody": {
+      "requestingUserId": "{{user_id}}"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\events\\internal\\api\\controllers\\AdminEventsController.java",
+    "class": "AdminEventsController",
+    "handler": "getDashboard",
+    "line": 78,
+    "method": "GET",
+    "path": "/v1/admin/events",
+    "module": "08-events",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [
+      {
+        "name": "search",
+        "type": "String",
+        "required": false,
+        "defaultValue": null
+      },
+      {
+        "name": "status",
+        "type": "AdminEventStatusFilter",
+        "required": false,
+        "defaultValue": "ALL"
+      },
+      {
+        "name": "category",
+        "type": "String",
+        "required": false,
+        "defaultValue": null
+      },
+      {
+        "name": "page",
+        "type": "int",
+        "required": false,
+        "defaultValue": "0"
+      },
+      {
+        "name": "size",
+        "type": "int",
+        "required": false,
+        "defaultValue": "9"
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminEventsManagerService.AdminEventsDashboardResponse",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\events\\internal\\api\\controllers\\AdminEventsController.java",
+    "class": "AdminEventsController",
+    "handler": "createEvent",
+    "line": 99,
+    "method": "POST",
+    "path": "/v1/admin/events",
+    "module": "08-events",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "AdminCreateEventRequest",
+    "requestBodyOptional": false,
+    "responseType": "UUID",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "organizerId": "00000000-0000-0000-0000-000000000000",
+      "title": "Sample title",
+      "description": "Sample text",
+      "hostName": "Sample name",
+      "category": "OTHER",
+      "contactPhone": "+201000000000"
+    },
+    "fullBody": {
+      "organizerId": "00000000-0000-0000-0000-000000000000",
+      "title": "Sample title",
+      "description": "Sample text",
+      "location": "sample",
+      "startDate": "2027-01-01T10:00:00Z",
+      "endDate": "2027-01-01T10:00:00Z",
+      "imageUrl": "sample",
+      "hostName": "Sample name",
+      "price": 150.0,
+      "maxAttendees": 1,
+      "category": "OTHER",
+      "hostRole": "sample",
+      "contactPhone": "+201000000000",
+      "latitude": 150.0,
+      "longitude": 150.0,
+      "date": "sample",
+      "time": "sample",
+      "duration": 1,
+      "durationUnit": "sample",
+      "tags": "VALUE",
+      "recurringEvent": false
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\events\\internal\\api\\controllers\\AdminEventsController.java",
+    "class": "AdminEventsController",
+    "handler": "deleteEvent",
+    "line": 185,
+    "method": "DELETE",
+    "path": "/v1/admin/events/{eventId}",
+    "module": "08-events",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "eventId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [
+      {
+        "name": "adminId",
+        "type": "UUID",
+        "required": false,
+        "defaultValue": null
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\events\\internal\\api\\controllers\\AdminEventsController.java",
+    "class": "AdminEventsController",
+    "handler": "editEvent",
+    "line": 154,
+    "method": "PATCH",
+    "path": "/v1/admin/events/{eventId}",
+    "module": "08-events",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "eventId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "AdminEventCardMenuService.AdminUpdateEventRequest",
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": {
+      "sample": "value"
+    },
+    "fullBody": {
+      "sample": "value"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\events\\internal\\api\\controllers\\AdminEventsController.java",
+    "class": "AdminEventsController",
+    "handler": "approveEvent",
+    "line": 128,
+    "method": "PATCH",
+    "path": "/v1/admin/events/{eventId}/approve",
+    "module": "08-events",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "eventId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "AdminActorRequest",
+    "requestBodyOptional": true,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": {
+      "adminId": "00000000-0000-0000-0000-000000000000"
+    },
+    "fullBody": {
+      "adminId": "00000000-0000-0000-0000-000000000000"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\events\\internal\\api\\controllers\\AdminEventsController.java",
+    "class": "AdminEventsController",
+    "handler": "exportAttendees",
+    "line": 176,
+    "method": "GET",
+    "path": "/v1/admin/events/{eventId}/attendees/export",
+    "module": "08-events",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "eventId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "byte[]",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\events\\internal\\api\\controllers\\AdminEventsController.java",
+    "class": "AdminEventsController",
+    "handler": "completeEvent",
+    "line": 142,
+    "method": "PATCH",
+    "path": "/v1/admin/events/{eventId}/complete",
+    "module": "08-events",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "eventId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "AdminActorRequest",
+    "requestBodyOptional": true,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": {
+      "adminId": "00000000-0000-0000-0000-000000000000"
+    },
+    "fullBody": {
+      "adminId": "00000000-0000-0000-0000-000000000000"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\events\\internal\\api\\controllers\\AdminEventsController.java",
+    "class": "AdminEventsController",
+    "handler": "getEventCardDetails",
+    "line": 149,
+    "method": "GET",
+    "path": "/v1/admin/events/{eventId}/details",
+    "module": "08-events",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "eventId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminEventCardMenuService.AdminEventCardDetailsResponse",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\events\\internal\\api\\controllers\\AdminEventsController.java",
+    "class": "AdminEventsController",
+    "handler": "notifyResidents",
+    "line": 163,
+    "method": "POST",
+    "path": "/v1/admin/events/{eventId}/notify-residents",
+    "module": "08-events",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "eventId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "AdminNotifyResidentsRequest",
+    "requestBodyOptional": true,
+    "responseType": "AdminEventCardMenuService.NotifyResidentsResult",
+    "statusHint": "200 OK",
+    "minimalBody": {
+      "title": "Sample title",
+      "message": "Sample text",
+      "channel": "PUSH"
+    },
+    "fullBody": {
+      "title": "Sample title",
+      "message": "Sample text",
+      "channel": "PUSH"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\events\\internal\\api\\controllers\\AdminEventsController.java",
+    "class": "AdminEventsController",
+    "handler": "rejectEvent",
+    "line": 135,
+    "method": "PATCH",
+    "path": "/v1/admin/events/{eventId}/reject",
+    "module": "08-events",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "eventId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "AdminActorRequest",
+    "requestBodyOptional": true,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": {
+      "adminId": "00000000-0000-0000-0000-000000000000"
+    },
+    "fullBody": {
+      "adminId": "00000000-0000-0000-0000-000000000000"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\events\\internal\\api\\controllers\\AdminEventsController.java",
+    "class": "AdminEventsController",
+    "handler": "getCategoryOptions",
+    "line": 89,
+    "method": "GET",
+    "path": "/v1/admin/events/categories",
+    "module": "08-events",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<String>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\events\\internal\\api\\controllers\\AdminEventsController.java",
+    "class": "AdminEventsController",
+    "handler": "getStatusOptions",
+    "line": 94,
+    "method": "GET",
+    "path": "/v1/admin/events/statuses",
+    "module": "08-events",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<String>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\events\\internal\\api\\controllers\\EventController.java",
+    "class": "EventController",
+    "handler": "listEvents",
+    "line": 58,
+    "method": "GET",
+    "path": "/v1/events",
+    "module": "08-events",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [
+      {
+        "name": "status",
+        "type": "EventStatus",
+        "required": false,
+        "defaultValue": null
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<EventDto>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\events\\internal\\api\\controllers\\EventController.java",
+    "class": "EventController",
+    "handler": "proposeEvent",
+    "line": 47,
+    "method": "POST",
+    "path": "/v1/events",
+    "module": "08-events",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "ProposeEventCommand",
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "200/201 depending on handler logic",
+    "minimalBody": {
+      "organizerId": "00000000-0000-0000-0000-000000000000",
+      "title": "Sample title",
+      "description": "Sample text",
+      "hostName": "Sample name",
+      "category": "OTHER",
+      "contactPhone": "+201000000000"
+    },
+    "fullBody": {
+      "organizerId": "00000000-0000-0000-0000-000000000000",
+      "title": "Sample title",
+      "description": "Sample text",
+      "location": "sample",
+      "startDate": "2027-01-01T10:00:00Z",
+      "endDate": "2027-01-01T10:00:00Z",
+      "imageUrl": "sample",
+      "hostName": "Sample name",
+      "price": 150.0,
+      "maxAttendees": 1,
+      "category": "OTHER",
+      "hostRole": "sample",
+      "contactPhone": "+201000000000",
+      "latitude": 150.0,
+      "longitude": 150.0,
+      "tags": "sample",
+      "recurringEvent": false
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\events\\internal\\api\\controllers\\EventController.java",
+    "class": "EventController",
+    "handler": "getEventDetails",
+    "line": 64,
+    "method": "GET",
+    "path": "/v1/events/{id}",
+    "module": "08-events",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "EventDto",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\events\\internal\\api\\controllers\\EventController.java",
+    "class": "EventController",
+    "handler": "approveEvent",
+    "line": 71,
+    "method": "PATCH",
+    "path": "/v1/events/{id}/approve",
+    "module": "08-events",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [
+      {
+        "name": "adminId",
+        "type": "UUID",
+        "required": true,
+        "defaultValue": null
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\events\\internal\\api\\controllers\\EventController.java",
+    "class": "EventController",
+    "handler": "cancelRegistration",
+    "line": 89,
+    "method": "DELETE",
+    "path": "/v1/events/{id}/register",
+    "module": "08-events",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [
+      {
+        "name": "residentId",
+        "type": "UUID",
+        "required": true,
+        "defaultValue": null
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\events\\internal\\api\\controllers\\EventController.java",
+    "class": "EventController",
+    "handler": "registerForEvent",
+    "line": 83,
+    "method": "POST",
+    "path": "/v1/events/{id}/register",
+    "module": "08-events",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [
+      {
+        "name": "residentId",
+        "type": "UUID",
+        "required": true,
+        "defaultValue": null
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\events\\internal\\api\\controllers\\EventController.java",
+    "class": "EventController",
+    "handler": "rejectEvent",
+    "line": 77,
+    "method": "PATCH",
+    "path": "/v1/events/{id}/reject",
+    "module": "08-events",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [
+      {
+        "name": "adminId",
+        "type": "UUID",
+        "required": true,
+        "defaultValue": null
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\notifications\\internal\\api\\controllers\\AdminCommunicationsController.java",
+    "class": "AdminCommunicationsController",
+    "handler": "createAnnouncement",
+    "line": 96,
+    "method": "POST",
+    "path": "/v1/admin/communications/announcements",
+    "module": "09-notifications-communications",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "AdminCreateAnnouncementRequest",
+    "requestBodyOptional": false,
+    "responseType": "UUID",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "authorId": "00000000-0000-0000-0000-000000000000",
+      "title": "Sample title",
+      "content": "Sample text",
+      "priority": "NORMAL"
+    },
+    "fullBody": {
+      "authorId": "00000000-0000-0000-0000-000000000000",
+      "title": "Sample title",
+      "content": "Sample text",
+      "priority": "NORMAL",
+      "expiresAt": "2027-01-01T10:00:00Z"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\notifications\\internal\\api\\controllers\\AdminCommunicationsController.java",
+    "class": "AdminCommunicationsController",
+    "handler": "deleteAnnouncementItem",
+    "line": 130,
+    "method": "DELETE",
+    "path": "/v1/admin/communications/announcements/{announcementId}",
+    "module": "09-notifications-communications",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "announcementId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\notifications\\internal\\api\\controllers\\AdminCommunicationsController.java",
+    "class": "AdminCommunicationsController",
+    "handler": "getAnnouncementItem",
+    "line": 109,
+    "method": "GET",
+    "path": "/v1/admin/communications/announcements/{announcementId}",
+    "module": "09-notifications-communications",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "announcementId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminCommunicationsCenterService.CommunicationCardItem",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\notifications\\internal\\api\\controllers\\AdminCommunicationsController.java",
+    "class": "AdminCommunicationsController",
+    "handler": "updateAnnouncementItem",
+    "line": 114,
+    "method": "PATCH",
+    "path": "/v1/admin/communications/announcements/{announcementId}",
+    "module": "09-notifications-communications",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "announcementId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "AdminUpdateAnnouncementRequest",
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": {
+      "title": "Sample title",
+      "content": "Sample text",
+      "priority": "NORMAL"
+    },
+    "fullBody": {
+      "title": "Sample title",
+      "content": "Sample text",
+      "priority": "NORMAL",
+      "expiresAt": "2027-01-01T10:00:00Z",
+      "active": false
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\notifications\\internal\\api\\controllers\\AdminCommunicationsController.java",
+    "class": "AdminCommunicationsController",
+    "handler": "getCenter",
+    "line": 34,
+    "method": "GET",
+    "path": "/v1/admin/communications/center",
+    "module": "09-notifications-communications",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [
+      {
+        "name": "tab",
+        "type": "String",
+        "required": false,
+        "defaultValue": "PUSH_NOTIFICATIONS"
+      },
+      {
+        "name": "status",
+        "type": "String",
+        "required": false,
+        "defaultValue": "ALL"
+      },
+      {
+        "name": "search",
+        "type": "String",
+        "required": false,
+        "defaultValue": null
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminCommunicationsCenterService.AdminCommunicationsCenterResponse",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\notifications\\internal\\api\\controllers\\AdminCommunicationsController.java",
+    "class": "AdminCommunicationsController",
+    "handler": "createPushNotification",
+    "line": 43,
+    "method": "POST",
+    "path": "/v1/admin/communications/notifications",
+    "module": "09-notifications-communications",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "AdminCreatePushNotificationRequest",
+    "requestBodyOptional": false,
+    "responseType": "AdminCommunicationsCenterService.CreatePushNotificationResult",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "adminId": "00000000-0000-0000-0000-000000000000",
+      "recipientIds": "00000000-0000-0000-0000-000000000000",
+      "title": "Sample title",
+      "priority": "NORMAL"
+    },
+    "fullBody": {
+      "adminId": "00000000-0000-0000-0000-000000000000",
+      "recipientIds": "00000000-0000-0000-0000-000000000000",
+      "sendToAll": false,
+      "title": "Sample title",
+      "message": "Sample text",
+      "priority": "NORMAL",
+      "scheduleAt": "2027-01-01T10:00:00Z"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\notifications\\internal\\api\\controllers\\AdminCommunicationsController.java",
+    "class": "AdminCommunicationsController",
+    "handler": "deleteNotificationItem",
+    "line": 87,
+    "method": "DELETE",
+    "path": "/v1/admin/communications/notifications/{itemId}",
+    "module": "09-notifications-communications",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "itemId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [
+      {
+        "name": "tab",
+        "type": "String",
+        "required": false,
+        "defaultValue": "PUSH_NOTIFICATIONS"
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\notifications\\internal\\api\\controllers\\AdminCommunicationsController.java",
+    "class": "AdminCommunicationsController",
+    "handler": "getNotificationItem",
+    "line": 62,
+    "method": "GET",
+    "path": "/v1/admin/communications/notifications/{itemId}",
+    "module": "09-notifications-communications",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "itemId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [
+      {
+        "name": "tab",
+        "type": "String",
+        "required": false,
+        "defaultValue": "PUSH_NOTIFICATIONS"
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminCommunicationsCenterService.CommunicationCardItem",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\notifications\\internal\\api\\controllers\\AdminCommunicationsController.java",
+    "class": "AdminCommunicationsController",
+    "handler": "updateNotificationItem",
+    "line": 70,
+    "method": "PATCH",
+    "path": "/v1/admin/communications/notifications/{itemId}",
+    "module": "09-notifications-communications",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "itemId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [
+      {
+        "name": "tab",
+        "type": "String",
+        "required": false,
+        "defaultValue": "PUSH_NOTIFICATIONS"
+      }
+    ],
+    "requestBodyType": "AdminUpdateNotificationRequest",
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": {
+      "title": "Sample title",
+      "priority": "NORMAL"
+    },
+    "fullBody": {
+      "title": "Sample title",
+      "message": "Sample text",
+      "priority": "NORMAL",
+      "sendNow": false
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\notifications\\internal\\api\\controllers\\DeviceTokenController.java",
+    "class": "DeviceTokenController",
+    "handler": "registerDeviceToken",
+    "line": 34,
+    "method": "POST",
+    "path": "/v1/device-tokens",
+    "module": "09-notifications-communications",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "RegisterDeviceTokenRequest",
+    "requestBodyOptional": false,
+    "responseType": "UUID",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "userId": "{{user_id}}",
+      "token": "sample",
+      "platform": "ANDROID"
+    },
+    "fullBody": {
+      "userId": "{{user_id}}",
+      "token": "sample",
+      "platform": "ANDROID"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\notifications\\internal\\api\\controllers\\DeviceTokenController.java",
+    "class": "DeviceTokenController",
+    "handler": "deactivateDeviceToken",
+    "line": 42,
+    "method": "DELETE",
+    "path": "/v1/device-tokens/{id}",
+    "module": "09-notifications-communications",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\notifications\\internal\\api\\controllers\\NotificationController.java",
+    "class": "NotificationController",
+    "handler": "listNotifications",
+    "line": 50,
+    "method": "GET",
+    "path": "/v1/notifications",
+    "module": "09-notifications-communications",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [
+      {
+        "name": "recipientId",
+        "type": "UUID",
+        "required": true,
+        "defaultValue": null
+      },
+      {
+        "name": "status",
+        "type": "NotificationStatus",
+        "required": false,
+        "defaultValue": null
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<NotificationResponse>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\notifications\\internal\\api\\controllers\\NotificationController.java",
+    "class": "NotificationController",
+    "handler": "markAsRead",
+    "line": 62,
+    "method": "PATCH",
+    "path": "/v1/notifications/{id}/read",
+    "module": "09-notifications-communications",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [
+      {
+        "name": "id",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [
+      {
+        "name": "recipientId",
+        "type": "UUID",
+        "required": true,
+        "defaultValue": null
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\notifications\\internal\\api\\controllers\\NotificationController.java",
+    "class": "NotificationController",
+    "handler": "markAllAsRead",
+    "line": 68,
+    "method": "PATCH",
+    "path": "/v1/notifications/read-all",
+    "module": "09-notifications-communications",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [
+      {
+        "name": "recipientId",
+        "type": "UUID",
+        "required": true,
+        "defaultValue": null
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\notifications\\internal\\api\\controllers\\NotificationController.java",
+    "class": "NotificationController",
+    "handler": "sendNotification",
+    "line": 74,
+    "method": "POST",
+    "path": "/v1/notifications/send",
+    "module": "09-notifications-communications",
+    "auth": "Bearer token (authenticated user)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "SendNotificationRequest",
+    "requestBodyOptional": false,
+    "responseType": "UUID",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "recipientId": "00000000-0000-0000-0000-000000000000",
+      "title": "Sample title",
+      "type": "MAINTENANCE_UPDATE",
+      "referenceId": "00000000-0000-0000-0000-000000000000"
+    },
+    "fullBody": {
+      "recipientId": "00000000-0000-0000-0000-000000000000",
+      "title": "Sample title",
+      "body": "sample",
+      "type": "MAINTENANCE_UPDATE",
+      "referenceId": "00000000-0000-0000-0000-000000000000",
+      "channel": "PUSH"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminMissingFoundController.java",
+    "class": "AdminMissingFoundController",
+    "handler": "getCategoryOptions",
+    "line": 176,
+    "method": "GET",
+    "path": "/v1/admin/missing-found/categories",
+    "module": "10-admin-missing-found",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<String>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminMissingFoundController.java",
+    "class": "AdminMissingFoundController",
+    "handler": "getReports",
+    "line": 57,
+    "method": "GET",
+    "path": "/v1/admin/missing-found/reports",
+    "module": "10-admin-missing-found",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [
+      {
+        "name": "search",
+        "type": "String",
+        "required": false,
+        "defaultValue": null
+      },
+      {
+        "name": "type",
+        "type": "String",
+        "required": false,
+        "defaultValue": "ALL"
+      },
+      {
+        "name": "status",
+        "type": "String",
+        "required": false,
+        "defaultValue": "ALL"
+      },
+      {
+        "name": "category",
+        "type": "String",
+        "required": false,
+        "defaultValue": null
+      },
+      {
+        "name": "page",
+        "type": "int",
+        "required": false,
+        "defaultValue": "0"
+      },
+      {
+        "name": "size",
+        "type": "int",
+        "required": false,
+        "defaultValue": "25"
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminMissingFoundService.MissingFoundReportsPage",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminMissingFoundController.java",
+    "class": "AdminMissingFoundController",
+    "handler": "createReport",
+    "line": 101,
+    "method": "POST",
+    "path": "/v1/admin/missing-found/reports",
+    "module": "10-admin-missing-found",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "AdminMissingFoundCreateRequest",
+    "requestBodyOptional": false,
+    "responseType": "UUID",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "reporterId": "00000000-0000-0000-0000-000000000000",
+      "residentId": "{{user_id}}",
+      "type": "sample",
+      "category": "OTHER",
+      "description": "Sample text"
+    },
+    "fullBody": {
+      "reporterId": "00000000-0000-0000-0000-000000000000",
+      "residentId": "{{user_id}}",
+      "type": "sample",
+      "category": "OTHER",
+      "description": "Sample text",
+      "location": "sample",
+      "eventTime": "2027-01-01T10:00:00Z",
+      "photoUrls": "sample"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminMissingFoundController.java",
+    "class": "AdminMissingFoundController",
+    "handler": "deleteReport",
+    "line": 160,
+    "method": "DELETE",
+    "path": "/v1/admin/missing-found/reports/{reportId}",
+    "module": "10-admin-missing-found",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "reportId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminMissingFoundController.java",
+    "class": "AdminMissingFoundController",
+    "handler": "getReport",
+    "line": 91,
+    "method": "GET",
+    "path": "/v1/admin/missing-found/reports/{reportId}",
+    "module": "10-admin-missing-found",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "reportId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminMissingFoundService.MissingFoundReportDetails",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminMissingFoundController.java",
+    "class": "AdminMissingFoundController",
+    "handler": "updateReport",
+    "line": 118,
+    "method": "PATCH",
+    "path": "/v1/admin/missing-found/reports/{reportId}",
+    "module": "10-admin-missing-found",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "reportId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "AdminMissingFoundUpdateRequest",
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": {
+      "type": "sample",
+      "category": "OTHER",
+      "description": "Sample text"
+    },
+    "fullBody": {
+      "type": "sample",
+      "category": "OTHER",
+      "description": "Sample text",
+      "location": "sample",
+      "eventTime": "2027-01-01T10:00:00Z",
+      "photoUrls": "sample"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminMissingFoundController.java",
+    "class": "AdminMissingFoundController",
+    "handler": "getReportDetails",
+    "line": 96,
+    "method": "GET",
+    "path": "/v1/admin/missing-found/reports/{reportId}/details",
+    "module": "10-admin-missing-found",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "reportId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminMissingFoundService.MissingFoundReportDetails",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminMissingFoundController.java",
+    "class": "AdminMissingFoundController",
+    "handler": "markMatched",
+    "line": 136,
+    "method": "PATCH",
+    "path": "/v1/admin/missing-found/reports/{reportId}/mark-matched",
+    "module": "10-admin-missing-found",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "reportId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminMissingFoundController.java",
+    "class": "AdminMissingFoundController",
+    "handler": "markResolved",
+    "line": 142,
+    "method": "PATCH",
+    "path": "/v1/admin/missing-found/reports/{reportId}/mark-resolved",
+    "module": "10-admin-missing-found",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "reportId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminMissingFoundController.java",
+    "class": "AdminMissingFoundController",
+    "handler": "notifyUser",
+    "line": 148,
+    "method": "POST",
+    "path": "/v1/admin/missing-found/reports/{reportId}/notify-user",
+    "module": "10-admin-missing-found",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "reportId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "AdminMissingFoundNotifyUserRequest",
+    "requestBodyOptional": true,
+    "responseType": "AdminMissingFoundService.NotifyUserResult",
+    "statusHint": "200 OK",
+    "minimalBody": {
+      "title": "Sample title"
+    },
+    "fullBody": {
+      "title": "Sample title"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminMissingFoundController.java",
+    "class": "AdminMissingFoundController",
+    "handler": "updateStatus",
+    "line": 127,
+    "method": "PATCH",
+    "path": "/v1/admin/missing-found/reports/{reportId}/status",
+    "module": "10-admin-missing-found",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "reportId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "AdminMissingFoundStatusRequest",
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": {
+      "status": "OPEN"
+    },
+    "fullBody": {
+      "status": "OPEN"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminMissingFoundController.java",
+    "class": "AdminMissingFoundController",
+    "handler": "getResidentOptions",
+    "line": 181,
+    "method": "GET",
+    "path": "/v1/admin/missing-found/residents/options",
+    "module": "10-admin-missing-found",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [
+      {
+        "name": "search",
+        "type": "String",
+        "required": false,
+        "defaultValue": null
+      },
+      {
+        "name": "page",
+        "type": "int",
+        "required": false,
+        "defaultValue": "0"
+      },
+      {
+        "name": "size",
+        "type": "int",
+        "required": false,
+        "defaultValue": "25"
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminResidentOptionsPage",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminMissingFoundController.java",
+    "class": "AdminMissingFoundController",
+    "handler": "getStatusOptions",
+    "line": 171,
+    "method": "GET",
+    "path": "/v1/admin/missing-found/statuses",
+    "module": "10-admin-missing-found",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<String>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminMissingFoundController.java",
+    "class": "AdminMissingFoundController",
+    "handler": "getSummary",
+    "line": 76,
+    "method": "GET",
+    "path": "/v1/admin/missing-found/summary",
+    "module": "10-admin-missing-found",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [
+      {
+        "name": "search",
+        "type": "String",
+        "required": false,
+        "defaultValue": null
+      },
+      {
+        "name": "type",
+        "type": "String",
+        "required": false,
+        "defaultValue": "ALL"
+      },
+      {
+        "name": "status",
+        "type": "String",
+        "required": false,
+        "defaultValue": "ALL"
+      },
+      {
+        "name": "category",
+        "type": "String",
+        "required": false,
+        "defaultValue": null
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminMissingFoundService.MissingFoundSummary",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\community\\internal\\api\\controllers\\AdminMissingFoundController.java",
+    "class": "AdminMissingFoundController",
+    "handler": "getTypeOptions",
+    "line": 166,
+    "method": "GET",
+    "path": "/v1/admin/missing-found/types",
+    "module": "10-admin-missing-found",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<String>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AdminResidentsController.java",
+    "class": "AdminResidentsController",
+    "handler": "listResidents",
+    "line": 89,
+    "method": "GET",
+    "path": "/v1/admin/residents",
+    "module": "11-admin-residents",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [
+      {
+        "name": "search",
+        "type": "String",
+        "required": false,
+        "defaultValue": null
+      },
+      {
+        "name": "buildingId",
+        "type": "UUID",
+        "required": false,
+        "defaultValue": null
+      },
+      {
+        "name": "status",
+        "type": "ResidentDirectoryStatus",
+        "required": false,
+        "defaultValue": null
+      },
+      {
+        "name": "approvalStatus",
+        "type": "ResidentApprovalStatus",
+        "required": false,
+        "defaultValue": null
+      },
+      {
+        "name": "page",
+        "type": "int",
+        "required": false,
+        "defaultValue": "0"
+      },
+      {
+        "name": "size",
+        "type": "int",
+        "required": false,
+        "defaultValue": "25"
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminResidentDirectoryService.AdminResidentDirectoryPage",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AdminResidentsController.java",
+    "class": "AdminResidentsController",
+    "handler": "createResident",
+    "line": 166,
+    "method": "POST",
+    "path": "/v1/admin/residents",
+    "module": "11-admin-residents",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "CreateResidentRequest",
+    "requestBodyOptional": false,
+    "responseType": "UUID",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "firstName": "Sample name",
+      "lastName": "Sample name",
+      "phoneNumber": "+201000000000",
+      "email": "user@example.com",
+      "password": "Password123!",
+      "type": "PROPERTY_OWNER",
+      "unitId": "{{unit_id}}",
+      "loginMethod": "PHONE_OTP",
+      "approvalStatus": "PENDING",
+      "nationalId": "sample"
+    },
+    "fullBody": {
+      "firstName": "Sample name",
+      "lastName": "Sample name",
+      "phoneNumber": "+201000000000",
+      "email": "user@example.com",
+      "password": "Password123!",
+      "type": "PROPERTY_OWNER",
+      "unitId": "{{unit_id}}",
+      "loginMethod": "PHONE_OTP",
+      "approvalStatus": "PENDING",
+      "moveInDate": "2027-01-01",
+      "monthlyFee": 150.0,
+      "nationalId": "sample"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AdminResidentsController.java",
+    "class": "AdminResidentsController",
+    "handler": "deactivateResident",
+    "line": 316,
+    "method": "DELETE",
+    "path": "/v1/admin/residents/{residentId}",
+    "module": "11-admin-residents",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "residentId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AdminResidentsController.java",
+    "class": "AdminResidentsController",
+    "handler": "getResident",
+    "line": 109,
+    "method": "GET",
+    "path": "/v1/admin/residents/{residentId}",
+    "module": "11-admin-residents",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "residentId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminResidentDirectoryService.AdminResidentDirectoryItem",
+    "statusHint": "200/201 depending on handler logic",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AdminResidentsController.java",
+    "class": "AdminResidentsController",
+    "handler": "updateResident",
+    "line": 232,
+    "method": "PATCH",
+    "path": "/v1/admin/residents/{residentId}",
+    "module": "11-admin-residents",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "residentId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "UpdateResidentRequest",
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": {
+      "firstName": "Sample name",
+      "lastName": "Sample name",
+      "phoneNumber": "+201000000000",
+      "email": "user@example.com",
+      "unitId": "{{unit_id}}",
+      "type": "PROPERTY_OWNER",
+      "nationalId": "sample"
+    },
+    "fullBody": {
+      "firstName": "Sample name",
+      "lastName": "Sample name",
+      "phoneNumber": "+201000000000",
+      "email": "user@example.com",
+      "isActive": false,
+      "unitId": "{{unit_id}}",
+      "type": "PROPERTY_OWNER",
+      "moveInDate": "2027-01-01",
+      "monthlyFee": 150.0,
+      "nationalId": "sample"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AdminResidentsController.java",
+    "class": "AdminResidentsController",
+    "handler": "updateApprovalStatus",
+    "line": 215,
+    "method": "PATCH",
+    "path": "/v1/admin/residents/{residentId}/approval",
+    "module": "11-admin-residents",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "residentId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "UpdateResidentApprovalRequest",
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": {
+      "approvalStatus": "PENDING"
+    },
+    "fullBody": {
+      "approvalStatus": "PENDING"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AdminResidentsController.java",
+    "class": "AdminResidentsController",
+    "handler": "getResidentCard",
+    "line": 116,
+    "method": "GET",
+    "path": "/v1/admin/residents/{residentId}/card",
+    "module": "11-admin-residents",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "residentId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminResidentCardService.ResidentCardResponse",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AdminResidentsController.java",
+    "class": "AdminResidentsController",
+    "handler": "resetResidentPassword",
+    "line": 286,
+    "method": "POST",
+    "path": "/v1/admin/residents/{residentId}/reset-password",
+    "module": "11-admin-residents",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "residentId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "ResetPasswordRequest",
+    "requestBodyOptional": true,
+    "responseType": "ResetPasswordResponse",
+    "statusHint": "200 OK",
+    "minimalBody": {
+      "newPassword": "Password123!"
+    },
+    "fullBody": {
+      "newPassword": "Password123!"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AdminResidentsController.java",
+    "class": "AdminResidentsController",
+    "handler": "listResidentBuildings",
+    "line": 121,
+    "method": "GET",
+    "path": "/v1/admin/residents/buildings",
+    "module": "11-admin-residents",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<AdminResidentDirectoryService.AdminResidentBuildingOption>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AdminResidentsController.java",
+    "class": "AdminResidentsController",
+    "handler": "listResidentUnits",
+    "line": 126,
+    "method": "GET",
+    "path": "/v1/admin/residents/units",
+    "module": "11-admin-residents",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [
+      {
+        "name": "buildingId",
+        "type": "UUID",
+        "required": false,
+        "defaultValue": null
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<ResidentUnitOptionResponse>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AdminEmployeesController.java",
+    "class": "AdminEmployeesController",
+    "handler": "listEmployees",
+    "line": 35,
+    "method": "GET",
+    "path": "/v1/admin/employees",
+    "module": "12-admin-employees",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [
+      {
+        "name": "search",
+        "type": "String",
+        "required": false,
+        "defaultValue": null
+      },
+      {
+        "name": "role",
+        "type": "String",
+        "required": false,
+        "defaultValue": "ALL"
+      },
+      {
+        "name": "status",
+        "type": "String",
+        "required": false,
+        "defaultValue": "ALL"
+      },
+      {
+        "name": "page",
+        "type": "int",
+        "required": false,
+        "defaultValue": "0"
+      },
+      {
+        "name": "size",
+        "type": "int",
+        "required": false,
+        "defaultValue": "25"
+      }
+    ],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminEmployeeDirectoryService.AdminEmployeesDashboardResponse",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AdminEmployeesController.java",
+    "class": "AdminEmployeesController",
+    "handler": "createEmployee",
+    "line": 67,
+    "method": "POST",
+    "path": "/v1/admin/employees",
+    "module": "12-admin-employees",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": "AdminCreateEmployeeRequest",
+    "requestBodyOptional": false,
+    "responseType": "AdminEmployeeDirectoryService.CreateEmployeeResult",
+    "statusHint": "201 Created",
+    "minimalBody": {
+      "fullName": "Sample name",
+      "firstName": "Sample name",
+      "lastName": "Sample name",
+      "phoneNumber": "+201000000000",
+      "email": "user@example.com",
+      "password": "Password123!",
+      "confirmPassword": "Password123!",
+      "loginMethod": "PHONE_OTP"
+    },
+    "fullBody": {
+      "fullName": "Sample name",
+      "firstName": "Sample name",
+      "lastName": "Sample name",
+      "phoneNumber": "+201000000000",
+      "email": "user@example.com",
+      "password": "Password123!",
+      "confirmPassword": "Password123!",
+      "role": "sample",
+      "hireDate": "2027-01-01",
+      "department": "sample",
+      "isSuperAdmin": false,
+      "isActive": false,
+      "isPhoneVerified": false,
+      "loginMethod": "PHONE_OTP",
+      "scopePermissions": "sample",
+      "specializations": "sample",
+      "technicianAvailable": false
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AdminEmployeesController.java",
+    "class": "AdminEmployeesController",
+    "handler": "deactivateEmployee",
+    "line": 152,
+    "method": "DELETE",
+    "path": "/v1/admin/employees/{employeeId}",
+    "module": "12-admin-employees",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "employeeId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AdminEmployeesController.java",
+    "class": "AdminEmployeesController",
+    "handler": "getEmployee",
+    "line": 52,
+    "method": "GET",
+    "path": "/v1/admin/employees/{employeeId}",
+    "module": "12-admin-employees",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "employeeId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "AdminEmployeeDirectoryService.AdminEmployeeItem",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AdminEmployeesController.java",
+    "class": "AdminEmployeesController",
+    "handler": "updateEmployee",
+    "line": 96,
+    "method": "PATCH",
+    "path": "/v1/admin/employees/{employeeId}",
+    "module": "12-admin-employees",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "employeeId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "AdminUpdateEmployeeRequest",
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": {
+      "fullName": "Sample name",
+      "firstName": "Sample name",
+      "lastName": "Sample name",
+      "phoneNumber": "+201000000000",
+      "email": "user@example.com",
+      "password": "Password123!",
+      "confirmPassword": "Password123!",
+      "loginMethod": "PHONE_OTP"
+    },
+    "fullBody": {
+      "fullName": "Sample name",
+      "firstName": "Sample name",
+      "lastName": "Sample name",
+      "phoneNumber": "+201000000000",
+      "email": "user@example.com",
+      "password": "Password123!",
+      "confirmPassword": "Password123!",
+      "role": "sample",
+      "hireDate": "2027-01-01",
+      "department": "sample",
+      "isSuperAdmin": false,
+      "isActive": false,
+      "isPhoneVerified": false,
+      "loginMethod": "PHONE_OTP",
+      "scopePermissions": "sample",
+      "specializations": "sample",
+      "technicianAvailable": false
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AdminEmployeesController.java",
+    "class": "AdminEmployeesController",
+    "handler": "resetPassword",
+    "line": 143,
+    "method": "POST",
+    "path": "/v1/admin/employees/{employeeId}/reset-password",
+    "module": "12-admin-employees",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "employeeId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "AdminResetPasswordRequest",
+    "requestBodyOptional": true,
+    "responseType": "AdminEmployeeDirectoryService.ResetPasswordResult",
+    "statusHint": "200 OK",
+    "minimalBody": {
+      "newPassword": "Password123!"
+    },
+    "fullBody": {
+      "newPassword": "Password123!"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AdminEmployeesController.java",
+    "class": "AdminEmployeesController",
+    "handler": "updateStatus",
+    "line": 127,
+    "method": "PATCH",
+    "path": "/v1/admin/employees/{employeeId}/status",
+    "module": "12-admin-employees",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [
+      {
+        "name": "employeeId",
+        "type": "UUID"
+      }
+    ],
+    "queryParams": [],
+    "requestBodyType": "AdminUpdateEmployeeStatusRequest",
+    "requestBodyOptional": false,
+    "responseType": "Void",
+    "statusHint": "204 No Content",
+    "minimalBody": {
+      "isActive": false,
+      "status": "OPEN"
+    },
+    "fullBody": {
+      "isActive": false,
+      "status": "OPEN"
+    }
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AdminEmployeesController.java",
+    "class": "AdminEmployeesController",
+    "handler": "getRoleOptions",
+    "line": 57,
+    "method": "GET",
+    "path": "/v1/admin/employees/roles",
+    "module": "12-admin-employees",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<String>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  },
+  {
+    "file": "C:\\Users\\M16-PC\\Projects\\Sakany\\src\\main\\java\\com\\theMs\\sakany\\accounts\\internal\\api\\controllers\\AdminEmployeesController.java",
+    "class": "AdminEmployeesController",
+    "handler": "getStatusOptions",
+    "line": 62,
+    "method": "GET",
+    "path": "/v1/admin/employees/statuses",
+    "module": "12-admin-employees",
+    "auth": "Admin Bearer token (ROLE_ADMIN)",
+    "pathParams": [],
+    "queryParams": [],
+    "requestBodyType": null,
+    "requestBodyOptional": false,
+    "responseType": "List<String>",
+    "statusHint": "200 OK",
+    "minimalBody": null,
+    "fullBody": null
+  }
+]

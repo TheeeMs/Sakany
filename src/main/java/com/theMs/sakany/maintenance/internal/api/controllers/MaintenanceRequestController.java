@@ -9,8 +9,12 @@ import com.theMs.sakany.maintenance.internal.application.commands.*;
 import com.theMs.sakany.maintenance.internal.application.queries.*;
 import com.theMs.sakany.maintenance.internal.domain.MaintenanceRequest;
 import com.theMs.sakany.maintenance.internal.domain.MaintenanceStatus;
+import com.theMs.sakany.shared.exception.BusinessRuleException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -58,6 +62,11 @@ public class MaintenanceRequestController {
 
     @PostMapping
     public ResponseEntity<UUID> createRequest(@RequestBody CreateMaintenanceRequestDto dto) {
+        UUID actorId = getAuthenticatedUserId();
+        if (!isAdminActor() && (dto.residentId() == null || !actorId.equals(dto.residentId()))) {
+            throw new BusinessRuleException("residentId must match authenticated user");
+        }
+
         CreateMaintenanceRequestCommand command = new CreateMaintenanceRequestCommand(
                 dto.residentId(),
                 dto.unitId(),
@@ -105,6 +114,7 @@ public class MaintenanceRequestController {
 
     @PostMapping("/{id}/assign")
     public ResponseEntity<Void> assignTechnician(@PathVariable UUID id, @RequestBody AssignTechnicianDto dto) {
+        authorizeMutationForRequest(id);
         assignHandler.handle(new AssignTechnicianCommand(id, dto.technicianId()));
 
         timelineService.record(
@@ -119,6 +129,7 @@ public class MaintenanceRequestController {
 
     @PostMapping("/{id}/start")
     public ResponseEntity<Void> startWork(@PathVariable UUID id) {
+        authorizeMutationForRequest(id);
         startWorkHandler.handle(new StartWorkCommand(id));
 
         timelineService.record(
@@ -136,6 +147,7 @@ public class MaintenanceRequestController {
             @PathVariable UUID id,
             @RequestBody(required = false) ResolveMaintenanceRequestDto dto
         ) {
+            authorizeMutationForRequest(id);
         String resolution = dto != null ? dto.resolution() : null;
         java.math.BigDecimal totalCost = dto != null ? dto.totalCost() : null;
 
@@ -153,6 +165,7 @@ public class MaintenanceRequestController {
 
     @PostMapping("/{id}/cancel")
     public ResponseEntity<Void> cancel(@PathVariable UUID id) {
+        authorizeMutationForRequest(id);
         cancelHandler.handle(new CancelCommand(id));
 
         timelineService.record(
@@ -167,6 +180,7 @@ public class MaintenanceRequestController {
 
     @PostMapping("/{id}/reject")
     public ResponseEntity<Void> reject(@PathVariable UUID id, @RequestBody RejectRequestDto dto) {
+        authorizeMutationForRequest(id);
         rejectHandler.handle(new RejectCommand(id, dto.reason()));
 
         timelineService.record(
@@ -195,5 +209,50 @@ public class MaintenanceRequestController {
             details.append("Cost: ").append(totalCost).append(" EGP");
         }
         return details.toString();
+    }
+
+    private void authorizeMutationForRequest(UUID requestId) {
+        UUID actorId = getAuthenticatedUserId();
+        if (isAdminActor()) {
+            return;
+        }
+
+        MaintenanceRequest request = getByIdHandler.handle(new GetMaintenanceRequestByIdQuery(requestId));
+        if (!actorId.equals(request.getResidentId())) {
+            throw new BusinessRuleException("You are not allowed to modify this maintenance request");
+        }
+    }
+
+    private UUID getAuthenticatedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new BusinessRuleException("No authenticated user");
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UUID uuid) {
+            return uuid;
+        }
+
+        try {
+            return UUID.fromString(principal.toString());
+        } catch (IllegalArgumentException e) {
+            throw new BusinessRuleException("Invalid authenticated principal");
+        }
+    }
+
+    private boolean isAdminActor() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getAuthorities() == null) {
+            return false;
+        }
+
+        for (GrantedAuthority authority : authentication.getAuthorities()) {
+            if ("ROLE_ADMIN".equals(authority.getAuthority())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

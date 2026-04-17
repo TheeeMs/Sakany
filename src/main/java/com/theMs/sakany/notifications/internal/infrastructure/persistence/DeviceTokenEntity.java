@@ -46,19 +46,39 @@ public class DeviceTokenEntity extends BaseEntity {
         return userId;
     }
 
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
+
     public String getToken() {
         return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public Platform getPlatform() {
         return platform;
     }
 
+    public void setPlatform(Platform platform) {
+        this.platform = platform;
+    }
+
     public boolean isActive() {
         return isActive;
     }
 
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
     public Instant getLastUsedAt() {
         return lastUsedAt;
+    }
+
+    public void setLastUsedAt(Instant lastUsedAt) {
+        this.lastUsedAt = lastUsedAt;
     }
 }

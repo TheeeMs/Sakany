@@ -11,4 +11,8 @@ public interface ResidentProfileJpaRepository extends JpaRepository<ResidentProf
     void deleteByUserId(UUID userId);
 
     Optional<ResidentProfileEntity> findByUserId(UUID userId);
+
+    boolean existsByNationalId(String nationalId);
+
+    boolean existsByNationalIdAndUserIdNot(String nationalId, UUID userId);
 }
