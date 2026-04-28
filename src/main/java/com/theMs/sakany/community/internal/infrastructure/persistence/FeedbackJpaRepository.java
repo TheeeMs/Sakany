@@ -14,6 +14,7 @@ import java.util.UUID;
 public interface FeedbackJpaRepository extends JpaRepository<FeedbackEntity, UUID> {
     List<FeedbackEntity> findAllByOrderByCreatedAtDesc();
     List<FeedbackEntity> findByIsPublicTrueOrderByCreatedAtDesc();
+    List<FeedbackEntity> findByIsPublicTrueAndStatusOrderByCreatedAtDesc(String status);
     List<FeedbackEntity> findByAuthorIdOrderByCreatedAtDesc(UUID authorId);
 
     @Query(value = """
