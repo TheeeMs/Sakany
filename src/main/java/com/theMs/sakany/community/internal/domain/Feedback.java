@@ -63,7 +63,7 @@ public class Feedback extends AggregateRoot {
         }
 
         UUID id = UUID.randomUUID();
-        Feedback feedback = new Feedback(id, authorId, title, content, type, isPublic, FeedbackStatus.OPEN, 0, 0, category, location, isAnonymous, null, imageUrl, 0, Instant.now());
+        Feedback feedback = new Feedback(id, authorId, title, content, type, isPublic, FeedbackStatus.UNDER_REVIEW, 0, 0, category, location, isAnonymous, null, imageUrl, 0, Instant.now());
         feedback.registerEvent(new FeedbackSubmitted(id, authorId, title, content, type, isPublic, Instant.now()));
         return feedback;
     }
